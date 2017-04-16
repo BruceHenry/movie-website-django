@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>MOVIESpy</title>
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% load static %}
+    <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" id="bootstrap-css">
+    <link href="{% static "css/navbar.css" %}" rel="stylesheet">
+    <script src="{% static "js/jquery-1.10.2.min.js.download" %}"></script>
+    <script src="{% static "js/bootstrap.min.js.download" %}"></script>
+    <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
+    <style type="text/css">
+        #TrailerWindow {
+            width: 600px;
+            height: 350px;
+            box-shadow: 0px 0px 10px #000;
+            position: absolute;
+            z-index: 101;
+            display: none;
+        }
+
+        #TrailerWindow #title {
+            height: 50px;
+            background: #000000;
+            color: #fff;
+            font-size: 30px;
+            text-indent: 35px;
+            line-height: 50px;
+            cursor: move;
+        }
+
+        #TrailerWindow #title button {
+            width: 20px;
+            height: 20px;
+            color: white;
+            float: right;
+            margin: 10px 20px 0px 0px;
+            display: inline-block;
+        }
+
+        #TrailerWindow #videoControl {
+            width: 600px;
+            height: 500px;
+            background: #000000;
+        }
+
+        .Layer {
+            background: #000;
+            position: absolute;
+            top: 0px;
+            fillter: Alpha(opacity=60);
+            -moz-opacity: 0.6;
+            opacity: 0.6;
+            z-index: 100;
+            display: none;
+        }
+
+        .button_trailer {
+            background-color: black;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .add_button_seen {
+            background-color: white;
+            color: black;
+            border: 2px solid #f44336;
+            padding: 10px 10px;
+            border-radius: 12px;
+        }
+
+        .add_button_seen:hover {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .add_button_expect {
+            background-color: white;
+            color: black;
+            border: 2px solid #f44336;
+            padding: 10px 10px;
+            border-radius: 12px;
+        }
+
+        .add_button_expect:hover {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .search_button {
+            background-color: white;
+            color: #008CBA;
+            border: 2px solid #008CBA;
+            padding: 10px 20px;
+            border-radius: 12px;
+        }
+
+        .search_button:hover {
+            background-color: #008CBA;
+            color: white;
+        }
+    </style>
+
+
+</head>
+
+<body style="background-color:#e6ffe6;">
+
+    <nav class="navbar navbar-default navbar-inverse" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">MOVIESpy</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/movie/movie_all/1">Movies</a></li>
+                <li><a href="/movie/actor_all/1">Actors</a></li>
+                <li class="dropdown">
+                    <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                       data-toggle="dropdown">Visualization<span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="/">1</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/">2</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/">3</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="navbar-form navbar-left" action="/" method="post">
+                {% csrf_token %}
+
+                <input type="text" name="title" class="form-control" placeholder="Search Movies or Actors" onkeyup="showResult(this.value)"/>
+                <input type="submit" class="btn btn-default" name="Search" value="Submit"/>
+                <div class = "searchlistdiv" style = "user-select: none; display: none;" aria-expanded="false" >
+                    <div class="search-row-label">Movies</div>
+                    <div class="search-row" id=":mx" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                    <div class="search-row" id=":my" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                    <div class="search-row" id=":mz" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                    <div class="search-row-label">Actors</div>
+                    <div class="search-row" id=":ax" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                    <div class="search-row" id=":ay" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                    <div class="search-row" id=":az" style="user-select: none;">
+                        <a style="display: block; user-select: none;" href="/topic/19906833">
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                    <li>
+                        <p class="navbar-text" style="color:#fff9fe;">
+                            Welcome,{{ username }}
+                            <li class="dropdown">
+                            <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                             data-toggle="dropdown">myMovies<span class="caret"></span></a>
+                             <ul class="dropdown-menu" role="menu">
+                            <li><a href="/movie/seen/">Seen List</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/movie/expect/">Expect List</a></li>
+                             </ul>
+                             </li>
+                            <a href="/user/logout/">Logout</a>
+                        </p>
+                    </li>
+                {% else %}
+                    {% if message %}
+                        <li><p class="navbar-text" style="color:red;">{{ message }}</p></li>
+                    {% endif %}
+                    <li><p class="navbar-text">Already have an account?</p></li>
+                    <li class="dropdown">
+                        <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                           data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
+                        <ul id="login-dp" class="dropdown-menu">
+                            <li>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        Login via
+                                        <div class="social-buttons">
+                                            <a href="http://www.facebook.com" class="btn btn-fb"><i
+                                                    class="fa fa-facebook"></i> Facebook</a>
+                                            <a href="http://www.twitter.com" class="btn btn-tw"><i
+                                                    class="fa fa-twitter"></i> Twitter</a>
+                                        </div>
+                                        or
+                                        <form class="form" role="form" method="post" action="/user/login/"
+                                              accept-charset="UTF-8" id="login-nav">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label class="sr-only" for="exampleInputEmail2">User Name</label>
+                                                <input name='username' class="form-control" id="exampleInputEmail2"
+                                                       placeholder="User Name">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="sr-only" for="exampleInputPassword2">Password</label>
+                                                <input name="password" type="password" class="form-control"
+                                                       id="exampleInputPassword2" placeholder="Password">
+                                                <div class="help-block text-right"><a
+                                                        href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4">Forget
+                                                    the password ?</a></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="submit" class="btn btn-primary btn-block" value="Sign in"/>
+                                            </div>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox"> keep me logged-in
+                                                </label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="bottom text-center">
+                                        New here ? <a href="/user/register/"><b>Join Us</b></a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                {% endif %}
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+    <script>
+        //Not finish yet
+        var searchRequest = null;
+        $(function(){
+            var minlength = 2;
+            $(".searchlistdiv").keyup(function(){
+                var that = this,
+                    value = $(this).val();
+                if(value.length >= minlength){
+                    if (searchRequest != null)
+                        searchRequest.abort();
+                    searchRequest = $.ajax({
+                        type:"GET",
+                        url: "search/",
+                        data:{
+
+                        },
+                        dataType:"text",
+                        success: function(msg){
+
+                        }
+                    })
+                }
+            })
+        })
+    </script>
+    {% block mainbody %}
+    {% load static %}
+    <img border="0" src="{% static "images/movie.jpg" %}" width="1280" height="720">
+{% endblock %}
+
+
+</body>
+
+</html>

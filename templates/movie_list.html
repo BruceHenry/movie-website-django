@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+
+    {% if object %}
+        <img border="0" src="{{ object.photo }}" alt="Cannot load photo, sorry!" width="350" height="500">
+        <h1>{{ object.name }}</h1>
+        <p><a href="http://www.imdb.com/name/{{ object.actorid }}" target="_self">See in IMDB</a></p>
+        <h2>{{ object.name }} in the following movie(s):</h2>
+        <hr>
+    {% endif %}
+
+
+    {% for item in items %}
+        <h2><a href="/movie/movie_detail/{{ item.movieid }}" target="_self">{{ item.title }}</a></h2>
+        <img border="0" src="{{ item.poster }}" alt="Cannot load photo, sorry!" width="200" height="320">
+        <hr>
+    {% endfor %}
+
+    {% if pages %}
+        <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+    {% endif %}
+    {% if last_page %}
+        <a href="/movie/movie_all/{{ last_page }}" target="_self"><<<</a>
+    {% endif %}
+
+    {% for page in pages %}
+        <a href="/movie/movie_all/{{ page }}" target="_self">{{ page }}</a>
+    {% endfor %}
+
+    {% if next_page %}
+        <a href="/movie/movie_all/{{ next_page }}" target="_self">>>></a>
+    {% endif %}
+
+
+
+{% endblock %}

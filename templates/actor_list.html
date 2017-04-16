@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+    {% if object %}
+        <img border="0" src="{{ object.poster }}" alt="Cannot load photo, sorry!" width="300" height="500">
+        <h1>{{ object.title }}</h1>
+
+        {% if  user.is_authenticated %}
+            {% if  object.flag == 1 %}
+                <button class="button add_button_seen" style="background-color: #f44336;color: white;cursor: not-allowed">In
+                    your Seen List
+                </button>
+            {% elif  object.flag == 2 %}
+                <button class="button add_button_expect" style="background-color: #f44336;color: white;cursor: not-allowed">In
+                    your Expect List
+                </button>
+            {% else %}
+                <button class="button add_button_seen" >Add to Seen</button>
+                <button class="button add_button_expect" >Add to Expect</button>
+            {% endif %}
+        {% endif %}
+
+
+        <script>
+            $(document).ready(function () {
+                $(".add_button_seen").click(function () {
+                    $.get("/movie/add_seen/{{ object.movieid }}", function () {
+                        $(".add_button_seen").css({
+                            'background-color': '#f44336',
+                            'color': 'white',
+                            'cursor': 'not-allowed'
+                        });
+                        $(".add_button_seen").html('In your Seen List');
+                        $(".add_button_expect").hide();
+                    });
+                });
+            });
+        </script>
+
+        <script>
+            $(document).ready(function () {
+                $(".add_button_expect").click(function () {
+                    $.get("/movie/add_expect/{{ object.movieid }}", function () {
+                        $(".add_button_expect").css({
+                            'background-color': '#f44336',
+                            'color': 'white',
+                            'cursor': 'not-allowed'
+                        });
+                        $(".add_button_expect").html('In your Expect List');
+                        $(".add_button_seen").hide();
+                    });
+                });
+            });
+        </script>
+
+        <!-- Layer -->
+        <div class="Layer" id="layer"></div>
+
+        <p>Year: {{ object.year }}</p>
+        <p>Release Date: {{ object.date }}</p>
+        <p>Rating: {{ object.rate }}</p>
+        <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB</a></p>
+        <span class="click_Show"> <button class="button_trailer">Trailer</button></span>
+
+        <div id="TrailerWindow" style="position: fixed;">
+            <div id="title">{{ object.title }}
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">x</span>
+                </button>
+            </div>
+            <div id="videoControl">
+                <video width="600" height="500" controls>
+                    <source src="{{ object.trailer }}" type="video/mp4">
+                </video>
+            </div>
+        </div>
+
+        <p id="summary">Plot Summary:"{{ object.plot }}"</p>
+        <h2>Main actors in {{ object.title }}:</h2>
+        <hr>
+
+    {% endif %}
+
+
+
+    {% for item in items %}
+        <h3><a href="/movie/actor_detail/{{ item.actorid }}" target="_self">{{ item.name }}</a></h3>
+        <img border="0" src="{{ item.photo }}" alt="Cannot load photo, sorry!" width="200" height="280">
+        <hr>
+    {% endfor %}
+
+    <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+    {% if last_page %}
+        <a href="/movie/actor_all/{{ last_page }}" target="_self"><<<</a>
+    {% endif %}
+
+    {% for page in pages %}
+        <a href="/movie/actor_all/{{ page }}" target="_self">{{ page }}</a>
+    {% endfor %}
+
+    {% if next_page %}
+        <a href="/movie/actor_all/{{ next_page }}" target="_self">>>></a>
+    {% endif %}
+
+
+    <script type="text/javascript">
+        function layersize() {
+            document.getElementById("layer").style.width = document.documentElement.scrollWidth + "px";
+            document.getElementById("layer").style.height = document.documentElement.scrollHeight + "px";
+        }
+
+        $(".click_Show").click(function () {
+            layersize();
+            $(".Layer").show();//show layer
+            $("#TrailerWindow").show();//show videoWindow
+            tm();
+        });
+
+        $(window).resize(function () {
+            layersize();
+            tm();
+        });
+
+        function tm() {
+            var _left = (document.documentElement.clientWidth - $("#TrailerWindow").width()) / 2;//Get distance of left
+            var _top = (document.documentElement.clientHeight) * 0.15;//Get distance of top
+            $("#TrailerWindow").css({left: _left, top: _top});
+        }
+
+        $("button.close").click(function () {
+            $('video').trigger('pause');
+            $("#TrailerWindow").hide();//hide
+            $(".Layer").hide();//hide
+        });
+    </script>
+
+    <!--Drag-->
+    <script type="text/javascript">
+        window.onload = function () {
+            init(document.getElementById("title"));
+        };
+
+        var l = 0, t = 0, x = 0, y = 0;
+        var isOver = false;
+        var zindex = 99999;
+        function init(titleDom) {
+            var thisDom = titleDom;
+            var parentDom = thisDom.parentNode;
+            titleDom.onmousedown = function (event) {
+                var e = event || window.event;
+                x = e.clientX;
+                y = e.clientY;
+                l = parseInt(parentDom.offsetLeft);
+                t = parseInt(parentDom.offsetTop);
+                isOver = true;
+                zindex++;
+                parentDom.style.zIndex = zindex;
+                document.onmousemove = function (event) {
+                    if (isOver) {
+                        var e = event || window.event;
+                        var newLeft = l + e.clientX - x;
+                        var newTop = t + e.clientY - y;
+                        parentDom.style.left = newLeft + "px";
+                        parentDom.style.top = newTop + "px";
+
+                    }
+                };
+                document.onmouseup = function (event) {
+                    if (isOver) {
+                        isOver = false;
+                    }
+                };
+            };
+        }
+    </script>
+
+
+{% endblock %}
+
