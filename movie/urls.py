@@ -12,4 +12,5 @@ urlpatterns = [
     url(r'^add_seen/(?P<movie_id>.*)', views.add_seen, name='seen'),
     url(r'^expect/(?P<movie_id>.*)', views.expect, name='expect'),
     url(r'^add_expect/(?P<movie_id>.*)', views.add_expect, name='expect'),
+    url(r'^search_suggest/(?P<str>.*)', views.search_suggest, name='search_suggest'),
 ]

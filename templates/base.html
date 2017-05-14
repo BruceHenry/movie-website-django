@@ -11,111 +11,14 @@
     <script src="{% static "js/jquery-1.10.2.min.js.download" %}"></script>
     <script src="{% static "js/bootstrap.min.js.download" %}"></script>
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
-    <style type="text/css">
-        #TrailerWindow {
-            width: 600px;
-            height: 350px;
-            box-shadow: 0px 0px 10px #000;
-            position: absolute;
-            z-index: 101;
-            display: none;
-        }
-
-        #TrailerWindow #title {
-            height: 50px;
-            background: #000000;
-            color: #fff;
-            font-size: 30px;
-            text-indent: 35px;
-            line-height: 50px;
-            cursor: move;
-        }
-
-        #TrailerWindow #title button {
-            width: 20px;
-            height: 20px;
-            color: white;
-            float: right;
-            margin: 10px 20px 0px 0px;
-            display: inline-block;
-        }
-
-        #TrailerWindow #videoControl {
-            width: 600px;
-            height: 500px;
-            background: #000000;
-        }
-
-        .Layer {
-            background: #000;
-            position: absolute;
-            top: 0px;
-            fillter: Alpha(opacity=60);
-            -moz-opacity: 0.6;
-            opacity: 0.6;
-            z-index: 100;
-            display: none;
-        }
-
-        .button_trailer {
-            background-color: black;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-        }
-
-        .add_button_seen {
-            background-color: white;
-            color: black;
-            border: 2px solid #f44336;
-            padding: 10px 10px;
-            border-radius: 12px;
-        }
-
-        .add_button_seen:hover {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .add_button_expect {
-            background-color: white;
-            color: black;
-            border: 2px solid #f44336;
-            padding: 10px 10px;
-            border-radius: 12px;
-        }
-
-        .add_button_expect:hover {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .search_button {
-            background-color: white;
-            color: #008CBA;
-            border: 2px solid #008CBA;
-            padding: 10px 20px;
-            border-radius: 12px;
-        }
-
-        .search_button:hover {
-            background-color: #008CBA;
-            color: white;
-        }
-    </style>
-
-
+    <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
+    <style type="text/css"></style>
 </head>
 
-<body style="background-color:#e6ffe6;">
-
-    <nav class="navbar navbar-default navbar-inverse" role="navigation">
+{% load static %}
+<body style="background-color:#FAFAD2;">
+<nav class="navbar navbar-default navbar-inverse" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -125,58 +28,27 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">MOVIESpy</a>
+            <a class="navbar-brand" href="/"><span class=" 	glyphicon glyphicon-home"></span> Home</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/movie/movie_all/1">Movies</a></li>
-                <li><a href="/movie/actor_all/1">Actors</a></li>
-                <li class="dropdown">
-                    <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                       data-toggle="dropdown">Visualization<span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="/">1</a></li>
-                        <li class="divider"></li>
-                        <li><a href="/">2</a></li>
-                        <li class="divider"></li>
-                        <li><a href="/">3</a></li>
-                    </ul>
-                </li>
+                <li><a href="/movie/movie_all/1"><span class="glyphicon glyphicon-film"></span> Movies</a></li>
+                <li><a href="/movie/actor_all/1"><span class="glyphicon glyphicon-user"></span> Actors</a></li>
             </ul>
             <form class="navbar-form navbar-left" action="/" method="post">
                 {% csrf_token %}
 
-                <input type="text" name="title" class="form-control" placeholder="Search Movies or Actors" onkeyup="showResult(this.value)"/>
+                <input type="text" name="title" class="form-control" placeholder="Search Movies or Actors"
+                       onkeyup="showResult(this.value)" size="55" autocomplete="off"/>
                 <input type="submit" class="btn btn-default" name="Search" value="Submit"/>
-                <div class = "searchlistdiv" style = "user-select: none; display: none;" aria-expanded="false" >
-                    <div class="search-row-label">Movies</div>
-                    <div class="search-row" id=":mx" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
-                    <div class="search-row" id=":my" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
-                    <div class="search-row" id=":mz" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
-                    <div class="search-row-label">Actors</div>
-                    <div class="search-row" id=":ax" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
-                    <div class="search-row" id=":ay" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
-                    <div class="search-row" id=":az" style="user-select: none;">
-                        <a style="display: block; user-select: none;" href="/topic/19906833">
-                        </a>
-                    </div>
+
+                <div class="searchlistdiv"
+                     style="position:absolute;top:42px;left:295px;user-select:none;display:none;width: 380px;"
+                     aria-expanded="false">
+                    <div class="search-movie">Movie:</div>
+                    <div class="search-actor">Actor:</div>
                 </div>
 
             </form>
@@ -185,18 +57,18 @@
                 {% if user.is_authenticated %}
                     <li>
                         <p class="navbar-text" style="color:#fff9fe;">
-                            Welcome,{{ username }}
-                            <li class="dropdown">
-                            <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                             data-toggle="dropdown">myMovies<span class="caret"></span></a>
-                             <ul class="dropdown-menu" role="menu">
+                            Welcome, {{ user.username }}
+                    <li class="dropdown">
+                        <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                           data-toggle="dropdown">myMovies<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
                             <li><a href="/movie/seen/">Seen List</a></li>
                             <li class="divider"></li>
                             <li><a href="/movie/expect/">Expect List</a></li>
-                             </ul>
-                             </li>
-                            <a href="/user/logout/">Logout</a>
-                        </p>
+                        </ul>
+                    </li>
+                    <button class="btn btn-tumblr" onclick="logout()">Logout</button>
+                    </p>
                     </li>
                 {% else %}
                     {% if message %}
@@ -212,10 +84,9 @@
                                     <div class="col-md-12">
                                         Login via
                                         <div class="social-buttons">
-                                            <a href="http://www.facebook.com" class="btn btn-fb"><i
-                                                    class="fa fa-facebook"></i> Facebook</a>
-                                            <a href="http://www.twitter.com" class="btn btn-tw"><i
-                                                    class="fa fa-twitter"></i> Twitter</a>
+                                            <button type="button" class="btn btn-fb" onclick="login()">
+                                                <span class="fa fa-facebook"></span> Facebook
+                                            </button>
                                         </div>
                                         or
                                         <form class="form" role="form" method="post" action="/user/login/"
@@ -230,9 +101,6 @@
                                                 <label class="sr-only" for="exampleInputPassword2">Password</label>
                                                 <input name="password" type="password" class="form-control"
                                                        id="exampleInputPassword2" placeholder="Password">
-                                                <div class="help-block text-right"><a
-                                                        href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4">Forget
-                                                    the password ?</a></div>
                                             </div>
                                             <div class="form-group">
                                                 <input type="submit" class="btn btn-primary btn-block" value="Sign in"/>
@@ -256,38 +124,119 @@
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
-    <script>
-        //Not finish yet
-        var searchRequest = null;
-        $(function(){
-            var minlength = 2;
-            $(".searchlistdiv").keyup(function(){
-                var that = this,
-                    value = $(this).val();
-                if(value.length >= minlength){
-                    if (searchRequest != null)
-                        searchRequest.abort();
-                    searchRequest = $.ajax({
-                        type:"GET",
-                        url: "search/",
-                        data:{
-
-                        },
-                        dataType:"text",
-                        success: function(msg){
-
-                        }
-                    })
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-            })
-        })
-    </script>
-    {% block mainbody %}
+            }
+        }
+        return cookieValue;
+    }
+
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '283394035432709',
+            cookie: true,
+            xfbml: true,  // parse social plugins on this page
+            version: 'v2.8' // use graph api version 2.8
+        });
+
+        FB.getLoginStatus(function (response) {
+        });
+
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function logout() {
+        FB.logout(function () {
+        });
+        $.get("/user/logout/", function () {
+            location.reload();
+        });
+        {#        location.href = "/user/logout/";#}
+    }
+    function login() {
+        FB.login(function (response) {
+            if (response.status === 'connected') {
+                FB.api('/me', function (response) {
+                    $.post("/user/facebook/", {
+                        csrfmiddlewaretoken: getCookie('csrftoken'),
+                        username: response.name,
+                        password: "facebook"
+                    }, function () {
+                        location.reload();
+                    });
+                });
+            }
+        });
+    }
+</script>
+<script>
+    $(".form-control").bind('blur', function () {
+        setTimeout(function () {
+            $(".searchlistdiv").hide();
+        }, 150);
+    });
+    function showResult(str) {
+        if (str.length == 0) {
+            $(".searchlistdiv").hide();
+            return;
+        }
+        var path = "/movie/search_suggest/" + str;
+        $.get(path, function (data) {
+            data = JSON.parse(data);
+            $(".search-movie").siblings().not(".search-actor").remove();
+            for (var i = data.movie.length - 1; i >= 0; i--) {
+                var img = "<img src='" + data.movie[i].poster + "' width='60' height='75'></img>";
+                var link = "<div class='suggest' onclick=\"location.href='/movie/movie_detail/"
+                    + data.movie[i].movieid + "'\">" + img + "<b>" + data.movie[i].title + "</b></div>";
+                $(".search-movie").after(link)
+            }
+            if (data.movie.length == 0)
+                $(".search-movie").after("<div class='no_suggest'><b>No suggestion!</b></div>")
+
+            for (var i = 0; i < data.actor.length; i++) {
+                var img = "<img src='" + data.actor[i].photo + "' width='60' height='75'></img>";
+                var link = "<div class='suggest' onclick=\"location.href='/movie/actor_detail/"
+                    + data.actor[i].actorid + "'\">" + img + "<b>" + data.actor[i].name + "</b></div>";
+                $(".search-actor").after(link)
+            }
+            if (data.actor.length == 0)
+                $(".search-actor").after("<div class='no_suggest'><b>No suggestion!</b></div>")
+
+            $(".searchlistdiv").show();
+        });
+    }
+</script>
+{% block mainbody %}
     {% load static %}
-    <img border="0" src="{% static "images/movie.jpg" %}" width="1280" height="720">
+    <div style=" margin-left: 1%;">
+        <p style="color: white"><b>Recently Popular:</b></p>
+        {% for movie in list %}
+            <a href="/movie/movie_detail/{{ movie.movieid }}">
+                <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+            </a>
+        {% endfor %}
+    </div>
+    <div id="particles-js">
+    </div>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>
 {% endblock %}
 
-
 </body>
-
 </html>

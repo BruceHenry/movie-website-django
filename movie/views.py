@@ -2,31 +2,57 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from movie.models import *
 from django.http import HttpResponse
+import json
 
 
 def add_seen(request, movie_id):
     if request.is_ajax():
         history = Seen.objects.filter(movieid_id=movie_id, username=request.user.get_username())
         if len(history) == 0:
+            movie = Popularity.objects.get(movieid_id=movie_id)
+            weight = movie.weight
+            movie.delete()
+            new_record = Popularity(movieid_id=movie_id, weight=weight + 3)
+            new_record.save()
             new_record = Seen(movieid_id=movie_id, username=request.user.get_username())
             new_record.save()
-        return HttpResponse('success')
+            return HttpResponse('1')
+        else:
+            history.delete()
+            return HttpResponse('0')
 
 
 def add_expect(request, movie_id):
     if request.is_ajax():
         history = Expect.objects.filter(movieid_id=movie_id, username=request.user.get_username())
         if len(history) == 0:
+            movie = Popularity.objects.get(movieid_id=movie_id)
+            weight = movie.weight
+            movie.delete()
+            new_record = Popularity(movieid_id=movie_id, weight=weight + 3)
+            new_record.save()
             new_record = Expect(movieid_id=movie_id, username=request.user.get_username())
             new_record.save()
-        return HttpResponse('success')
+            return HttpResponse('2')
+        else:
+            history.delete()
+            return HttpResponse('0')
 
 
 @csrf_protect
 def detail(request, model, id):
     items = []
     try:
-        if model.get_name() == 'movie':
+        if model.get_name() == 'movie' and id != 'None':
+            try:
+                d = Popularity.objects.get(movieid_id=id)
+                weight = d.weight
+                d.delete()
+                new_record = Popularity(movieid_id=id, weight=weight + 1)
+                new_record.save()
+            except:
+                new_record = Popularity(movieid_id=id, weight=1)
+                new_record.save()
             label = 'actor'
             object = model.objects.get(movieid=id)
             records = Act.objects.filter(movieid_id=id)
@@ -84,6 +110,33 @@ def search(request, pattern):
     return render(request, 'searchresult.html',
                   {'items1': movies, 'search1': pattern, 'number1': len(movies), 'items2': actors, 'search2': pattern,
                    'number2': len(actors)})
+
+
+def search_suggest(request, str):
+    movie_list, actor_list = [], []
+    # movie
+    movies = Movie.objects.filter(title__istartswith=str).order_by('-rate')
+    if len(movies) > 3:
+        for i in range(3):
+            movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
+    else:
+        movies = Movie.objects.filter(title__contains=str).order_by('-rate')
+        num = 3 - len(movie_list) if len(movies) > 3 - len(movie_list) else len(movies)
+        for i in range(num):
+            movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
+    # actor
+    actors = Actor.objects.filter(name__istartswith=str)
+    if len(actors) > 3:
+        for i in range(3):
+            actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
+    else:
+        actors = Actor.objects.filter(name__contains=str)
+        num = 3 - len(actor_list) if len(actors) > 3 - len(actor_list) else len(actors)
+        for i in range(num):
+            actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
+    # result in a dictionary
+    result = {'movie': movie_list, 'actor': actor_list}
+    return HttpResponse(json.dumps(result, ensure_ascii=False))
 
 
 @csrf_protect

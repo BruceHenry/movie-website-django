@@ -6,32 +6,34 @@
         <h1>{{ object.title }}</h1>
 
         {% if  user.is_authenticated %}
+            <button class="add_button" id="seen">Have seen</button>
+            <button class="add_button" id="expect">Want to see</button>
+            <b style="color: #f44336" id="message"></b>
             {% if  object.flag == 1 %}
-                <button class="button add_button_seen" style="background-color: #f44336;color: white;cursor: not-allowed">In
-                    your Seen List
-                </button>
-            {% elif  object.flag == 2 %}
-                <button class="button add_button_expect" style="background-color: #f44336;color: white;cursor: not-allowed">In
-                    your Expect List
-                </button>
-            {% else %}
-                <button class="button add_button_seen" >Add to Seen</button>
-                <button class="button add_button_expect" >Add to Expect</button>
+                <script>
+                    $("#seen").css({"background-color": "#f44336", "color": "white"});
+                </script>
+            {% endif %}
+            {% if  object.flag == 2 %}
+                <script>
+                    $("#expect").css({"background-color": "#f44336", "color": "white"});
+                </script>
             {% endif %}
         {% endif %}
 
-
         <script>
             $(document).ready(function () {
-                $(".add_button_seen").click(function () {
-                    $.get("/movie/add_seen/{{ object.movieid }}", function () {
-                        $(".add_button_seen").css({
-                            'background-color': '#f44336',
-                            'color': 'white',
-                            'cursor': 'not-allowed'
-                        });
-                        $(".add_button_seen").html('In your Seen List');
-                        $(".add_button_expect").hide();
+                $("#seen").click(function () {
+                    $.get("/movie/add_seen/{{ object.movieid }}", function (msg) {
+                        if (msg == "1") {
+                            $("#seen").css({"background-color": "#f44336", "color": "white"});
+                            $("#expect").css({"background-color": "white", "color": "black"});
+                            $("#message").html("Added to Seen list!").fadeIn("fast").fadeOut("slow");
+                        }
+                        if (msg == "0") {
+                            $("#seen").css({"background-color": "white", "color": "black"});
+                            $("#message").html("Deleted from Seen list!").fadeIn("fast").fadeOut("slow");
+                        }
                     });
                 });
             });
@@ -39,18 +41,31 @@
 
         <script>
             $(document).ready(function () {
-                $(".add_button_expect").click(function () {
-                    $.get("/movie/add_expect/{{ object.movieid }}", function () {
-                        $(".add_button_expect").css({
-                            'background-color': '#f44336',
-                            'color': 'white',
-                            'cursor': 'not-allowed'
-                        });
-                        $(".add_button_expect").html('In your Expect List');
-                        $(".add_button_seen").hide();
+                $("#expect").click(function () {
+                    $.get("/movie/add_expect/{{ object.movieid }}", function (msg) {
+                        if (msg == "2") {
+                            $("#expect").css({"background-color": "#f44336", "color": "white"});
+                            $("#seen").css({"background-color": "white", "color": "black"});
+                            $("#message").html("Added to Wish list!").fadeIn("fast").fadeOut("slow");
+                        }
+                        if (msg == "0") {
+                            $("#expect").css({"background-color": "white", "color": "black"});
+                            $("#message").html("Deleted from Wish list!").fadeIn("fast").fadeOut("slow");
+                        }
                     });
                 });
             });
+        </script>
+        <script>
+            $(function () {
+                $('span.stars').stars();
+            });
+            $.fn.stars = function () {
+                return $(this).each(function () {
+                    $(this).html($('<span />').width(Math.max(0, (Math.min(10, parseFloat($(this).html())))) * 8));
+                });
+            }
+
         </script>
 
         <!-- Layer -->
@@ -58,9 +73,13 @@
 
         <p>Year: {{ object.year }}</p>
         <p>Release Date: {{ object.date }}</p>
+        <span class="stars">{{ object.rate }}</span>
         <p>Rating: {{ object.rate }}</p>
-        <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB</a></p>
-        <span class="click_Show"> <button class="button_trailer">Trailer</button></span>
+        <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
+                class="glyphicon glyphicon-new-window"></span></a></p>
+        <span class="click_Show"> <button class="button_trailer">
+            <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
+        </span>
 
         <div id="TrailerWindow" style="position: fixed;">
             <div id="title">{{ object.title }}
@@ -89,17 +108,19 @@
         <hr>
     {% endfor %}
 
-    <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
-    {% if last_page %}
-        <a href="/movie/actor_all/{{ last_page }}" target="_self"><<<</a>
-    {% endif %}
+    {% if pages %}
+        <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+        {% if last_page %}
+            <a href="/movie/actor_all/{{ last_page }}" target="_self"><<<</a>
+        {% endif %}
 
-    {% for page in pages %}
-        <a href="/movie/actor_all/{{ page }}" target="_self">{{ page }}</a>
-    {% endfor %}
+        {% for page in pages %}
+            <a href="/movie/actor_all/{{ page }}" target="_self">{{ page }}</a>
+        {% endfor %}
 
-    {% if next_page %}
-        <a href="/movie/actor_all/{{ next_page }}" target="_self">>>></a>
+        {% if next_page %}
+            <a href="/movie/actor_all/{{ next_page }}" target="_self">>>></a>
+        {% endif %}
     {% endif %}
 
 

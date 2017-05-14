@@ -12,8 +12,21 @@
 
 
     {% for item in items %}
-        <h2><a href="/movie/movie_detail/{{ item.movieid }}" target="_self">{{ item.title }}</a></h2>
-        <img border="0" src="{{ item.poster }}" alt="Cannot load photo, sorry!" width="200" height="320">
+        <table>
+            <td>
+                <img border="0" src="{{ item.poster }}" alt="Cannot load photo, sorry!" width="180" height="250"
+                     style="padding: 10px;">
+            </td>
+            <td style="vertical-align: top;text-align: left;padding: 10px;">
+                <h3><a href="/movie/movie_detail/{{ item.movieid }}"
+                       target="_self">{{ item.title }}({{ item.year }})</a></h3>
+
+                <span class="stars">{{ item.rate }}</span>
+                <p class="stars">Rate: {{ item.rate }}</p>
+                <br>
+                <cite>{{ item.plot }}</cite>
+            </td>
+        </table>
         <hr>
     {% endfor %}
 
@@ -32,6 +45,16 @@
         <a href="/movie/movie_all/{{ next_page }}" target="_self">>>></a>
     {% endif %}
 
+    <script>
+        $(function () {
+            $('span.stars').stars();
+        });
+        $.fn.stars = function () {
+            return $(this).each(function () {
+                $(this).html($('<span />').width(Math.max(0, (Math.min(10, parseFloat($(this).html())))) * 8));
+            });
+        }
 
+    </script>
 
 {% endblock %}
