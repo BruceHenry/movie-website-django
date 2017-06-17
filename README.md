@@ -1,5 +1,6 @@
 # Movie-Django
-You can see this website at: baohan08.pythonanywhere.com
+You can see this website at: http://baohan08.pythonanywhere.com
+
 Instructions
 1. Install Python 3, make sure to set environment variable correctly. https://www.python.org/
 2. Install Django, https://docs.djangoproject.com/en/1.11/topics/install/#installing-official-release
