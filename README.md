@@ -1,7 +1,15 @@
 # Movie-Django
+## Brief Introduction
+This is a movie website, using Django as framework, SQlite as database. Features like search, user management, login via Facebook are implemented.
+
+## Database
+To make it easy to deploy, SQLite is used as database. The database file is "movie.db" in the root directory.
+To add more data, please modify "add_top250.py" in the root directory.
+
+## Have a Look!
 You can see this website at: http://baohan08.pythonanywhere.com
 
-Instructions
+## Installation Instructions
 1. Install Python 3, make sure to set environment variable correctly. https://www.python.org/
 2. Install Django, https://docs.djangoproject.com/en/1.11/topics/install/#installing-official-release
 3. In the teminal, input command: python manage.py runserver 8080
