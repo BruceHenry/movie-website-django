@@ -1,6 +1,6 @@
 # Movie-Django
 ## Have a Look!
-[Click here to visit]((http://baohan08.pythonanywhere.com))
+[Click here to visit](http://baohan08.pythonanywhere.com)
 
 ## Brief Introduction
 This is a movie website, using Django as backend, SQlite as database. Features like search, user management, login via Facebook are implemented.
