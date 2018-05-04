@@ -17,7 +17,8 @@ def user_login(request):
         if user is not None and user.is_active:
             print("User Login:  Username:" + username + '    Password:' + password)
             login(request, user)
-            return render(request, 'base.html', {'username': username})
+            # return render(request, 'base.html', {'username': username})
+            return redirect('/')
         else:
             return render(request, 'base.html', {'message': 'Username or Password wrong!'})
     else:

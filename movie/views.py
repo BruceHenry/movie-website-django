@@ -3,6 +3,13 @@ from django.views.decorators.csrf import csrf_protect
 from movie.models import *
 from django.http import HttpResponse
 import json
+from movie import index
+
+index.all_object_dict()
+index.index_dir()
+index.rating_dir()
+
+cache = {}
 
 
 def add_seen(request, movie_id):
@@ -81,10 +88,9 @@ def detail(request, model, id):
 
 
 def whole_list(request, model, page):
-    if page:
-        page = int(page)
-    else:
+    if page is None:
         return render(request, '404.html')
+    page = int(page)
     objects = model.objects.all()
     total_page = len(objects) // 10
     if (len(objects) / 10 - len(objects) // 10) > 0:
@@ -105,37 +111,52 @@ def whole_list(request, model, page):
 
 def search(request, pattern):
     pattern = pattern.replace("%20", " ")
-    movies = Movie.objects.filter(title__contains=pattern)
-    actors = Actor.objects.filter(name__contains=pattern)
+    search_results = index.wildcard_search(pattern)
+    movies, actors = [], []
+    for movieid in search_results[0]:
+        movies.append(index.object_dict['movie_dict'].get(movieid))
+    for actorid in search_results[1]:
+        actors.append(index.object_dict['actor_dict'].get(actorid))
     return render(request, 'searchresult.html',
-                  {'items1': movies, 'search1': pattern, 'number1': len(movies), 'items2': actors, 'search2': pattern,
-                   'number2': len(actors)})
+                  {'items1': movies, 'search1': pattern, 'number1': len(movies),
+                   'items2': actors,
+                   'search2': pattern, 'number2': len(actors)})
 
 
 def search_suggest(request, str):
+    global cache
+    if str in cache:
+        return HttpResponse(json.dumps(cache.get(str), ensure_ascii=False))
     movie_list, actor_list = [], []
+    res = index.search_suggest(str)
+    movies, actors = [], []
+    for movieid in res[0]:
+        movies.append(index.object_dict['movie_dict'].get(movieid))
+    for actorid in res[1]:
+        actors.append(index.object_dict['actor_dict'].get(actorid))
     # movie
-    movies = Movie.objects.filter(title__istartswith=str).order_by('-rate')
     if len(movies) > 3:
         for i in range(3):
             movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
     else:
-        movies = Movie.objects.filter(title__contains=str).order_by('-rate')
+        # movies = Movie.objects.filter(title__contains=str).order_by('-rate')
         num = 3 - len(movie_list) if len(movies) > 3 - len(movie_list) else len(movies)
         for i in range(num):
             movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
     # actor
-    actors = Actor.objects.filter(name__istartswith=str)
     if len(actors) > 3:
         for i in range(3):
             actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
     else:
-        actors = Actor.objects.filter(name__contains=str)
+        # actors = Actor.objects.filter(name__contains=str)
         num = 3 - len(actor_list) if len(actors) > 3 - len(actor_list) else len(actors)
         for i in range(num):
             actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
     # result in a dictionary
-    result = {'movie': movie_list, 'actor': actor_list}
+    result = {'movie': movie_list, 'actor': actor_list, 'text': str}
+    if len(cache) > 1000:
+        cache = {}
+    cache[str] = result
     return HttpResponse(json.dumps(result, ensure_ascii=False))
 
 

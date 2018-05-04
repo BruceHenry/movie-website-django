@@ -1,3 +1,20 @@
+#container {
+    margin: auto;
+    width: 1080px;
+}
+
+#main-pic {
+    padding: 15px;
+    margin: 0px 600px 10px 10px;
+}
+
+#detail-infro {
+    padding: 25px;
+    margin: 40px 10px 10px 10px;
+    width: 660px;
+    float: right;
+}
+
 #TrailerWindow {
     width: 600px;
     height: 350px;

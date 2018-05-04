@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>MOVIESpy</title>
+    <title>Movie-Hunter</title>
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load static %}
@@ -18,7 +18,7 @@
 
 {% load static %}
 <body style="background-color:#FAFAD2;">
-<nav class="navbar navbar-default navbar-inverse" role="navigation">
+<nav class="navbar navbar-default navbar-inverse" role="navigation" style="margin-bottom: 0">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -40,8 +40,9 @@
             <form class="navbar-form navbar-left" action="/" method="post">
                 {% csrf_token %}
 
-                <input type="text" name="title" class="form-control" placeholder="Search Movies or Actors"
-                       onkeyup="showResult(this.value)" size="55" autocomplete="off"/>
+                <input type="text" name="title" id="search-input" class="form-control"
+                       placeholder="Search Movies or Actors"
+                       onkeyup="start_timer()" size="55" autocomplete="off"/>
                 <input type="submit" class="btn btn-default" name="Search" value="Submit"/>
 
                 <div class="searchlistdiv"
@@ -57,7 +58,7 @@
                 {% if user.is_authenticated %}
                     <li>
                         <p class="navbar-text" style="color:#fff9fe;">
-                            Welcome, {{ user.username }}
+                            Welcome, {{ user.username }}</p></li>
                     <li class="dropdown">
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown">myMovies<span class="caret"></span></a>
@@ -67,8 +68,8 @@
                             <li><a href="/movie/expect/">Expect List</a></li>
                         </ul>
                     </li>
-                    <button class="btn btn-tumblr" onclick="logout()">Logout</button>
-                    </p>
+                    <li style="align-items: center">
+                        <button class="btn btn-tumblr" onclick="logout()" style="margin-top:8px">Logout</button>
                     </li>
                 {% else %}
                     {% if message %}
@@ -170,6 +171,7 @@
         });
         {#        location.href = "/user/logout/";#}
     }
+
     function login() {
         FB.login(function (response) {
             if (response.status === 'connected') {
@@ -192,14 +194,28 @@
             $(".searchlistdiv").hide();
         }, 150);
     });
+    var last_input_time = Date.now();
+
+    function start_timer() {
+        var this_input_time = Date.now();
+        last_input_time = this_input_time;
+        setTimeout(
+            function (this_input_time) {
+                if (last_input_time === this_input_time)
+                    showResult(document.getElementById('search-input').value);
+            }, 150, this_input_time);
+    }
+
     function showResult(str) {
-        if (str.length == 0) {
+        if (str.length === 0) {
             $(".searchlistdiv").hide();
             return;
         }
         var path = "/movie/search_suggest/" + str;
         $.get(path, function (data) {
             data = JSON.parse(data);
+            if (document.getElementById('search-input').value !== data.text)
+                return;
             $(".search-movie").siblings().not(".search-actor").remove();
             for (var i = data.movie.length - 1; i >= 0; i--) {
                 var img = "<img src='" + data.movie[i].poster + "' width='60' height='75'></img>";
@@ -207,36 +223,53 @@
                     + data.movie[i].movieid + "'\">" + img + "<b>" + data.movie[i].title + "</b></div>";
                 $(".search-movie").after(link)
             }
-            if (data.movie.length == 0)
+            if (data.movie.length === 0)
                 $(".search-movie").after("<div class='no_suggest'><b>No suggestion!</b></div>")
 
-            for (var i = 0; i < data.actor.length; i++) {
+            for (var i = data.actor.length - 1; i >= 0; i--) {
                 var img = "<img src='" + data.actor[i].photo + "' width='60' height='75'></img>";
                 var link = "<div class='suggest' onclick=\"location.href='/movie/actor_detail/"
                     + data.actor[i].actorid + "'\">" + img + "<b>" + data.actor[i].name + "</b></div>";
                 $(".search-actor").after(link)
             }
-            if (data.actor.length == 0)
+            if (data.actor.length === 0)
                 $(".search-actor").after("<div class='no_suggest'><b>No suggestion!</b></div>")
 
             $(".searchlistdiv").show();
         });
     }
 </script>
+
 {% block mainbody %}
     {% load static %}
     <div style=" margin-left: 1%;">
         <p style="color: white"><b>Recently Popular:</b></p>
-        {% for movie in list %}
+        {% for movie in popular %}
             <a href="/movie/movie_detail/{{ movie.movieid }}">
                 <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
             </a>
         {% endfor %}
     </div>
-    <div id="particles-js">
-    </div>
+    {#    <div id="particles-js">#}
+    {#    </div>#}
     <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>
+
+    {% if user.is_authenticated %}
+        {% load static %}
+        <div style=" margin-left: 1%;">
+            <p style="color: white"><b>Recommendations For You:</b></p>
+            {% for movie in recommendations %}
+                <a href="/movie/movie_detail/{{ movie.movieid }}">
+                    <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+                </a>
+            {% endfor %}
+        </div>
+        {#        <div id="particles-js">#}
+        {#        </div>#}
+        {#        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>#}
+    {% endif %}
 {% endblock %}
+
 
 </body>
 </html>
