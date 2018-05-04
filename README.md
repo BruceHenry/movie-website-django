@@ -1,52 +1,39 @@
 # MovieHunter
-This is a movie website using **Django** as backend framework and SQlite as database. 
+This is a movie website using **Django** as backend framework and SQLite as database.
 
 For the current version, the following features are implemented, 
-- Search Engine
+- **Search Engine** including inverted index and LRU cache
 - User Management
-- Login via Facebook (OAuth with Facebook API)
-- Recommender
-- Cache
+- Login via Facebook (**OAuth** with Facebook API)
+- **Recommender** according to user's taste
 
-We deployed the website on a Digital Ocean server at [http://zijun-xu.com](http://zijun-xu.com).
+I deployed the website at [https://baohan08.pythonanywhere.com/](https://baohan08.pythonanywhere.com/).
 
 ***
 
 ## Index of Contents
 1. [Data and Database](#data-and-database)
-2. [Search Engine](#search-engine)
+2. [Search Engine and Cache](#search-engine)
 3. [Recommender](#recommender)
 4. [Deployment Instructions](#deployment-instructions)
 
 
-<a name="hello-world"></a>
+<a name="data-and-database"></a>
 
 ## Data and Database 
-We downloaded a raw [movie dataset](https://www.kaggle.com/oxanozaep/imdb-eda/data) which contains 5000+ movies and features from IMDB. With movieid, we utilized python lib to collect the features we want from IMDB. Finally, we inserted about 3000 movies into database.
+I got 5000+ movie_ids from this [movie dataset](https://www.kaggle.com/oxanozaep/imdb-eda/data). With these movie_ids, I utilized a python lib called [imdbpie](https://pypi.org/project/imdbpie/) to collect other columns of data. Currently, there are about 3000 movies in the database.
 
-To make it easy to deploy, SQLite is used as database. The database file is "movie.db" in the root directory.
+To make it easy to deploy, SQLite is chosen as database. The database file is `movie.db` in the root directory.
 
 
 <a name="search-engine"></a>
 
-## Search Engine
+## Search Engine and Cache
 
-### Our Idea
-- Permuterm Index : B-Tree
-- Transform users’ queries into Wildcard queries
-- Return sorted results
-
-### Detail
-For each token, add wild-card between each character respectively. 
-
-Return the results that contain all the tokens or contain at least one token of the query.
-
-Sort: 
-- Result movies are sorted by ratings.                                             
-- Result actors are sorted by number of movies they act.    
-- Search “*token” and “token*” first.
-
-Return the results that contain all the tokens in the query first.
+### Approaches
+- An Inverted Permuterm Index in B-Tree Structure
+- LRU Cache for Frequent Query
+- Results Sorted by Rating
 
 
 <a name="recommender"></a>
@@ -54,9 +41,6 @@ Return the results that contain all the tokens in the query first.
 ## Recommender
 
 - **Item-based** : Do the item-based recommendation based on users’ seens and expects
-- **Content-based** : Do the content-based recommendation based on movies’ plots(tf-idf and euclidean distance)
-
-![image](/img/recommender.jpg)
 
 
 <a name="deployment-instructions"></a>

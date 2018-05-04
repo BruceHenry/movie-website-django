@@ -35,7 +35,6 @@ def index(request):
                         recommendations.remove(expect.movieid.movieid)
 
             recommendation = []
-            # print('re', len(recommendations))
             if len(recommendations) < 5:
                 high_rates = Movie.objects.exclude(movieid__in=seens_and_expects).order_by('-rate')[:50]
                 supplies = random.sample(list(high_rates), 5 - len(recommendations))
@@ -43,18 +42,14 @@ def index(request):
                     recommendations.add(supply.movieid)
                 for movieid in recommendations:
                     try:
-                        temp = {}
-                        temp['movieid'] = movieid
-                        temp['poster'] = Movie.objects.get(movieid=movieid).poster
+                        temp = {'movieid': movieid, 'poster': Movie.objects.get(movieid=movieid).poster}
                         recommendation.append(temp)
                     except:
                         continue
             else:
                 for movieid in random.sample(recommendations, 5):
                     try:
-                        temp = {}
-                        temp['movieid'] = movieid
-                        temp['poster'] = Movie.objects.get(movieid=movieid).poster
+                        temp = {'movieid': movieid, 'poster': Movie.objects.get(movieid=movieid).poster}
                         recommendation.append(temp)
                     except:
                         continue
@@ -64,9 +59,7 @@ def index(request):
         popular = []
         for movie in popular_movies[:5]:
             try:
-                temp = {}
-                temp['movieid'] = movie.movieid_id
-                temp['poster'] = Movie.objects.get(movieid=movie.movieid_id).poster
+                temp = {'movieid': movie.movieid_id, 'poster': Movie.objects.get(movieid=movie.movieid_id).poster}
                 popular.append(temp)
             except:
                 continue
@@ -75,18 +68,16 @@ def index(request):
         return render(request, 'base.html', data)
 
 
-def find_recommendations(recommendations, seens_or_expects):
-    for seen_or_expect in seens_or_expects:
+def find_recommendations(recommendations, user_favorite):
+    for seen_or_expect in user_favorite:
         cur = Movie.objects.get(movieid=seen_or_expect.movieid.movieid)
-        if cur.plot == None or cur.plot == '':
+        if cur.plot is None or cur.plot == '':
             continue
-
         movies = Movie.objects.filter(genres=cur.genres)
-        # print('num', len(movies))
         elements = []
         corpus = []
         for movie in movies:
-            if movie.plot != None and movie.plot != '':
+            if movie.plot is not None and movie.plot != '':
                 elements.append({'movieid': movie.movieid})
                 corpus.append(movie.plot)
 
