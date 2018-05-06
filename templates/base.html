@@ -104,6 +104,7 @@
                                                        id="exampleInputPassword2" placeholder="Password">
                                             </div>
                                             <div class="form-group">
+                                                <input type="hidden" name="path" value="{{ request.path }}">
                                                 <input type="submit" class="btn btn-primary btn-block" value="Sign in"/>
                                             </div>
                                             <div class="checkbox">
@@ -250,24 +251,17 @@
             </a>
         {% endfor %}
     </div>
-    {#    <div id="particles-js">#}
-    {#    </div>#}
     <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>
 
-    {% if user.is_authenticated %}
-        {% load static %}
-        <div style=" margin-left: 1%;">
-            <p style="color: white"><b>Recommendations For You:</b></p>
-            {% for movie in recommendations %}
-                <a href="/movie/movie_detail/{{ movie.movieid }}">
-                    <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
-                </a>
-            {% endfor %}
-        </div>
-        {#        <div id="particles-js">#}
-        {#        </div>#}
-        {#        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>#}
-    {% endif %}
+    {% load static %}
+    <div style=" margin-left: 1%;">
+        <p style="color: white"><b>Recommendation For You:</b></p>
+        {% for movie in recommendation %}
+            <a href="/movie/movie_detail/{{ movie.movieid }}">
+                <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+            </a>
+        {% endfor %}
+    </div>
 {% endblock %}
 
 

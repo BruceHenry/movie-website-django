@@ -3,7 +3,8 @@ from movie.models import Movie, Actor, Act
 
 
 class Index:
-    data_in_memory = {'movie_dict': {}, 'actor_dict': {}, 'movie_list': [], 'actor_list': [], 'actor_act_num': {}}
+    data_in_memory = {'movie_dict': {}, 'actor_dict': {}, 'movie_list': [], 'actor_list': [], 'actor_act_num': {},
+                      'movie_rating': {}, 'movie_genre': {}}
     movie_index = {}
     actor_index = {}
 
@@ -15,6 +16,12 @@ class Index:
         for movie in Movie.objects.all():
             self.data_in_memory['movie_dict'][movie.movieid] = movie
             self.data_in_memory['movie_list'].append(movie)
+            self.data_in_memory['movie_rating'][movie.movieid] = movie.rate
+            genres = movie.genres.split('|')
+            for genre in genres:
+                if genre not in self.data_in_memory['movie_genre']:
+                    self.data_in_memory['movie_genre'][genre] = set()
+                self.data_in_memory['movie_genre'][genre].add(movie.movieid)
         for actor in Actor.objects.all():
             self.data_in_memory['actor_dict'][actor.actorid] = actor
             self.data_in_memory['actor_list'].append(actor)

@@ -1,10 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
 from movie.models import *
-from sklearn.metrics.pairwise import euclidean_distances
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer
+import operator
 import random
+from movie.initializer import search_index
 
 
 @csrf_protect
@@ -15,88 +14,50 @@ def index(request):
             return redirect('/movie/search/' + content)
     else:
         data = {}
+        movie_dict = search_index.data_in_memory['movie_dict']
         if request.user.is_authenticated:
             data = {'username': request.user.get_username()}
-
-            recommendations = set()
-            seens_and_expects = set()
-            seens = Seen.objects.filter(username=request.user.get_username())
-            if len(seens) != 0:
-                find_recommendations(recommendations, seens)
-                for seen in seens:
-                    seens_and_expects.add(seen.movieid.movieid)
-                    recommendations.remove(seen.movieid.movieid)
-            else:
-                expects = Expect.objects.filter(username=request.user.get_username())
-                if len(expects) != 0:
-                    find_recommendations(recommendations, expects)
-                    for expect in expects:
-                        seens_and_expects.add(expect.movieid.movieid)
-                        recommendations.remove(expect.movieid.movieid)
-
-            recommendation = []
-            if len(recommendations) < 5:
-                high_rates = Movie.objects.exclude(movieid__in=seens_and_expects).order_by('-rate')[:50]
-                supplies = random.sample(list(high_rates), 5 - len(recommendations))
-                for supply in supplies:
-                    recommendations.add(supply.movieid)
-                for movieid in recommendations:
-                    try:
-                        temp = {'movieid': movieid, 'poster': Movie.objects.get(movieid=movieid).poster}
-                        recommendation.append(temp)
-                    except:
-                        continue
-            else:
-                for movieid in random.sample(recommendations, 5):
-                    try:
-                        temp = {'movieid': movieid, 'poster': Movie.objects.get(movieid=movieid).poster}
-                        recommendation.append(temp)
-                    except:
-                        continue
-            data['recommendations'] = recommendation
-
         popular_movies = Popularity.objects.all().order_by('-weight')
         popular = []
         for movie in popular_movies[:5]:
             try:
-                temp = {'movieid': movie.movieid_id, 'poster': Movie.objects.get(movieid=movie.movieid_id).poster}
-                popular.append(temp)
+                popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
             except:
                 continue
         data['popular'] = popular
-
+        popular_movie_list = [movie_dict[movie.movieid_id] for movie in popular_movies[:5]]
+        data['recommendation'] = get_recommendation(request, popular_movie_list)
         return render(request, 'base.html', data)
 
 
-def find_recommendations(recommendations, user_favorite):
-    for seen_or_expect in user_favorite:
-        cur = Movie.objects.get(movieid=seen_or_expect.movieid.movieid)
-        if cur.plot is None or cur.plot == '':
-            continue
-        movies = Movie.objects.filter(genres=cur.genres)
-        elements = []
-        corpus = []
-        for movie in movies:
-            if movie.plot is not None and movie.plot != '':
-                elements.append({'movieid': movie.movieid})
-                corpus.append(movie.plot)
-
-        vectorizer = CountVectorizer()
-        transformer = TfidfTransformer()
-        tfidf = transformer.fit_transform(
-            vectorizer.fit_transform(corpus).todense())
-        weight = tfidf.toarray()
-
-        cur_vector = []
-        for i in range(len(elements)):
-            elements[i]['vector'] = weight[i].reshape(1, -1)
-            if elements[i]['movieid'] == seen_or_expect.movieid.movieid:
-                cur_vector = elements[i]['vector']
-
-        for element in elements:
-            dist = euclidean_distances(cur_vector, element['vector'])
-            element['dist'] = dist[0, 0]
-        elements = sorted(elements, key=lambda e: e['dist'])
-
-        for i in range(0, min(10, len(elements))):
-            recommendations.add(elements[i]['movieid'])
+def get_recommendation(request, popular_movie_list):
+    result = []
+    movie_dict = search_index.data_in_memory['movie_dict']
+    if request.user.is_authenticated:
+        username = request.user.get_username()
+        watched_movies = set([movie_dict[movie.movieid_id] for movie in Seen.objects.filter(username=username)] +
+                             [movie_dict[movie.movieid_id] for movie in Expect.objects.filter(username=username)])
+        unwatched_movies = set(search_index.data_in_memory['movie_list']) - watched_movies - set(popular_movie_list)
+        genre_stats = {}
+        for movie in watched_movies:
+            for genre in movie.genres.split('|'):
+                genre_stats[genre] = genre_stats.get(genre, 0) + 1
+        movie_score = {}
+        for movie in unwatched_movies:
+            for genre in movie.genres.split('|'):
+                movie_score[movie.movieid] = genre_stats.get(genre, 0) / len(watched_movies) + movie.rate
+        sorted_list = sorted(movie_score.items(), key=operator.itemgetter(1), reverse=True)
+        for item in sorted_list:
+            movie = movie_dict[item[0]]
+            result.append({'movieid': movie.movieid, 'poster': movie.poster})
+            if len(result) == 8:
+                break
+    sorted_list = sorted(search_index.data_in_memory['movie_rating'].items(), key=operator.itemgetter(1),
+                         reverse=True)
+    for item in sorted_list:
+        movie = movie_dict[item[0]]
+        if movie not in popular_movie_list:
+            result.append({'movieid': movie.movieid, 'poster': movie.poster})
+        if len(result) == 10:
+            break
+    return [result[i] for i in random.sample(range(len(result)), 5)]
