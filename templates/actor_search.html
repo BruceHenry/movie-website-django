@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+
+    <a href="/movie/search/movie/{{ query_string }}/{{ 1 }}">
+        <button class="button search_button">
+            <span class="glyphicon glyphicon-film"></span> Movie
+        </button>
+    </a>
+    <a href="/movie/search/actor/{{ query_string }}/{{ 1 }}">
+        <button class="button search_button" style="background-color: #008CBA;color: white;">
+            <span class="glyphicon glyphicon-user"></span> Actor
+        </button>
+    </a>
+    <div>
+        <h2>{{ length }} actor(s) with "{{ query_string }}":</h2>
+        <hr>
+
+        {% for actor in items %}
+            <h2><a href="/movie/actor_detail/{{ actor.actorid }}" target="_self">{{ actor.name }}</a></h2>
+            <img border="0" src="{{ actor.photo }}" alt="Cannot load photo, sorry!" width="200" height="280">
+            <hr>
+        {% endfor %}
+
+        {% if pages %}
+            <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+            {% if current_page != 1 %}
+                <a href="/movie/search/actor/{{ query_string }}/{{ 1 }}" target="_self">First</a>
+                <a href="/movie/search/actor/{{ query_string }}/{{ current_page|add:-1 }}" target="_self">Previous</a>
+            {% endif %}
+
+            {% for page in pages %}
+                {% if page == current_page %}
+                    <b>{{ page }}</b>
+                {% else %}
+                    <a href="/movie/search/actor/{{ query_string }}/{{ page }}" target="_self">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if current_page != page_number %}
+                <a href="/movie/search/actor/{{ query_string }}/{{ current_page|add:1 }}" target="_self">Next</a>
+                <a href="/movie/search/actor/{{ query_string }}/{{ page_number }}" target="_self">Last</a>
+            {% endif %}
+        {% endif %}
+
+    </div>
+{% endblock %}
