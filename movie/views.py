@@ -4,12 +4,7 @@ from movie.models import *
 from django.http import HttpResponse
 import json
 
-from movie.initializer import search_cache
-from movie import index
-
-index.load_data_from_db()
-index.index_dir()
-index.rating_dir()
+from movie.initializer import search_cache, search_index
 
 
 def add_seen(request, movie_id):
@@ -111,12 +106,12 @@ def whole_list(request, model, page):
 
 def search(request, pattern):
     pattern = pattern.replace("%20", " ")
-    search_results = index.wildcard_search(pattern)
+    search_results = search_index.search(pattern)
     movies, actors = [], []
     for movieid in search_results[0]:
-        movies.append(index.data_in_memory['movie_dict'].get(movieid))
+        movies.append(search_index.data_in_memory['movie_dict'].get(movieid))
     for actorid in search_results[1]:
-        actors.append(index.data_in_memory['actor_dict'].get(actorid))
+        actors.append(search_index.data_in_memory['actor_dict'].get(actorid))
     return render(request, 'searchresult.html',
                   {'items1': movies, 'search1': pattern, 'number1': len(movies),
                    'items2': actors,
@@ -128,31 +123,26 @@ def search_suggest(request, query_string):
     if result is not None:
         return HttpResponse(json.dumps(result, ensure_ascii=False))
     movie_list, actor_list = [], []
-    res = index.search_suggest(query_string)
+    res = search_index.search_suggest(query_string)
     movies, actors = [], []
     for movieid in res[0]:
-        movies.append(index.data_in_memory['movie_dict'].get(movieid))
+        movies.append(search_index.data_in_memory['movie_dict'].get(movieid))
     for actorid in res[1]:
-        actors.append(index.data_in_memory['actor_dict'].get(actorid))
-    # movie
+        actors.append(search_index.data_in_memory['actor_dict'].get(actorid))
     if len(movies) > 3:
         for i in range(3):
             movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
     else:
-        # movies = Movie.objects.filter(title__contains=str).order_by('-rate')
         num = 3 - len(movie_list) if len(movies) > 3 - len(movie_list) else len(movies)
         for i in range(num):
             movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
-    # actor
     if len(actors) > 3:
         for i in range(3):
             actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
     else:
-        # actors = Actor.objects.filter(name__contains=str)
         num = 3 - len(actor_list) if len(actors) > 3 - len(actor_list) else len(actors)
         for i in range(num):
             actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
-    # result in a dictionary
     result = {'movie': movie_list, 'actor': actor_list, 'text': query_string}
     search_cache.set(query_string, result)
     return HttpResponse(json.dumps(result, ensure_ascii=False))
