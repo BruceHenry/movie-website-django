@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_protect
 from movie.models import *
 from django.http import HttpResponse
 import json
+import math
 
 from movie.initializer import search_cache, search_index
 
@@ -87,20 +88,19 @@ def whole_list(request, model, page):
         return render(request, '404.html')
     page = int(page)
     objects = model.objects.all()
-    total_page = len(objects) // 10
-    if (len(objects) / 10 - len(objects) // 10) > 0:
-        total_page += 1
+    total_page = int(math.ceil(len(objects) / 10))
     if page > total_page:
         return render(request, '404.html')
-    pages = [x + 1 for x in range(total_page)]
-    end = 10 * page if page != total_page else len(objects)
-    result = objects[10 * (page - 1):end]
-    data = {'items': result, 'number': len(objects), 'pages': pages, 'current_page': page, 'next_page': page + 1,
-            'last_page': page - 1, 'page_number': total_page}
-    if page == 1:
-        del data['last_page']
-    if page == total_page:
-        del data['next_page']
+    last_item_index = 10 * page if page != total_page else len(objects)
+    pages = []
+    end_distance = total_page - page
+    start_page_num = page - 5 if end_distance >= 5 else page - 10 + end_distance
+    end_page_num = page + 5 if page > 5 else 10
+    for i in range(start_page_num, end_page_num + 1):
+        if 1 <= i <= total_page:
+            pages.append(i)
+    data = {'items': objects[10 * (page - 1):last_item_index], 'current_page': page, 'page_number': total_page,
+            'pages': pages}
     return render(request, '{}_list.html'.format(model.get_name()), data)
 
 
@@ -123,26 +123,17 @@ def search_suggest(request, query_string):
     if result is not None:
         return HttpResponse(json.dumps(result, ensure_ascii=False))
     movie_list, actor_list = [], []
-    res = search_index.search_suggest(query_string)
-    movies, actors = [], []
-    for movieid in res[0]:
-        movies.append(search_index.data_in_memory['movie_dict'].get(movieid))
-    for actorid in res[1]:
-        actors.append(search_index.data_in_memory['actor_dict'].get(actorid))
-    if len(movies) > 3:
-        for i in range(3):
-            movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
-    else:
-        num = 3 - len(movie_list) if len(movies) > 3 - len(movie_list) else len(movies)
-        for i in range(num):
-            movie_list.append({'movieid': movies[i].movieid, 'poster': movies[i].poster, 'title': movies[i].title})
-    if len(actors) > 3:
-        for i in range(3):
-            actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
-    else:
-        num = 3 - len(actor_list) if len(actors) > 3 - len(actor_list) else len(actors)
-        for i in range(num):
-            actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
+    search_result = search_index.search_suggest(query_string)
+    for i, movie_id in enumerate(search_result[0]):
+        movie = search_index.data_in_memory['movie_dict'].get(movie_id)
+        movie_list.append({'movieid': movie.movieid, 'poster': movie.poster, 'title': movie.title})
+        if i == 2:
+            break
+    for i, actor_id in enumerate(search_result[1]):
+        actor = search_index.data_in_memory['actor_dict'].get(actor_id)
+        actor_list.append({'actorid': actor.actorid, 'photo': actor.photo, 'name': actor.name})
+        if i == 2:
+            break
     result = {'movie': movie_list, 'actor': actor_list, 'text': query_string}
     search_cache.set(query_string, result)
     return HttpResponse(json.dumps(result, ensure_ascii=False))

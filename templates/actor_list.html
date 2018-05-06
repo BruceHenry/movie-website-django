@@ -122,22 +122,22 @@
 
         {% if pages %}
             <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
-            {% if last_page %}
-                <a href="/movie/actor_all/{{ last_page }}" target="_self"><<<</a>
+            {% if current_page != 1 %}
+                <a href="/movie/actor_all/{{ 1 }}" target="_self">First</a>
+                <a href="/movie/actor_all/{{ current_page|add:-1 }}" target="_self">Previous</a>
             {% endif %}
 
             {% for page in pages %}
-                {% with large=current_page|add:10 %}
-                    {% with small=page|add:10 %}
-                        {% if small >= current_page and page < large %}
-                            <a href="/movie/actor_all/{{ page }}" target="_self">{{ page }}</a>
-                        {% endif %}
-                    {% endwith %}
-                {% endwith %}
+                {% if page == current_page %}
+                    <b>{{ page }}</b>
+                {% else %}
+                    <a href="/movie/actor_all/{{ page }}" target="_self">{{ page }}</a>
+                {% endif %}
             {% endfor %}
 
-            {% if next_page %}
-                <a href="/movie/actor_all/{{ next_page }}" target="_self">>>></a>
+            {% if current_page != page_number %}
+                <a href="/movie/actor_all/{{ current_page|add:1 }}" target="_self">Next</a>
+                <a href="/movie/actor_all/{{ page_number }}" target="_self">Last</a>
             {% endif %}
         {% endif %}
 
