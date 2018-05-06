@@ -3,13 +3,13 @@ from django.views.decorators.csrf import csrf_protect
 from movie.models import *
 from django.http import HttpResponse
 import json
+
+from movie.initializer import search_cache
 from movie import index
 
-index.all_object_dict()
+index.load_data_from_db()
 index.index_dir()
 index.rating_dir()
-
-cache = {}
 
 
 def add_seen(request, movie_id):
@@ -114,26 +114,26 @@ def search(request, pattern):
     search_results = index.wildcard_search(pattern)
     movies, actors = [], []
     for movieid in search_results[0]:
-        movies.append(index.object_dict['movie_dict'].get(movieid))
+        movies.append(index.data_in_memory['movie_dict'].get(movieid))
     for actorid in search_results[1]:
-        actors.append(index.object_dict['actor_dict'].get(actorid))
+        actors.append(index.data_in_memory['actor_dict'].get(actorid))
     return render(request, 'searchresult.html',
                   {'items1': movies, 'search1': pattern, 'number1': len(movies),
                    'items2': actors,
                    'search2': pattern, 'number2': len(actors)})
 
 
-def search_suggest(request, str):
-    global cache
-    if str in cache:
-        return HttpResponse(json.dumps(cache.get(str), ensure_ascii=False))
+def search_suggest(request, query_string):
+    result = search_cache.get(query_string)
+    if result is not None:
+        return HttpResponse(json.dumps(result, ensure_ascii=False))
     movie_list, actor_list = [], []
-    res = index.search_suggest(str)
+    res = index.search_suggest(query_string)
     movies, actors = [], []
     for movieid in res[0]:
-        movies.append(index.object_dict['movie_dict'].get(movieid))
+        movies.append(index.data_in_memory['movie_dict'].get(movieid))
     for actorid in res[1]:
-        actors.append(index.object_dict['actor_dict'].get(actorid))
+        actors.append(index.data_in_memory['actor_dict'].get(actorid))
     # movie
     if len(movies) > 3:
         for i in range(3):
@@ -153,10 +153,8 @@ def search_suggest(request, str):
         for i in range(num):
             actor_list.append({'actorid': actors[i].actorid, 'photo': actors[i].photo, 'name': actors[i].name})
     # result in a dictionary
-    result = {'movie': movie_list, 'actor': actor_list, 'text': str}
-    if len(cache) > 1000:
-        cache = {}
-    cache[str] = result
+    result = {'movie': movie_list, 'actor': actor_list, 'text': query_string}
+    search_cache.set(query_string, result)
     return HttpResponse(json.dumps(result, ensure_ascii=False))
 
 
