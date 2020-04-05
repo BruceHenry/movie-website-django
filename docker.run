@@ -1,0 +1,3 @@
+#!/bin/bash
+sudo docker container rm -f movie
+sudo docker container run -d --name movie --network local --network-alias movie -p 8080:8080 movie
