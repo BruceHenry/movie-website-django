@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block mainbody %}
+<main class="container bootdey">
+<main class="main-content p-5" role="main">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                {% comment %} <img class="card-img" src="https://via.placeholder.com/600x100/" alt="Feature Image"> {% endcomment %}
+                <div class="card-user-profile">
+                    <div class="profile-page-left">
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="profile-picture profile-picture-lg bg-gradient bg-primary mb-4">
+                                    <img src="{{user.}}" width="144" height="144">
+                                </div>
+                                <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" href="#">
+                                    <span class="gradient">
+                                <i class="batch-icon batch-icon-user-alt-add-2"></i>
+                              Edit Profile
+                            </span>
+                        </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="my-0">Followers</h5>
+                                <div class="h3 my-0">
+                                    <a href="#">682</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="my-0">Following</h5>
+                                <div class="h3 my-0">
+                                    <a href="#">341</a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5>
+                      <i class="batch-icon batch-icon-users"></i>
+                      Friends
+                    </h5>
+                        <div class="profile-page-block-outer clearfix">
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar3.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar4.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar6.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar3.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar4.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <a class="float-right mt-2" href="#">More</a>
+                        </div>
+                        <hr>
+                        <h5>
+                      <i class="batch-icon batch-icon-image"></i>
+                      Information
+                    </h5>
+                        <a href="#">
+                            <img src="" class="img-fluid img-thumbnail">
+                        </a>
+                        <a class="float-right mt-2" href="#">More</a>
+                    </div>
+                    <div class="profile-page-center">
+                        <h1 class="card-user-profile-name">{{user.username}}</h1>
+                        <div class="comment-block">
+                            <div class="form-group">
+                                <textarea class="form-control" id="comment-textarea" rows="2" placeholder="Enter your comment here..."></textarea>
+                                <div class="media-feed-control clearfix">
+                                    <button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
+                                    <a href="#" data-toggle="tooltip" title="" data-original-title="Add Picture">
+                                        <i class="batch-icon batch-icon-image"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <ul class="list-unstyled mt-5">
+                            <li class="media">
+                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="44" height="44">
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-title mt-0 mb-1">
+                                        <a href="#">John Doe</a> <small> 1 hour ago</small>
+                                    </div>
+                                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio.
+                                    <div class="media-feed-control">
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-heart-full"></i> Like (4)
+                                        </a>
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment (2)
+                                        </a>
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-flag"></i> Report
+                                        </a>
+                                    </div>
+                                    <div class="media-body-reply-block">
+                                        <ul class="list-unstyled">
+                                            <li class="media mt-4">
+                                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="44" height="44">
+                                                </div>
+                                                <div class="media-body">
+                                                    <div class="media-title mt-0 mb-1">
+                                                        <a href="#">John Doe</a> <small> 45 mins ago</small>
+                                                    </div>
+                                                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio.
+                                                    <div class="media-feed-control">
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-heart-full"></i> Like
+                                                        </a>
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment
+                                                        </a>
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-flag"></i> Report
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="media mt-4">
+                                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                                    <img src="https://bootdey.com/img/Content/avatar/avatar3.png" width="44" height="44">
+                                                </div>
+                                                <div class="media-body">
+                                                    <div class="media-title mt-0 mb-1">
+                                                        <a href="#">John Doe</a> <small> 7 mins ago</small>
+                                                    </div>
+                                                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio.
+                                                    <div class="media-feed-control">
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-heart-full"></i> Like
+                                                        </a>
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment
+                                                        </a>
+                                                        <a href="#">
+                                                            <i class="batch-icon batch-icon-flag"></i> Report
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="comment-reply-block mt-4">
+                                                <div class="form-group clearfix">
+                                                    <textarea class="form-control comment-reply-textarea" rows="2" placeholder="Enter your comment here..."></textarea>
+                                                    <button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply</button>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="media">
+                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar4.png" width="44" height="44">
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-title mt-0 mb-1">
+                                        <a href="#">John Doe</a> <small> 1 hour ago</small>
+                                    </div>
+                                    <a href="#">
+                                        <img src="https://bootdey.com/img/Content/avatar/avatar3.png" class="img-fluid img-thumbnail">
+                                    </a>
+                                    <div class="media-feed-control">
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-heart-full"></i> Like (57)
+                                        </a>
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment
+                                        </a>
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-flag"></i> Report
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+{% endblock mainbody %}

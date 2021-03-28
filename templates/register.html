@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>MOVIESpy-Register</title>
+    <title>Imovie - Register</title>
     <style>
         #container {
             margin: auto;
@@ -11,12 +11,15 @@
         #header{
 
         }
-
+        #main_subtitle {
+            text-align : center;
+            padding: 24px 16px;
+        }
         form {
             border: 3px solid #f1f1f1;
         }
 
-        input[type=text], input[type=password] {
+        input[type=text], input[type=password] , input[type='email']{
             width: 100%;
             padding: 12px 20px;
             margin: 8px 0;
@@ -79,13 +82,13 @@
 </head>
 <body>
 <div id="container">
-    <h2 align="center"> Welcome to Join Us!</h2>
+    {% load crispy_forms_tags %}         
+    <h2 id='main_subtitle'> Welcome to join Imovie </h2>
     <form action="" method="post">
         <div class="imgcontainer">
             {% load static %}
-            <img src="{% static "images/movie.jpg" %}" alt="Avatar" class="avatar">
         </div>
-
+        
         {% if error %}
             <div class="error">
                 <p style="color:red;">{{ error }}</p>
@@ -94,11 +97,12 @@
 
         <div class="container">
             {% csrf_token %}
-            {{ form.as_p }}
+		    {{ register_form|crispy }}                    
             <button type="submit">Register</button>
+	<p class="text-center">If you already have an account, <a href="{% url 'index' %}">login</a> instead.</p>
         </div>
     </form>
-</div>
+</div> 
 
 </body>
 </html>

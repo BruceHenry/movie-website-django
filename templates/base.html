@@ -13,6 +13,8 @@
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
     <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
+
     <style type="text/css"></style>
 </head>
 
@@ -57,7 +59,7 @@
                 {% if user.is_authenticated %}
                     <li>
                         <p class="navbar-text" style="color:#fff9fe;">
-                            Welcome, {{ user.username }}</p></li>
+                            Welcome, <a href="/user/detail/" > {{ user.username }} </a> </p></li>
                     <li class="dropdown">
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown">myMovies<span class="caret"></span></a>
@@ -68,13 +70,16 @@
                         </ul>
                     </li>
                     <li style="align-items: center">
-                        <button class="btn btn-tumblr" onclick="logout()" style="margin-top:8px">Logout</button>
+                        <form method="post" action="/user/logout/">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-tumblr" style="margin-top:8px"  value="Logout">
+                        </form>
                     </li>
                 {% else %}
                     {% if message %}
                         <li><p class="navbar-text" style="color:red;">{{ message }}</p></li>
                     {% endif %}
-                    <li><p class="navbar-text">Already have an account?</p></li>
+                    <li><p class="navbar-text" style ="color: #fff;" >Already have an account?</p></li>
                     <li class="dropdown">
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
@@ -88,7 +93,7 @@
                                                 <span class="fa fa-facebook"></span> Facebook
                                             </button>
                                         </div>
-                                        or
+                                        Login with Account
                                         <form class="form" role="form" method="post" action="/user/login/"
                                               accept-charset="UTF-8" id="login-nav">
                                             {% csrf_token %}
@@ -108,13 +113,16 @@
                                             </div>
                                             <div class="checkbox">
                                                 <label>
-                                                    <input type="checkbox"> keep me logged-in
+                                                    <input type="checkbox"> Keep me Logged-in
                                                 </label>
+                                            </div>
+                                            <div>
+                                                <a href="/user/password_reset/"> <b> Forgot Password </b> </a>
                                             </div>
                                         </form>
                                     </div>
                                     <div class="bottom text-center">
-                                        New here ? <a href="/user/register/"><b>Join Us</b></a>
+                                        Register Now  ? <a href="/user/register/"><b>Join Us</b></a>
                                     </div>
                                 </div>
                             </li>
@@ -143,7 +151,7 @@
 
     window.fbAsyncInit = function () {
         FB.init({
-            appId: '283394035432709',
+            appId: '876304389878411',
             cookie: true,
             xfbml: true,  // parse social plugins on this page
             version: 'v2.8' // use graph api version 2.8
@@ -164,13 +172,14 @@
     }(document, 'script', 'facebook-jssdk'));
 
     function logout() {
+        // Doan nay chua hieu lam
         FB.logout(function () {
         });
         $.get("/user/logout/", function () {
-            location.reload();
+            location.replace('');
+            alert('Are you sure you want to Logout ');
         });
-        {#        location.href = "/user/logout/";#}
-    }
+    };
 
     function login() {
         FB.login(function (response) {
@@ -181,8 +190,10 @@
                         username: response.name,
                         password: "facebook"
                     }, function () {
+                        console.log('okeeeee');
                         location.reload();
-                    });
+                    } //dont understand
+                    );
                 });
             }
         });
@@ -258,14 +269,16 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>
 
     {% load static %}
-    <div style=" margin-left: 1%;">
-        <p style="color: white"><b>Recommendation For You:</b></p>
-        {% for movie in recommendation %}
-            <a href="/movie/movie_detail/{{ movie.movieid }}">
-                <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
-            </a>
-        {% endfor %}
-    </div>
+    {% if user.is_authenticated  %}
+        <div style=" margin-left: 1%;">
+            <p style="color: white"><b>Recommendation For You:</b></p>
+            {% for movie in recommendation %}
+                <a href="/movie/movie_detail/{{ movie.movieid }}">
+                    <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 
