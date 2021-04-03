@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import *
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
 from .forms import UserCreateForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,6 +20,10 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
+from .models import Profile
+
+#add os to display image
+import os
 
 # UserModel = get_user_model()
 
@@ -33,7 +39,7 @@ def user_login(request):
             print("User Login:  Username:" + user_name + '    Password:' + pass_word)
             print(request.POST)
             login(request, user)
-            return redirect(request.POST.get('path'))
+            return redirect('/')
         else:
             return render(request, 'base.html', {'message': 'Username or Password wrong!'})
     else:
@@ -106,6 +112,44 @@ def facebook(request):
     return HttpResponse()
 
 def user_detail(request, format=None):
-    print('co goi den day khong !!!')
     username = request.user.get_username()
-    return render(request, "user_detail.html", {'username': username})
+    profile = Profile.objects.filter(user=request.user).order_by('-id')[0]
+    context = {
+        'username': username,
+        'gender': profile.gender,
+        'birthday': profile.birthday,
+        'bio': profile.bio,
+        'profile': profile,
+    }
+    return render(request, "user_detail.html",context)
+@login_required
+def user_detail_edit_profile(request):
+    response_data = {}
+    if request.method == "POST":
+        # get data
+        if request.is_ajax():
+            print('oke')
+            location = request.POST.get('location')
+            gender = request.POST.get('gender')
+            birthday =  request.POST.get('birthday')
+            bio = request.POST.get('bio')
+            profile_picture = request.FILES.get('profile_picture')
+            print('image',profile_picture)
+
+            user_profile = Profile.objects.filter(user=request.user).order_by('-id')[0].delete()
+            user_profile = Profile.objects.create(user=request.user, location=location, bio=bio, birthday=birthday, profile_picture=profile_picture)
+            user_profile.save()
+
+
+            # return data
+            response_data['location'] = location
+            response_data['gender'] = gender
+            response_data['birthday'] = birthday
+            response_data['bio'] = bio
+            response_data['profile_picture'] = user_profile.profile_picture.url
+
+
+            return JsonResponse(response_data)
+            # return HttpResponse('hello world')
+    return render(request, 'edit_detail_profile.html', {'user': request.user})
+

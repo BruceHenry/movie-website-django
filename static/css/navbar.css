@@ -68,3 +68,10 @@
         border-top:0 none;
     }
 }
+.navbar-header{
+        align-items: center;
+        display: flex;
+        margin: 0 auto;
+        min-height: 100%;
+        width: 1128px;
+}

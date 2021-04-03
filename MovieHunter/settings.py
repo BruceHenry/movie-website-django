@@ -11,9 +11,13 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from pathlib import Path
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#edit 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -24,7 +28,7 @@ SECRET_KEY = ')xttil7o#c&*nw8)d+n@nns-$py#7rv86!=l_t)-#9!ov65l5)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".hbao.blog", ".localhost"]
+ALLOWED_HOSTS = [".localhost"]
 
 # Application definition
 
@@ -71,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                  'social_django.context_processors.backends',  #
                 'social_django.context_processors.login_redirect',  # 
+                'django.template.context_processors.media', # media
             ],
         },
     },
@@ -112,7 +117,6 @@ AUTHENTICATION_BACKENDS = [
     #'social_core.backends.instagram.InstagramOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Internationalization
@@ -148,10 +152,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# image storage - avatar 
-MEDIA_ROOT =  os.path.join(BASE_DIR, 'media') 
-MEDIA_URL = '/media/'
 
+# image storage - avatar 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'
 
 # email - verify 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -169,3 +173,4 @@ DEFAULT_FROM_EMAIL = 'noreply<no_reply@domain.com>'
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
+

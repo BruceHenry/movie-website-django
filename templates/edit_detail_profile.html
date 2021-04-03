@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block mainbody %}
+
+<div class="container rounded bg-white mt-5 mb-5">
+    <div class="profile-page-left">
+        <div class="row">
+            <div class="ccol-md-12">
+                <div class="profile-picture profile-picture-lg bg-gradient bg-primary mb-4">
+                    {% if user.profile.profile_picture %}
+                        <img id="avatar" src="{{ user.profile.profile_picture.url }}" alt="User Photo">
+                    {% else %}
+                        <img src="/media/image/avatar.png" alt="User Photo">
+                    {% endif %}
+
+            </div>
+        </div>
+    <div>
+
+        <div class="col-md-5 border-right">
+            <div class="p-3 py-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <form id="profile" method="POST" enctype="multipart/form-data">
+                        <div class="row mt-3">
+                            {% csrf_token %}
+                                <div class="col-md-12"><label class="labels">Location</label><input type="text" id='location' name="location" class="form-control" placeholder="enter location..." value="{{user.profile.location}}"></div>
+                                <br>
+                                <div class="col-md-12"><label class="labels">Gender</label></div>
+                                <br>
+                                <div class="col-md-12"><input type="radio" name="gender" value="M"> Male<br> </div>
+                                <div class="col-md-12"><input type="radio" name="gender" value="F"> Female<br> </div>
+                                <br>
+                                <div class="col-md-12"><label class="labels">Birthday</label><input type="date" id='birthday' name="birthday" class="form-control" placeholder="enter Bio" value="{{user.profile.birthday|date:'Y-m-d'}}"></div>
+                                <br>
+                                <div class="col-md-12"><label class="labels">Bio</label><input type="text" id='bio' name="bio" class="form-control" placeholder="enter" value="{{user.profile.bio}}"></div>
+                                <br>
+                                <div class="col-md-12"><label class="labels">Avatar</label><input id='profile_picture' name="profile_picture" type="file" value="{{user.profile.profile_picture}}"> </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-success" type="submit" > Submit </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function (){
+        $("form").submit(function (event) {
+            console.log($('#profile_picture').val());
+        var formdata =  new FormData($('#profile').get(0));
+        console.log(formdata);
+        $.ajax({
+          type: "POST",
+          url: "{% url 'detail-edit-profile'%}",
+          data: formdata,
+        processData: false,
+        contentType: false
+        }).done(function (data) {
+          console.log(data);
+            $('#avatar').attr("src", data.profile_picture);
+            Swal.fire(
+            'Succsess !',
+            'You changed the profile !',
+            'success'
+            );
+        });
+        event.preventDefault();
+    });
+    });
+</script>
+{% endblock mainbody %}

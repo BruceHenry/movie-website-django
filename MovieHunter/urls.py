@@ -26,6 +26,10 @@ urlpatterns = [
     url(r'^movie/', include('movie.urls')),
     url(r'^user/', include('user.urls')),
     url(r'^$', views.index, name='index'),
-    url(r'.*', lambda request: render(request, '404.html'), name='404'),
-    path('verification/', include('verify_email.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # error here 
+    # url(r'.*', lambda request: render(request, '404.html'), name='404'),
+    path('verification/', include('verify_email.urls')),] 
+
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -16,6 +16,15 @@ urlpatterns = [
     path('password_reset/reset/complete', auth_views.PasswordResetCompleteView.as_view(template_name= "templates/password_reset_complete.html") ,name='password_reset_complete'),
     
     #detail and profile
-    url('detail/', views.user_detail, name='detail'),
+    path('detail/', views.user_detail, name='detail'),
+    path('detail/edit_profile', views.user_detail_edit_profile, name='detail-edit-profile'),
+
     path('activate/<uidb64>/',views.activate, name='activate'),  
+
+    #test image upload 
+
+    # path('image', views.hotel_image_view, name='upload'),
+    # path('success', views.success, name='display'),
+
+
 ]

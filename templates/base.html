@@ -14,15 +14,20 @@
     <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 
     <style type="text/css"></style>
 </head>
 
 {% load static %}
-<body style="background-color:#FAFAD2;">
-<nav class="navbar navbar-default navbar-inverse" role="navigation" style="margin-bottom: 0">
+<body style="background-color:#FFF;">
+<nav class="navbar navbar-default navbar-inverse" role="navigation" style="margin: 0">
     <div class="container-fluid">
-        <div class="navbar-header">
+        <div class="navbar-header" style=" align-items: center;
+        display: flex;
+        min-height: 100%;
+        width: 112px;">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                     data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
@@ -255,11 +260,10 @@
         });
     }
 </script>
-
 {% block mainbody %}
     {% load static %}
     <div style=" margin-left: 1%;">
-        <p style="color: white"><b>Recently Popular:</b></p>
+        <p style="color: white"><b>Seen Recently :</b></p>
         {% for movie in popular %}
             <a href="/movie/movie_detail/{{ movie.movieid }}">
                 <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">

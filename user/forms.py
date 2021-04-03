@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Profile
+from django.db import models
+
 #create your form here !
 class UserCreateForm(UserCreationForm):
 	email = forms.EmailField(required=True)
@@ -28,3 +31,8 @@ class UserCreateForm(UserCreationForm):
 			raise forms.ValidationError("This email already used")
 		return data
 
+# form update profile :
+# class ProfileForm(forms.ModelForm):
+# 	class Meta:
+# 		model = Profile
+# 		fields = ("gender", "birthday", "location")
