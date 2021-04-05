@@ -43,6 +43,15 @@
             <ul class="nav navbar-nav">
                 <li><a href="/movie/movie_all/1"><span class="glyphicon glyphicon-film"></span> Movies</a></li>
                 <li><a href="/movie/actor_all/1"><span class="glyphicon glyphicon-user"></span> Actors</a></li>
+                <li class="dropdown">
+                        <a  href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                           data-toggle="dropdown">My Movies<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="/movie/seen/">Favourite List </a></li>
+                            <li class="divider"></li>
+                            <li><a href="/movie/expect/">Expect List</a></li>
+                        </ul>
+                </li>
             </ul>
             <form class="navbar-form navbar-left" id="search--form" onsubmit="searchSubmit()">
                 {% csrf_token %}
@@ -63,16 +72,12 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                     <li>
-                        <p class="navbar-text" style="color:#fff9fe;">
-                            Welcome, <a href="/user/detail/" > {{ user.username }} </a> </p></li>
-                    <li class="dropdown">
-                        <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                           data-toggle="dropdown">myMovies<span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="/movie/seen/">Seen List</a></li>
-                            <li class="divider"></li>
-                            <li><a href="/movie/expect/">Expect List</a></li>
-                        </ul>
+                        <p class="navbar-text" style="color:#fff9">
+                            Welcome, <a href="/user/detail/" > {{ user.username }} </a>
+                        </p>
+                        <p class="navbar-text" >
+                            <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
+                        </p>
                     </li>
                     <li style="align-items: center">
                         <form method="post" action="/user/logout/">
@@ -262,6 +267,7 @@
 </script>
 {% block mainbody %}
     {% load static %}
+    {% load humanize  %}
     <div style=" margin-left: 1%;">
         <p style="color: white"><b>Seen Recently :</b></p>
         {% for movie in popular %}

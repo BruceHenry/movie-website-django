@@ -54,7 +54,7 @@
           url: "{% url 'detail-edit-profile'%}",
           data: formdata,
         processData: false,
-        contentType: false
+        contentType: false,
         }).done(function (data) {
           console.log(data);
             $('#avatar').attr("src", data.profile_picture);

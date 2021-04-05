@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+'<li class="media mt-4">' +
+                                                    '<div class="profile-picture bg-gradient bg-primary mb-4">' +
+                                                        '<img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="44" height="44">' +
+                                                    '</div>' +
+                                                    '<div class="media-body">' +
+                                                        '<div class="media-title mt-0 mb-1">' +
+                                                            '<a href="{{ post.user.profile.profile.get_absolute_url }}">' + {{ post.user.username }} + '</a>' +  '<small>' + post.date_posted + '</small>'+
+                                                        '</div>' +
+                                                        {{ post.content }} +
+                                                        '<div class="media-feed-control">' +
+                                                            '<a href="#">'+
+                                                                '<i class="batch-icon batch-icon-heart-full"></i> Like'
+                                                            '</a>'+
+                                                            '<a href="#">'+
+                                                                '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment +
+                                                            '</a>' +
+                                                            '<a href="#">' +
+                                                                '<i class="batch-icon batch-icon-flag"></i>Report +
+                                                            '</a>'+
+                                                        '</div>'+
+                                                    '</div>'+
+                                                '</li>'+
+
+                                                '<li class="comment-reply-block mt-4">' +
+                                                '<div class="form-group clearfix">'+
+                                                    '<textarea class="form-control comment-reply-textarea" rows="2" placeholder="Enter your comment here..."></textarea>'
+                                                    '<button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply</button>'
+                                                '</div>'+
+                                            '</li>'+
+</body>
+</html>

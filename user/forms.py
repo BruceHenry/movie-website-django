@@ -30,9 +30,3 @@ class UserCreateForm(UserCreationForm):
 		if User.objects.filter(email=data).exists():
 			raise forms.ValidationError("This email already used")
 		return data
-
-# form update profile :
-# class ProfileForm(forms.ModelForm):
-# 	class Meta:
-# 		model = Profile
-# 		fields = ("gender", "birthday", "location")

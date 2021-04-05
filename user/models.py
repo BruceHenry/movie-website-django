@@ -5,16 +5,20 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from autoslug import AutoSlugField
+from django.template.defaultfilters import slugify
 
 # add exception for user -> to profile 
 from django.core.exceptions import ObjectDoesNotExist
 # Create your models here.
 
 #add unique Email 
-User._meta.get_field('email')._unique = True
+# User._meta.get_field('email')._unique = True
 
 # add os to display url image avatar 
 import os
+
+#add timezones
+from django.utils import timezone
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
@@ -26,14 +30,17 @@ class Profile(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
     profile_picture = models.ImageField(upload_to='image/', default='image/avatar.png')
     birthday = models.DateField(verbose_name=("Birthday"), null=True)
-    slug = AutoSlugField(populate_from='user')
+    # slug = AutoSlugField(populate_from='user')
     bio = models.CharField(max_length=255, blank=True)
+
+    # def slug(self):
+    #     return slugify(self.id)
 
     def __str__(self):
         return self.user.username
     
     def get_absolute_url(self):
-        return "/users/detail/{}".format(self.slug)
+        return "/user/detail/{}".format(self.id)
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
@@ -41,4 +48,49 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         instance.profile.save()
     except ObjectDoesNotExist:
         Profile.objects.create(user=instance)
+
+class PostToUser(models.Model):
+    content = models.TextField(max_length=240)
+    date_posted = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='UserComment')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ToUser')
+    likes = models.ManyToManyField(User, related_name='likes', blank = True)
+    reports = models.ManyToManyField(User, related_name='reports', blank = True)
+
+    def __str__(self):
+        return "Post form {} to {}".format(self.author, self.to_user)
+
+    #def get_absolute_url(self):
+    #    return reverse('beets:beets-detail', kwargs={'pk': self.pk})
+
+    @property
+    def total_likes(self):
+        """
+        Likes for the beet
+        :return: Integer: Likes for the company
+        """
+        return self.likes.count()
+
+    @property
+    def total_reports(self):
+        """
+        Likes for the beet
+        :return: Integer: Likes for the company
+        """
+        return self.reports.count()
+
+    def total_comments(selfs):
+        return selfs.CommentToPost.author.count()
+
+class CommentToPost(models.Model):
+    content = models.TextField(max_length=240)
+    date_posted = models.DateTimeField(default=timezone.now)
+    post = models.ForeignKey(PostToUser, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.content
+
+
+
 

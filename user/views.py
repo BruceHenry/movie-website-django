@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth import *
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,11 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
-from .models import Profile
+from .models import Profile, PostToUser, CommentToPost
+
+# add date time and time ago - humaize
+import datetime
+import humanize
 
 #add os to display image
 import os
@@ -97,7 +101,7 @@ def activate(request, uidb64):
 
 #complete Facebook
 def facebook(request):
-    print('chuyen toi day !!!!')
+    print('Process here ...')
     username = request.POST.get('username')
     password = request.POST.get('password')
     user = authenticate(username=username, password=password)
@@ -152,4 +156,42 @@ def user_detail_edit_profile(request):
             return JsonResponse(response_data)
             # return HttpResponse('hello world')
     return render(request, 'edit_detail_profile.html', {'user': request.user})
+
+
+@login_required
+def comunity(request):
+    users = User.objects.all()
+    for user in users:
+        print(user)
+        # print(get_abouste_url(user))
+        # print(user.get_abouste_url())
+    return render(request, 'comunity.html', {'users': users})
+
+# get profile by id ...
+@login_required
+def detail_user(request, profile_id):
+        profile = get_object_or_404(Profile, pk=profile_id)
+        post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
+        if request.method == 'POST':
+            if request.is_ajax():
+                content = request.POST.get('content')
+                date_posted = datetime.datetime.now()
+                print(content)
+
+                new_post = PostToUser(content = content, author = request.user, to_user = profile.user, date_posted = date_posted)
+                new_post.save()
+
+
+                data = {
+                    'send_user': request.user.username,
+                    'to_user': profile.user.username,
+                    'content': content,
+                    'date_posted': 'just now',
+                    'send_user_url': request.user.profile.get_absolute_url(),
+                    'send_user_avatar': request.user.profile.profile_picture.url,
+                }
+
+                return JsonResponse(data)
+
+        return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments})
 

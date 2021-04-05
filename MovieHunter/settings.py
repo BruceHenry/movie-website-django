@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'verify_email',
     'six',
+    #add time ago ... load humanize
+    'django.contrib.humanize',
 
 ]
 
@@ -174,3 +176,7 @@ DEFAULT_FROM_EMAIL = 'noreply<no_reply@domain.com>'
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
+# add user url overite
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: "/detail/%s/" % u.username,
+}

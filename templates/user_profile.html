@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block mainbody %}
+
+<main class="container bootdey">
+<main class="main-content p-5" role="main">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-user-profile">
+                    <div class="profile-page-left">
+                        <div class="row">
+                            <div class="col-lg-12 mb-4">
+                                <div class="profile-picture profile-picture-lg bg-gradient bg-primary mb-4">
+                                    {% if profile.profile_picture %}
+                                        <img src="{{ profile.profile_picture.url }}" width="44" height="44">
+                                    {% else %}
+                                        <img src="/media/image/avatar.png" width="44" height="44">
+                                    {% endif %}
+                                </div>
+                                <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" href="#"> Follow </a>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="my-0">Followers</h5>
+                                <div class="h3 my-0">
+                                    <a href="#">682</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h5 class="my-0">Following</h5>
+                                <div class="h3 my-0">
+                                    <a href="#">341</a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5>
+                      <i class="batch-icon batch-icon-users"></i>
+                      Friends
+                    </h5>
+                        <div class="profile-page-block-outer clearfix">
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <h5>
+                      <i class="batch-icon batch-icon-users"></i>
+                      Information
+                    </h5>
+                        <p class="float-right mt-2"> Birthday : {{birthday}}</p>
+                        {% if gender == 'M' %}
+                            <p class="float-right mt-2"> Gender : Male</p>
+                        {% else %}
+                            <p class="float-right mt-2"> Gender : Female</p>
+                        {% endif %}
+                    </div>
+                    <div class="profile-page-center">
+                        <h3 class="card-user-profile-name"> News Feeds </h3>
+
+
+                        <div class="comment-block">
+                            <div id="form-comment" class="form-group">
+                                <textarea class="form-control" id="comment-textarea" rows="2" placeholder="Say something for {{profile.user}}..."></textarea>
+                                <div class="media-feed-control clearfix">
+                                    <button onclick="comment()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+
+                        <ul class="list-unstyled mt-5">
+                            <li class="media">
+
+                                <div id="comment-body" class="media-body">
+
+                                    <div class="media-body-reply-block">
+                                        <ul id="list-comment"  class="list-unstyled">
+                                            {% for post in posts %}
+
+                                                <li id="li-comment" class="media mt-4">
+                                                    <div class="profile-picture bg-gradient bg-primary mb-4">
+                                                        <img src="{{ post.author.profile.profile_picture.url}}" width="44" height="44">
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <div class="media-title mt-0 mb-1">
+                                                            <a href="{{ post.author.profile.get_absolute_url }}">{{ post.author.username }}</a> <small> {{ post.date_posted }}</small>
+                                                        </div>
+                                                        {{ post.content }}
+                                                        <div class="media-feed-control">
+                                                            <a href="#">
+                                                                <i class="batch-icon batch-icon-heart-full"></i> Like
+                                                            </a>
+                                                            <a href="#">
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment
+                                                            </a>
+                                                            <a href="#">
+                                                                <i class="batch-icon batch-icon-flag"></i> Report
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+
+                                                <li class="comment-reply-block mt-4">
+                                                <div class="form-group clearfix">
+                                                    <textarea class="form-control comment-reply-textarea" rows="2" placeholder="Enter your comment here..."></textarea>
+                                                    <button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply</button>
+                                                </div>
+                                            </li>
+
+                                            {% endfor %}
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</div>
+    <script>
+        $('#comment-textarea').keyup(function(){
+            console.log($('#comment-textarea').val());
+        });
+
+        function comment() {
+            var content = $('#comment-textarea').val();
+            console.log(content);
+
+            if (content == '') {
+                Swal.fire('Comments cannot be empty');
+                return
+            }
+            ;
+            $.ajax({
+                type: "POST",
+                // bo sung dau gach cheo moi duoc
+                url: "",
+                data: {content: content},
+                processData: "application/json",
+                dataType: "json",
+                beforeSend:function (xhr,settings) {
+                    xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                },
+            }).done(function (data) {
+                console.log(data);
+                document.getElementById("comment-textarea").value = '' ;
+
+                 $("#comment-body").prepend(
+                     '<li class="media mt-4">' +
+                        '<div class="profile-picture bg-gradient bg-primary mb-4">' +
+                            '<img src="' + data.send_user_avatar +'"'  + 'width="44" height="44">' +
+                        '</div>' +
+                        '<div class="media-body">' +
+                            '<div class="media-title mt-0 mb-1">' +
+                                '<a href=' +'"'+ data.send_user_url + '"' +'>'  + data.send_user + '</a>' +  '<small>' + '   ' +    data.date_posted + '</small>'+
+                            '</div>' +
+                            data.content +
+                            '<div class="media-feed-control">' +
+                                '<a href="#">'+
+                                    '<i class="batch-icon batch-icon-heart-full"></i>' +'Like' +
+                                '</a>'+
+                                '<a href="#">'+
+                                    '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' +
+                                '</a>' +
+                                '<a href="#">' +
+                                    '<i class="batch-icon batch-icon-flag"></i>' + 'Report' +
+                                '</a>'+
+                            '</div>'+
+                        '</div>'+
+                    '</li>' +
+                    '<li class="comment-reply-block mt-4">' +
+                        '<div class="form-group clearfix">'+
+                            '<textarea class="form-control comment-reply-textarea" rows="2" placeholder="Reply here ..."></textarea>' +
+                            '<button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">' + 'Reply' + '</button>' +
+                        '</div>'+
+                    '</li>'
+                );
+                Swal.fire(
+                    'Succsess !',
+                    'You changed the profile !',
+                    'success'
+                );
+
+
+            });
+            event.preventDefault();
+        };
+
+    </script>
+{% endblock mainbody %}

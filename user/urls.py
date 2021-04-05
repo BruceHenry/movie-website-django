@@ -18,6 +18,11 @@ urlpatterns = [
     #detail and profile
     path('detail/', views.user_detail, name='detail'),
     path('detail/edit_profile', views.user_detail_edit_profile, name='detail-edit-profile'),
+    #add comunity page
+
+    path('comunity/', views.comunity, name='comunity'),
+
+    path('detail/<int:profile_id>/', views.detail_user, name='detail-user'),
 
     path('activate/<uidb64>/',views.activate, name='activate'),  
 
