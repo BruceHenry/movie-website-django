@@ -78,7 +78,6 @@
                                     <div class="media-body-reply-block">
                                         <ul id="list-comment"  class="list-unstyled">
                                             {% for post in posts %}
-
                                                 <li id="li-comment" class="media mt-4">
                                                     <div class="profile-picture bg-gradient bg-primary mb-4">
                                                         <img src="{{ post.author.profile.profile_picture.url}}" width="44" height="44">
@@ -87,28 +86,37 @@
                                                         <div class="media-title mt-0 mb-1">
                                                             <a href="{{ post.author.profile.get_absolute_url }}">{{ post.author.username }}</a> <small> {{ post.date_posted }}</small>
                                                         </div>
-                                                        {{ post.content }}
+                                                        <b> {{ post.content }} </b>
                                                         <div class="media-feed-control">
                                                             <a href="#">
-                                                                <i class="batch-icon batch-icon-heart-full"></i> Like
+                                                                <i class="batch-icon batch-icon-heart-full"></i> Like {{post.total_likes}}
                                                             </a>
                                                             <a href="#">
-                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment {{post.total_comments}}
                                                             </a>
                                                             <a href="#">
                                                                 <i class="batch-icon batch-icon-flag"></i> Report
                                                             </a>
                                                         </div>
                                                     </div>
+                                                    <li class="comment-reply">
+                                                        {% for reply  in post.get_all_reply %}
+                                                            <div class="media-title mt-0 mb-1">
+                                                                <a href="{{ reply.author.profile.get_absolute_url }}">{{ reply.author.username }}</a> <small> {{ reply.date_posted }}</small>
+                                                            </div>
+                                                            <b> {{ reply.content }} </b>
+                                                        {% endfor %}
+                                                    </li>
+{#                                                    <li class="comment-reply-block mt-4">#}
+                                                    <li>
+                                                        <form method="POST" class="form-reply" enctype="multipart/form-data">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
+                                                            <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here ....."></textarea>
+                                                            <button type="submit" id="button{{post.id}}" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply </button>
+                                                        </form>
+                                                    </li>
                                                 </li>
-
-                                                <li class="comment-reply-block mt-4">
-                                                <div class="form-group clearfix">
-                                                    <textarea class="form-control comment-reply-textarea" rows="2" placeholder="Enter your comment here..."></textarea>
-                                                    <button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply</button>
-                                                </div>
-                                            </li>
-
                                             {% endfor %}
 
                                         </ul>
@@ -141,7 +149,7 @@
                 type: "POST",
                 // bo sung dau gach cheo moi duoc
                 url: "",
-                data: {content: content},
+                data: {content: content, type : 'comment'},
                 processData: "application/json",
                 dataType: "json",
                 beforeSend:function (xhr,settings) {
@@ -182,7 +190,7 @@
                     '</li>'
                 );
                 Swal.fire(
-                    'Succsess !',
+                    'Post success !',
                     'You changed the profile !',
                     'success'
                 );
@@ -191,6 +199,65 @@
             });
             event.preventDefault();
         };
+
+
+        $(document).ready(function () {
+            $('.form-reply').on('submit', function (event) {
+                event.preventDefault();
+                //remember the form element
+                var $form = $(this);
+
+                //disable the submit button and remember it for later
+                var $button = $form.find("button[type='submit']").attr('disabled', true);
+                // get dom by name
+                var $content = $form.find("textarea[name='content']");
+                // get dome by id
+                {#var $postID = $form.find(".postID");#}
+
+                var content =  $form.find("textarea[name='content']").val();
+                var postID =   $form.find("input[name='postID']").val();
+
+
+
+                console.log(content);
+                console.log(postID);
+
+                // now do ajax
+                $.ajax({
+                url: "",
+                type: 'POST',
+                datatype: 'json',
+                processData: "application/json",
+                data: {
+                    content: content,
+                    postID: postID,
+                    type: 'reply',
+                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
+                },
+                beforeSend:function (xhr,settings) {
+                    xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                },
+            }).done(function (data){
+                $content.val('');
+                console.log(data);
+                $(".comment-reply").prepend( '<div class="media-title mt-0 mb-1">' +
+                    '<a href="' + data.send_user_url + ' ">' + data.send_user  + '</a>' +  '<small>'  + data.date_posted + '</small>' +
+                                                            '</div>' + '<b>'+ data.content +  '</b>');
+
+                Swal.fire(
+                    'Succsess !',
+                    'You just reply !',
+                    'success'
+                );
+            });
+            });
+        });
+
+
+
+
+
+
 
     </script>
 {% endblock mainbody %}

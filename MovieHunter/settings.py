@@ -180,3 +180,5 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: "/detail/%s/" % u.username,
 }
+
+# timezone

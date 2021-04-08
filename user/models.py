@@ -19,6 +19,8 @@ import os
 
 #add timezones
 from django.utils import timezone
+import humanize
+import datetime as dt
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
@@ -58,7 +60,7 @@ class PostToUser(models.Model):
     reports = models.ManyToManyField(User, related_name='reports', blank = True)
 
     def __str__(self):
-        return "Post form {} to {}".format(self.author, self.to_user)
+        return self.content
 
     #def get_absolute_url(self):
     #    return reverse('beets:beets-detail', kwargs={'pk': self.pk})
@@ -79,8 +81,14 @@ class PostToUser(models.Model):
         """
         return self.reports.count()
 
-    def total_comments(selfs):
-        return selfs.CommentToPost.author.count()
+    def total_comments(self):
+        return CommentToPost.objects.filter(post = self).count()
+
+    def get_all_reply(self):
+
+        replys = CommentToPost.objects.filter(post = self).order_by('-date_posted')
+
+        return replys
 
 class CommentToPost(models.Model):
     content = models.TextField(max_length=240)

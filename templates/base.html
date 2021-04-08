@@ -64,8 +64,8 @@
                 <div class="searchlistdiv"
                      style="position:absolute;top:42px;left:295px;user-select:none;display:none;width: 380px;"
                      aria-expanded="false">
-                    <div class="search-movie">Movie:</div>
-                    <div class="search-actor">Actor:</div>
+                    <div class="search-movie"><b> Movie  </b> </div>
+                    <div class="search-actor"><b> Actor </b>:</div>
                 </div>
             </form>
 
@@ -171,14 +171,15 @@
         });
 
     };
+    // o day la ket noi voi facebook...
 
     (function (d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s);
-        js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js";
-        fjs.parentNode.insertBefore(js, fjs);
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) return;
+       js = d.createElement(s);
+       js.id = id;
+       js.src = "//connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
 
     function logout() {
@@ -208,8 +209,7 @@
             }
         });
     }
-</script>
-<script>
+
     function searchSubmit() {
         var action_src = '/movie/search/movie/' + document.getElementById("search-input").value + '/1';
         document.getElementById('search--form').action = action_src;
@@ -290,7 +290,5 @@
         </div>
     {% endif %}
 {% endblock %}
-
-
 </body>
 </html>

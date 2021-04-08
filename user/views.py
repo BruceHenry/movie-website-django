@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.models import User
-from .forms import UserCreateForm
+from .forms import UserCreateForm, ReplyForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
@@ -170,28 +170,62 @@ def comunity(request):
 # get profile by id ...
 @login_required
 def detail_user(request, profile_id):
+        print('vao day 1')
         profile = get_object_or_404(Profile, pk=profile_id)
         post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
         if request.method == 'POST':
+            print('vao day 2')
+
             if request.is_ajax():
-                content = request.POST.get('content')
-                date_posted = datetime.datetime.now()
-                print(content)
+                print('vao day 3')
 
-                new_post = PostToUser(content = content, author = request.user, to_user = profile.user, date_posted = date_posted)
-                new_post.save()
+                type = request.POST.get('type')
+                print('o day type la gi ', type)
+                if type == 'comment':
+                    print('vao day 4')
+                    content = request.POST.get('content')
+                    date_posted = datetime.datetime.now()
+                    print(content)
+
+                    new_post = PostToUser(content = content, author = request.user, to_user = profile.user, date_posted = date_posted)
+                    new_post.save()
 
 
-                data = {
-                    'send_user': request.user.username,
-                    'to_user': profile.user.username,
-                    'content': content,
-                    'date_posted': 'just now',
-                    'send_user_url': request.user.profile.get_absolute_url(),
-                    'send_user_avatar': request.user.profile.profile_picture.url,
-                }
+                    data = {
+                        'send_user': request.user.username,
+                        'to_user': profile.user.username,
+                        'content': content,
+                        'date_posted': 'just now',
+                        'send_user_url': request.user.profile.get_absolute_url(),
+                        'send_user_avatar': request.user.profile.profile_picture.url,
+                    }
 
-                return JsonResponse(data)
+                    return JsonResponse(data)
+                else:
+                    if type == 'reply':
+                        print('vao day 5')
+                        print('ban da vao day : reply .....')
+                        content = request.POST.get('content')
+                        date_posted = datetime.datetime.now()
+                        postID = request.POST.get('postID')
+                        post = get_object_or_404(PostToUser, pk=int(postID))
 
+                        print(content)
+                        print(postID)
+
+                        reply =  CommentToPost(post = post, author = request.user, date_posted = date_posted, content = content)
+                        reply.save()
+
+
+                        data = {
+                            'send_user': request.user.username,
+                            'to_post': postID,
+                            'content': content,
+                            'date_posted': 'just now',
+                            'send_user_url': request.user.profile.get_absolute_url(),
+                            'send_user_avatar': request.user.profile.profile_picture.url,
+                        }
+
+                        return JsonResponse(data)
         return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments})
 
