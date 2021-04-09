@@ -89,34 +89,33 @@
                                                         <b> {{ post.content }} </b>
                                                         <div class="media-feed-control">
                                                             <a href="#">
-                                                                <i class="batch-icon batch-icon-heart-full"></i> Like {{post.total_likes}}
+                                                                <i class="batch-icon batch-icon-heart-full"></i> Like ({{post.total_likes}})
                                                             </a>
                                                             <a href="#">
-                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment {{post.total_comments}}
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment ({{post.total_comments}})
                                                             </a>
                                                             <a href="#">
                                                                 <i class="batch-icon batch-icon-flag"></i> Report
                                                             </a>
                                                         </div>
                                                     </div>
-                                                    <li class="comment-reply">
+                                                    <li class="comment-reply" id="comment-reply">
                                                         {% for reply  in post.get_all_reply %}
                                                             <div class="media-title mt-0 mb-1">
                                                                 <a href="{{ reply.author.profile.get_absolute_url }}">{{ reply.author.username }}</a> <small> {{ reply.date_posted }}</small>
                                                             </div>
                                                             <b> {{ reply.content }} </b>
                                                         {% endfor %}
-                                                    </li>
-{#                                                    <li class="comment-reply-block mt-4">#}
-                                                    <li>
+                                                    <hr>
                                                         <form method="POST" class="form-reply" enctype="multipart/form-data">
                                                             {% csrf_token %}
                                                             <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
-                                                            <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here ....."></textarea>
-                                                            <button type="submit" id="button{{post.id}}" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Reply </button>
+                                                            <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here ....."> </textarea>
+                                                            <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
                                                         </form>
                                                     </li>
                                                 </li>
+                                                <hr>
                                             {% endfor %}
 
                                         </ul>
@@ -182,11 +181,12 @@
                             '</div>'+
                         '</div>'+
                     '</li>' +
-                    '<li class="comment-reply-block mt-4">' +
-                        '<div class="form-group clearfix">'+
-                            '<textarea class="form-control comment-reply-textarea" rows="2" placeholder="Reply here ..."></textarea>' +
-                            '<button type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">' + 'Reply' + '</button>' +
-                        '</div>'+
+                    '<li>' +
+                        '<form method="POST" class="form-reply" enctype="multipart/form-data">' +
+                            '<input type="hidden" class="postID" name="postID" value="' + data.post_id +  '">' +
+                            '<textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here .....">' + '</textarea>' +
+                            '<button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>'
+                        +'</form>' +
                     '</li>'
                 );
                 Swal.fire(
@@ -194,6 +194,7 @@
                     'You changed the profile !',
                     'success'
                 );
+                location.reload();
 
 
             });
@@ -207,8 +208,15 @@
                 //remember the form element
                 var $form = $(this);
 
+                {#var inputElem = document.createElement('input');#}
+                {#inputElem.type = 'hidden';#}
+                {#inputElem.name = 'csrfmiddlewaretoken';#}
+                {#inputElem.value = '{{ csrf_token }}';#}
+                {#console.log(inputElem.value);#}
+                {#$form.append(inputElem);#}
+
                 //disable the submit button and remember it for later
-                var $button = $form.find("button[type='submit']").attr('disabled', true);
+                {#var $button = $form.find("button[type='submit']").attr('disabled', true);#}
                 // get dom by name
                 var $content = $form.find("textarea[name='content']");
                 // get dome by id
@@ -216,8 +224,6 @@
 
                 var content =  $form.find("textarea[name='content']").val();
                 var postID =   $form.find("input[name='postID']").val();
-
-
 
                 console.log(content);
                 console.log(postID);
@@ -232,17 +238,18 @@
                     content: content,
                     postID: postID,
                     type: 'reply',
-                    csrfmiddlewaretoken: $('input[name="csrfmiddlewaretoken"]').val()
                 },
                 beforeSend:function (xhr,settings) {
+                    console.log("{{ csrf_token }}");
                     xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
                 },
             }).done(function (data){
                 $content.val('');
                 console.log(data);
-                $(".comment-reply").prepend( '<div class="media-title mt-0 mb-1">' +
+                $form.parent().prepend( '<div class="media-title mt-0 mb-1">' +
                     '<a href="' + data.send_user_url + ' ">' + data.send_user  + '</a>' +  '<small>'  + data.date_posted + '</small>' +
                                                             '</div>' + '<b>'+ data.content +  '</b>');
+                {#location.reload();#}
 
                 Swal.fire(
                     'Succsess !',
