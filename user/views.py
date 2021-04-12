@@ -28,6 +28,7 @@ import humanize
 
 #add os to display image
 import os
+from django.views.decorators.csrf import csrf_exempt
 
 # UserModel = get_user_model()
 
@@ -215,6 +216,8 @@ def comunity(request):
     return render(request, 'comunity.html', {'users': users})
 
 # get profile by id ...
+
+@csrf_exempt
 @login_required
 def detail_user(request, profile_id):
         print('vao day 1')
@@ -273,6 +276,7 @@ def detail_user(request, profile_id):
                             'send_user_url': request.user.profile.get_absolute_url(),
                             # bug ig you not have image avatar => bug here to ajax
                             'send_user_avatar': request.user.profile.profile_picture.url,
+                            'count_comments': post.total_comments(),
                         }
 
                         return JsonResponse(data)
@@ -281,3 +285,55 @@ def detail_user(request, profile_id):
 def user_detail(request, format=None):
     profile_id = request.user.profile.id
     return  detail_user(request, profile_id)
+
+
+@csrf_exempt
+@login_required
+def like_post(request):
+    if request.method == 'POST':
+        print('1')
+        if request.is_ajax():
+            print('2')
+            postID = request.POST.get('postID')
+            type = request.POST.get('type')
+            if type == 'like':
+                post = get_object_or_404(PostToUser, pk=int(postID))
+                request_user = request.user
+
+                if request_user in post.likes.all():
+                    #dislike
+                    post.likes.remove(request_user)
+                    count_likes = post.likes.count()
+                    return JsonResponse({'count_likes': count_likes, 'type':'dislike'})
+                else:
+                    post.likes.add(request.user)
+                    count_likes = post.likes.count()
+                    return JsonResponse({'count_likes': count_likes, 'type':'like'})
+    return JsonResponse({'count_likes': 0, 'type': -1})
+
+@csrf_exempt
+@login_required
+def report_post(request):
+    if request.method == 'POST':
+        print('1')
+        if request.is_ajax():
+            postID = request.POST.get('postID')
+            type = request.POST.get('type')
+            if type == 'report':
+                post = get_object_or_404(PostToUser, pk=int(postID))
+                request_user = request.user
+                if request_user in post.reports.all():
+                    #dislike
+                    post.reports.remove(request_user)
+                    return JsonResponse({'type':'unreport'})
+                else:
+                    post.reports.add(request.user)
+                    return JsonResponse({ 'type':'report'})
+
+    return JsonResponse({'type': -1})
+
+
+
+
+
+

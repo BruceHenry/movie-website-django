@@ -24,9 +24,13 @@ urlpatterns = [
 
     path('detail/<int:profile_id>/', views.detail_user, name='detail-user'),
 
-    path('activate/<uidb64>/',views.activate, name='activate'),  
+    path('activate/<uidb64>/',views.activate, name='activate'),
 
-    #test image upload 
+
+    path('likePost/', views.like_post, name='like-post'),
+    path('reportPost/', views.report_post, name='report-post'),
+
+    #test image upload
 
     # path('image', views.hotel_image_view, name='upload'),
     # path('success', views.success, name='display'),
