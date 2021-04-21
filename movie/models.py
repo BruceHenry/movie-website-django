@@ -1,5 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 
+#add timezones
+from django.utils import timezone
+import humanize
+import datetime as dt
 
 class Movie(models.Model):
     movieid = models.CharField(max_length=20, primary_key=True)
@@ -63,3 +68,14 @@ class Popularity(models.Model):
 
     def __str__(self):
         return self.movieid.movieid + '|' + str(self.weight)
+
+class User_Rate(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    rate = models.IntegerField(default=0)
+    review = models.CharField(max_length=500, null=True)
+    date_posted = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.movie.movieid + '|' + str(self.user.username) + '|' + str(self.rate)
+

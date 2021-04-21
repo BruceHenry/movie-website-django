@@ -65,20 +65,11 @@ class PostToUser(models.Model):
     #def get_absolute_url(self):
     #    return reverse('beets:beets-detail', kwargs={'pk': self.pk})
 
-    @property
     def total_likes(self):
-        """
-        Likes for the beet
-        :return: Integer: Likes for the company
-        """
+
         return self.likes.count()
 
-    @property
     def total_reports(self):
-        """
-        Likes for the beet
-        :return: Integer: Likes for the company
-        """
         return self.reports.count()
 
     def total_comments(self):

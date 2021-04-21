@@ -4,7 +4,7 @@ from movie.models import *
 import operator
 import random
 from movie.initializer import search_index
-
+from movie.views import top_movie
 
 @csrf_protect
 def index(request):
@@ -14,7 +14,7 @@ def index(request):
         data = {'username': request.user.get_username()}
     popular_movies = Popularity.objects.all().order_by('-weight')
     popular = []
-    for movie in popular_movies[:5]:
+    for movie in popular_movies[:11]:
         try:
             popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
         except:
@@ -22,6 +22,7 @@ def index(request):
     data['popular'] = popular
     popular_movie_list = [movie_dict[movie.movieid_id] for movie in popular_movies[:5]]
     data['recommendation'] = get_recommendation(request, popular_movie_list)
+    data['top_movie'] = top_movie(request)
     return render(request, 'base.html', data)
 
 
@@ -56,6 +57,9 @@ def get_recommendation(request, popular_movie_list):
         movie = movie_dict[item[0]]
         if movie not in popular_movie_list and movie not in added_movie_list:
             result.append({'movieid': movie.movieid, 'poster': movie.poster})
-        if len(result) == 10:
+        if len(result) == 20:
             break
-    return [result[i] for i in random.sample(range(len(result)), 5)]
+            # if not good movie for user, sample list in range
+    #print(result)
+    #print(len(result))
+    return [result[i] for i in random.sample(range(len(result)), 11 )]

@@ -7,6 +7,83 @@
 
             <div id="detail-infro">
                 <h1>{{ object.title }}</h1>
+
+                 <div class="rating">
+                            <input type="radio" name="rating" value="5" id="5">
+                            <label for="5">☆</label>
+                            <input type="radio" name="rating" value="4" id="4">
+                            <label for="4">☆</label>
+                            <input type="radio" name="rating" value="3" id="3">
+                            <label for="3">☆</label>
+                            <input type="radio" name="rating" value="2" id="2">
+                            <label for="2">☆</label>
+                            <input type="radio" name="rating" value="1" id="1">
+                            <label for="1">☆</label>
+                     <script>
+                         var rated = {{ object.rate }} ;
+                         movieid = '{{object.movieid}}'
+                         console.log(movieid);
+                         username = '{{ user.username }}';
+                         console.log(username);
+                         user_rate_movie = {{ rate_score }};
+                         if(user_rate_movie==0){
+                             var stars = Math.floor(rated/2);
+                             input_value = '#' + stars.toString();
+                             console.log(input_value);
+                             $(input_value).attr('checked', 'checked');
+                         }
+                         else{
+                             input_value = '#' + user_rate_movie.toString();
+                             console.log(input_value);
+                             $(input_value).attr('checked', 'checked');
+                         }
+
+                         $("input[name='rating']").click(function() {
+                             var radioValue = $("input[name='rating']:checked").val();
+                             console.log(radioValue);
+                             if (radioValue) {
+                                 console.log('send mess !');
+                                 $.ajax({
+                                   url : "{% url 'rate-movie' %}",
+                                   type: 'POST',
+                                   datatype: 'json',
+                                   processData: "application/json",
+                                   data: {
+                                   movieid: movieid,
+                                   type: 'rate',
+                                   username : username,
+                                   rate_score : radioValue,
+                                    },
+                                     beforeSend:function (xhr,settings) {
+                                    console.log("{{ csrf_token }}");
+                                    xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                                    },
+                                    }).done(function (data) {
+                                     if (data.type == 'error') {
+                                         alert('erorr !');
+                                         Swal.fire('Any fool can use a computer')
+                                         Swal.fire({
+                                             icon: 'error',
+                                             title: 'Oops...',
+                                             text: 'Something went wrong!',
+                                             footer: '<a href>Why do I have this issue?</a>'
+                                         })
+                                     } else {
+                                         Swal.fire(
+                                             'Good job!',
+                                             'You rated this movie!',
+                                             'success'
+                                         );
+                                         console.log(data);
+                                     }
+                                 });
+                             }
+                         });
+
+                     </script>
+
+                </div>
+
                 {% if  user.is_authenticated %}
                     <button class="add_button" id="seen">Have seen</button>
                     <button class="add_button" id="expect">Want to see</button>
@@ -69,56 +146,50 @@
                 </script>
                 <!-- Layer -->
                 {#                <div class="Layer" id="layer"></div>#}
+                <div class="movie-detail box">
 
-                <p><b>Year:</b> {{ object.year }}</p>
-                <p><b>Genres:</b> {{ object.genres }}</p>
-                <p><b>Movie Length:</b> {{ object.length }} min</p>
-                <span class="stars">{{ object.rate }}</span>
-                <p><b>Rating:</b> {{ object.rate }}</p>
-                <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
-                        class="glyphicon glyphicon-new-window"></span></a></p>
-                <span class="click_Show"> <button class="button_trailer">
-                <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
-                </span>
+                    <p><b>Year:</b> {{ object.year }}</p>
+                    <p><b>Genres:</b> {{ object.genres }}</p>
+                    <p><b>Movie Length:</b> {{ object.length }} min</p>
+                    <p><b>IMDB:</b> {{ object.rate }}</p>
+                    <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
+                            class="glyphicon glyphicon-new-window"></span></a></p>
+                    <span class="click_Show"> <button class="button_trailer">
+                    <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
+                    </span>
 
-                <div id="TrailerWindow" style="position: fixed;">
-                    <div id="title">{{ object.title }}
-                        <button type="button" class="close" aria-label="Close">
-                            <span aria-hidden="true">x</span>
-                        </button>
+                    <div id="TrailerWindow" style="position: fixed;">
+                        <div id="title">{{ object.title }}
+                            <button type="button" class="close" aria-label="Close">
+                                <span aria-hidden="true">x</span>
+                            </button>
+                        </div>
+                        <div id="videoControl">
+                            <video width="600" height="500" controls>
+                                <source src="{{ object.trailer }}" type="video/mp4">
+                            </video>
+                        </div>
                     </div>
-                    <div id="videoControl">
-                        <video width="600" height="500" controls>
-                            <source src="{{ object.trailer }}" type="video/mp4">
-                        </video>
-                    </div>
+
+                    <p id="summary"><b>Plot Summary: </b>"{{ object.plot }}"</p>
+
+                    <p><b>Main actors : </b></p>
+
+                    {% for item in items %}
+                        <a href="/movie/actor_detail/{{ item.actorid }}" target="_self">{{ item.name }}</a>
+                    {% endfor %}
+
                 </div>
-
-                <p id="summary"><b>Plot Summary: </b>"{{ object.plot }}"</p>
-
             </div>
 
             <div id="main-pic">
                 <img border="0" src="{{ object.poster }}" alt="Cannot load photo, sorry!" width="300" height="500">
             </div>
-            <h2>Main actors in {{ object.title }}:</h2>
-            <hr>
+
         {% endif %}
 
 
 
-        {% for item in items %}
-            <table>
-                <td>
-                    <img border="0" src="{{ item.photo }}" alt="Cannot load photo, sorry!" width="220" height="280"
-                         style="padding: 10px">
-                </td>
-                <td>
-                    <h3><a href="/movie/actor_detail/{{ item.actorid }}" target="_self">{{ item.name }}</a></h3>
-                </td>
-            </table>
-            <hr>
-        {% endfor %}
 
         {% if pages %}
             <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>

@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from . import views
 from . import models
+from django.urls import include, path
+
 
 urlpatterns = [
     url(r'^movie_all/(?P<page>\d*)', views.whole_list, {'model': models.Movie}, name='whole_list'),
@@ -13,4 +15,14 @@ urlpatterns = [
     url(r'^expect/(?P<movie_id>.*)', views.expect, name='expect'),
     url(r'^add_expect/(?P<movie_id>.*)', views.add_expect, name='expect'),
     url(r'^search_suggest/(?P<query_string>.*)', views.search_suggest, name='search_suggest'),
+
+    # Viet lai view cho movie detail , tu do them rate va review vao
+    # Voi actor thi chua can
+    # Lam man share fb cho movie
+
+    # viet function cho moive share ....
+
+    # path('detail/<str:movie_id>/', views.movie_detail, name='movie-detail'),
+    path('rate_movie/', views.rate_movie, name='rate-movie'),
+    path('top_movie/', views.top_movie, name='top_movie'),
 ]

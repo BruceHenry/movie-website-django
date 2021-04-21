@@ -1,20 +1,22 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from movie.models import *
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 import math
-
+import random
 from movie.initializer import search_cache, search_index
 
 
 def add_seen(request, movie_id):
+    print('oke')
     if request.is_ajax():
         history = Seen.objects.filter(movieid_id=movie_id, username=request.user.get_username())
         if len(history) == 0:
             movie = Popularity.objects.get(movieid_id=movie_id)
             weight = movie.weight
             movie.delete()
+            # if user seen movie , popularity + 3
             new_record = Popularity(movieid_id=movie_id, weight=weight + 3)
             new_record.save()
             new_record = Seen(movieid_id=movie_id, username=request.user.get_username())
@@ -26,13 +28,15 @@ def add_seen(request, movie_id):
 
 
 def add_expect(request, movie_id):
+    print('oke')
     if request.is_ajax():
         history = Expect.objects.filter(movieid_id=movie_id, username=request.user.get_username())
         if len(history) == 0:
             movie = Popularity.objects.get(movieid_id=movie_id)
             weight = movie.weight
             movie.delete()
-            new_record = Popularity(movieid_id=movie_id, weight=weight + 3)
+            # add want to see movie , populartity +2
+            new_record = Popularity(movieid_id=movie_id, weight=weight + 2)
             new_record.save()
             new_record = Expect(movieid_id=movie_id, username=request.user.get_username())
             new_record.save()
@@ -41,10 +45,84 @@ def add_expect(request, movie_id):
             history.delete()
             return HttpResponse('0')
 
+# @csrf_protect
+# def movie_detail(request, movie_id):
+#     print('1')
+#     items = []
+#     movie = Movie.objects.get(movieid=movie_id)
+#
+#     # popularity
+#     try:
+#         print('2')
+#         d = Popularity.objects.get(movieid_id=movie_id)
+#         d.weight = d.weight + 1
+#         d.save()
+#     except:
+#         new_record = Popularity(movieid_id=id, weight=1)
+#         new_record.save()
+#
+#     label = 'actor'
+#     records = Act.objects.filter(movieid_id=movie_id)
+#
+#     if request.user.get_username() != '':
+#         seen_list = [str(x).split('|')[1] for x in
+#                      Seen.objects.filter(username=request.user.get_username())]
+#         expect_list = [str(y).split('|')[1] for y in
+#                        Expect.objects.filter(username=request.user.get_username())]
+#         if id in seen_list:
+#             object.flag = 1
+#         if id in expect_list:
+#             object.flag = 2
+#     for query in records:
+#         for actor in Actor.objects.filter(actorid=query.actorid_id):
+#             items.append(actor)
+#
+#     return render(request, 'actor_list.html', {'items': items, 'number': len(items), 'object': movie})
+#
+
+
+@csrf_protect
+def rate_movie(request):
+    print('rate movie here ')
+    if request.method == 'POST':
+        print('rate movie here 2')
+        if request.is_ajax():
+            movie_id =request.POST.get('movieid')
+            username = request.POST.get('username')
+            print(movie_id)
+            print(username)
+
+            rate_score = request.POST.get('rate_score')
+            movie = Movie.objects.get(movieid=movie_id)
+            user = User.objects.get(username=username)
+            try:
+                rate_movie = User_Rate.objects.get(user=user, movie=movie)
+                rate_movie.rate = int(rate_score)
+                rate_movie.save()
+                print(rate_movie)
+                data = {'type': 'rated', 'rate_score':rate_score }
+                print(data)
+                return JsonResponse(data)
+            except:
+                rate_movie = User_Rate(movie=movie, user=user, rate=rate_score)
+                rate_movie.save()
+                print(rate_movie)
+                data = {'type': 'rated' , 'rate_score':rate_score}
+                print(data)
+                return JsonResponse(data)
+
+    return JsonResponse({'type':'error'})
+
+
+
+
+
 
 @csrf_protect
 def detail(request, model, id):
+    #set rate score
     items = []
+    rate_score = 0
     try:
         if model.get_name() == 'movie' and id != 'None':
             try:
@@ -71,6 +149,15 @@ def detail(request, model, id):
             for query in records:
                 for actor in Actor.objects.filter(actorid=query.actorid_id):
                     items.append(actor)
+            # add rated movie for user
+            try:
+                rate_movie = User_Rate.objects.get(movie=object, user=request.user)
+                rate_score = rate_movie.rate
+                print(rate_score)
+            except:
+                rate_score = 0
+                print(rate_score)
+
         if model.get_name() == 'actor':
             label = 'movie'
             object = model.objects.get(actorid=id)
@@ -80,7 +167,7 @@ def detail(request, model, id):
                     items.append(movie)
     except:
         return render(request, '404.html')
-    return render(request, '{}_list.html'.format(label), {'items': items, 'number': len(items), 'object': object})
+    return render(request, '{}_list.html'.format(label), {'items': items, 'number': len(items), 'object': object, 'rate_score' : rate_score,'user':request.user})
 
 
 def whole_list(request, model, page):
@@ -183,3 +270,13 @@ def expect(request, movie_id):
         movie_id = str(record).split('|')[1]
         movies.append(Movie.objects.get(movieid=movie_id))
     return render(request, 'expect.html', {'items': movies, 'number': len(movies)})
+
+
+def top_movie(request):
+    top_movie = Movie.objects.order_by('-rate')[:30]
+    result = list(top_movie)
+    # print(top_movie)
+
+    top_movie = [result[i] for i in random.sample(range(len(result)), 11 )]
+
+    return top_movie

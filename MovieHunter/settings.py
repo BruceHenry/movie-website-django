@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'six',
     #add time ago ... load humanize
     'django.contrib.humanize',
+    'django_social_share',
 
 ]
 

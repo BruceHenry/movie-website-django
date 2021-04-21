@@ -88,16 +88,21 @@
                                                         </div>
                                                         <b> {{ post.content }} </b>
                                                         <div class="media-feed-control">
-                                                            <a href="" id="likeButon">
+                                                            <a href="" id="likeButton">
                                                                 <input type="hidden" name="likePostID" value="{{ post.id }}">
                                                                 <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{post.total_likes}}) </span>
                                                             </a>
                                                             <a href="#">
-                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_likes}}) </span>
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_comments}}) </span>
                                                             </a>
-                                                            <a href="#" id="reportButon">
+                                                            <a href="" id="reportButton">
                                                                 <input type="hidden" name="reportPostID" value="{{ post.id }}">
-                                                                <i class="batch-icon batch-icon-flag"></i><span id="reports{{ post.id }}"> Report </span>
+                                                                {% if request.user in post.reports.all %}
+                                                                    <i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>
+                                                                {% else %}
+                                                                    <i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>
+                                                                {% endif %}
+
                                                             </a>
                                                         </div>
                                                     </div>
@@ -167,13 +172,13 @@
                             '</div>' +
                             data.content +
                             '<div class="media-feed-control">' +
-                                '<a href="#" id="likeButon">'+
+                                '<a href="#" id="likeButton">'+
                                     '<input type="hidden" name="likePostID" value="' + data.post_id + '">' +
                                     '<i class="batch-icon batch-icon-heart-full"></i>' +'Like' +
                                      '<span id="count-likes' + data.post_id+ '">' + ' ({{post.total_likes}})' + '</span>' +
                                 '</a>'+
                                 '<a href="#">'+
-                                    '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' ({{post.total_likes}})'  + '</span>' +
+                                    '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' ({{post.total_comments}})'  + '</span>' +
                                 '</a>' +
                                 '<a href="#">' +
                                     '<i class="batch-icon batch-icon-flag"></i>' + 'Report' +
@@ -259,7 +264,7 @@
             });
             });
 
-         $(document).on('click', '#likeButon', function (event) {
+         $(document).on('click', '#likeButton', function (event) {
                 event.preventDefault();
                 var postID  = $(this).find("input[name='likePostID']").val();
                 var likeID = '#count-likes' + postID
@@ -296,12 +301,14 @@
 
 
 
+
+
           $(document).on('click', '#reportButton', function (event) {
-              alert('kkkk');
                 event.preventDefault();
                 var postID  = $(this).find("input[name='reportPostID']").val();
                 var reportID = '#reports' + postID;
-                alert(postID);
+                alert(reportID);
+                console.log(reportID);
                 $.ajax({
                     url : "{% url 'report-post'%}",
                     type: 'POST',
@@ -321,10 +328,10 @@
                     }
                     else {
                         if(data.type=='report'){
-                            $(reportID).html('report').css("background-color", "red");
+                            $(reportID).css("color", "red");
                         }
                         else {
-                            $(reportID).html('report').css("background-color", "red").toggle();
+                            $(reportID).css("color", "black");
                         }
 
                     }
