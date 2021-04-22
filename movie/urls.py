@@ -23,6 +23,9 @@ urlpatterns = [
     # viet function cho moive share ....
 
     # path('detail/<str:movie_id>/', views.movie_detail, name='movie-detail'),
+    #ajax send data
+    path('review_movie/', views.review_movie, name='review-movie'),
+    path('reply_review/', views.reply_review, name='reply-review'),
     path('rate_movie/', views.rate_movie, name='rate-movie'),
     path('top_movie/', views.top_movie, name='top_movie'),
 ]

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from movie.models import *
 from django.http import HttpResponse, JsonResponse
 import json
@@ -80,8 +80,8 @@ def add_expect(request, movie_id):
 #     return render(request, 'actor_list.html', {'items': items, 'number': len(items), 'object': movie})
 #
 
-
-@csrf_protect
+# turn of csrf post method in django
+@csrf_exempt
 def rate_movie(request):
     print('rate movie here ')
     if request.method == 'POST':
@@ -113,9 +113,70 @@ def rate_movie(request):
 
     return JsonResponse({'type':'error'})
 
+@csrf_exempt
+def review_movie(request):
+    print('review movie here')
+    if request.method == 'POST':
+        print('rate movie here 2')
+        if request.is_ajax():
+            movie_id = request.POST.get('movieid')
+            username = request.POST.get('username')
+            content = request.POST.get('content')
+            type = request.POST.get('type')
+
+            if type =='review':
+                try:
+                    movie = Movie.objects.get(movieid=movie_id)
+                    user = User.objects.get(username=username)
+
+                    rate_movie = User_Rate.objects.get(user=user, movie=movie)
+                    rate_movie.review = content
+                    print(rate_movie)
+                    rate_movie.save()
+
+                except:
+                    rate_movie = User_Rate(movie=movie, user=user, review=content)
+                    rate_movie.save()
+                    print(rate_movie)
+
+                return JsonResponse({'mess':'success'})
+            else:
+                return JsonResponse({'mess':'error'})
+    return JsonResponse({'mess':'error'})
 
 
+@csrf_exempt
+def reply_review(request):
+    print('reply review here')
+    if request.method == 'POST':
+        print('reply review here 2')
+        if request.is_ajax():
+            data = {}
+            review_id = request.POST.get('review_id')
+            username = request.POST.get('username')
+            content = request.POST.get('content')
+            type = request.POST.get('type')
 
+            if type == 'reply':
+                try:
+                    rate_movie = User_Rate.objects.get(id=int(review_id))
+                    user = User.objects.get(username=username)
+                    reply = ReplyToReview(user=user, review=rate_movie, content=content)
+                    reply.save()
+                    data['mess'] = 'succsess'
+                    data['username'] = username
+                    data['content'] = content
+                    data['review_id'] = review_id
+
+                    data['send_user_url'] = user.profile.get_absolute_url()
+                    data['send_user_avatar']= user.profile.profile_picture.url
+                    data['date_posted']  = 'just now'
+
+
+                    return JsonResponse(data)
+                except:
+                    return JsonResponse({'mess':'error'})
+    return JsonResponse({'mess':'error'})
 
 
 @csrf_protect
@@ -150,10 +211,15 @@ def detail(request, model, id):
                 for actor in Actor.objects.filter(actorid=query.actorid_id):
                     items.append(actor)
             # add rated movie for user
+            review_form_flag = 1
             try:
                 rate_movie = User_Rate.objects.get(movie=object, user=request.user)
                 rate_score = rate_movie.rate
                 print(rate_score)
+                if rate_movie.review != None:
+                    review_form_flag = -1
+                reviews = User_Rate.objects.filter(movie=object).order_by('-date_posted')
+
             except:
                 rate_score = 0
                 print(rate_score)
@@ -167,7 +233,12 @@ def detail(request, model, id):
                     items.append(movie)
     except:
         return render(request, '404.html')
-    return render(request, '{}_list.html'.format(label), {'items': items, 'number': len(items), 'object': object, 'rate_score' : rate_score,'user':request.user})
+
+    print(review_form_flag)
+    return render(request, '{}_list.html'.format(label), {'items': items, 'number': len(items), 'object': object,'form_flag': review_form_flag , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+
+
+
 
 
 def whole_list(request, model, page):

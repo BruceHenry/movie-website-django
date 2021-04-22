@@ -75,7 +75,43 @@ class User_Rate(models.Model):
     rate = models.IntegerField(default=0)
     review = models.CharField(max_length=500, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
+    likes = models.ManyToManyField(User, related_name='review_likes', blank=True)
 
     def __str__(self):
-        return self.movie.movieid + '|' + str(self.user.username) + '|' + str(self.rate)
+        return self.movie.movieid + '|' + str(self.user.username) + '|' + str(self.rate) + '|' + str(self.review)
+
+    def total_likes(self):
+
+        return self.likes.count()
+
+
+    def total_reply(self):
+        return ReplyToReview.objects.filter(review = self).count()
+
+    def get_all_reply(self):
+        #order by count like =>>> good
+        replys = ReplyToReview.objects.filter(review = self).order_by('-date_posted')
+
+        return replys
+
+
+class ReplyToReview(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(User_Rate, on_delete=models.CASCADE)
+    content = models.CharField(max_length=500, null=True)
+    date_posted = models.DateTimeField(default=timezone.now)
+    likes = models.ManyToManyField(User, related_name='reply_likes', blank=True)
+
+    def total_likes(self):
+
+        return self.likes.count()
+
+    def __str__(self):
+        return self.user.username + '|' + str(self.review) + '|' + str(self.content)
+
+
+
+
+
+
 
