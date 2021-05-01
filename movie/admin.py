@@ -17,4 +17,6 @@ admin.site.register(Expect)
 admin.site.register(Popularity)
 admin.site.register(User_Rate)
 admin.site.register(ReplyToReview)
+admin.site.register(MovieTags)
+
 

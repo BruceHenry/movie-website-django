@@ -7,6 +7,8 @@ import math
 import random
 from movie.initializer import search_cache, search_index
 
+#import sort value for dict
+import operator
 
 def add_seen(request, movie_id):
     print('oke')
@@ -28,7 +30,6 @@ def add_seen(request, movie_id):
 
 
 def add_expect(request, movie_id):
-    print('oke')
     if request.is_ajax():
         history = Expect.objects.filter(movieid_id=movie_id, username=request.user.get_username())
         if len(history) == 0:
@@ -45,40 +46,7 @@ def add_expect(request, movie_id):
             history.delete()
             return HttpResponse('0')
 
-# @csrf_protect
-# def movie_detail(request, movie_id):
-#     print('1')
-#     items = []
-#     movie = Movie.objects.get(movieid=movie_id)
-#
-#     # popularity
-#     try:
-#         print('2')
-#         d = Popularity.objects.get(movieid_id=movie_id)
-#         d.weight = d.weight + 1
-#         d.save()
-#     except:
-#         new_record = Popularity(movieid_id=id, weight=1)
-#         new_record.save()
-#
-#     label = 'actor'
-#     records = Act.objects.filter(movieid_id=movie_id)
-#
-#     if request.user.get_username() != '':
-#         seen_list = [str(x).split('|')[1] for x in
-#                      Seen.objects.filter(username=request.user.get_username())]
-#         expect_list = [str(y).split('|')[1] for y in
-#                        Expect.objects.filter(username=request.user.get_username())]
-#         if id in seen_list:
-#             object.flag = 1
-#         if id in expect_list:
-#             object.flag = 2
-#     for query in records:
-#         for actor in Actor.objects.filter(actorid=query.actorid_id):
-#             items.append(actor)
-#
-#     return render(request, 'actor_list.html', {'items': items, 'number': len(items), 'object': movie})
-#
+
 
 # turn of csrf post method in django
 @csrf_exempt
@@ -179,6 +147,50 @@ def reply_review(request):
     return JsonResponse({'mess':'error'})
 
 
+@csrf_exempt
+def add_tag(request):
+    print('Add tag here ... ')
+    if request.method == 'POST':
+        print('Add tag here 2')
+        if request.is_ajax():
+            data = {}
+            movieid = request.POST.get('movieid')
+            username = request.POST.get('username')
+            tags = request.POST.get('tag')
+            type = request.POST.get('type')
+            print(movieid)
+            print(username)
+            print(tags)
+
+            movie = Movie.objects.get(movieid=movieid)
+            user = User.objects.get(username=username)
+            data = {}
+            try:
+                tag = MovieTags.objects.filter(movie=movie,user=user,tags=tags)
+                if len(tag) > 0:
+                    data['mess'] = 'error'
+                    return JsonResponse(data)
+                else:
+                    tag = MovieTags(movie=movie, user=user, tags=tags)
+                    tag.save()
+                    data['mess'] = 'success'
+                    data['tags'] = tags
+                    data['count'] = MovieTags.objects.filter(movie=movie, tags=tags).count()
+                    return JsonResponse(data)
+            except:
+                print('iam very sick !!!')
+                return JsonResponse({'mess':'ERROR!!!'})
+
+
+
+
+
+
+
+
+
+
+
 @csrf_protect
 def detail(request, model, id):
     #set rate score
@@ -222,7 +234,25 @@ def detail(request, model, id):
 
             except:
                 rate_score = 0
+                reviews = User_Rate.objects.filter(movie=object).order_by('-date_posted')
                 print(rate_score)
+
+
+            # get tags from movie
+            dict_tags ={}
+            try:
+                list_tags = MovieTags.objects.filter(movie=object)
+                for tag in list_tags:
+                    if tag.tags in dict_tags.keys():
+                        dict_tags[tag.tags] +=1
+                    else:
+                        dict_tags[tag.tags] =1
+
+
+            except:
+                print('empty')
+                dict_tags = {}
+
 
         if model.get_name() == 'actor':
             label = 'movie'
@@ -235,7 +265,7 @@ def detail(request, model, id):
         return render(request, '404.html')
 
     print(review_form_flag)
-    return render(request, '{}_list.html'.format(label), {'items': items, 'number': len(items), 'object': object,'form_flag': review_form_flag , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+    return render(request, '{}_list.html'.format(label), {'items': items ,'dict_tags': dict_tags ,'number': len(items), 'object': object,'form_flag': review_form_flag , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 
 

@@ -22,7 +22,7 @@
                          var rated = {{ object.rate }} ;
                          var movieid = '{{object.movieid}}';
                          console.log(movieid);
-                         username = '{{ user.username }}';
+                         var username = '{{ user.username }}';
                          console.log(username);
                          user_rate_movie = {{ rate_score }};
                          if(user_rate_movie==0){
@@ -114,6 +114,8 @@
                                 }
                             });
                         });
+
+
                     });
                 </script>
                 <script>
@@ -166,6 +168,90 @@
                     {% for item in items %}
                         <a href="/movie/actor_detail/{{ item.actorid }}" target="_self">{{ item.name }}</a>
                     {% endfor %}
+                    <br>
+                    <br>
+
+                    <p><b>Your Tags : </b></p>
+                    <div class="input-group mb-3" id="addTagClass">
+                      <input type="text" class="w-25 p-3" id="nameTag"  placeholder="Add your tags..." style="width: 20px" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" onclick="addTag()" type="button">+</button>
+                      </div>
+                    </div>
+
+
+
+
+
+                    <script>
+                        function addTag(){
+
+                            alert('oke');
+                            var movieid = '{{object.movieid}}';
+                            var username = '{{ user.username }}';
+                            {#console.log(username);#}
+                            {#console.log(movieid);#}
+                            var nameTag = $('#nameTag').val();
+                            {#console.log(nameTag);#}
+
+                            //send ajax
+                            $.ajax({
+                                   url : "{% url 'add-tag' %}",
+                                   type: 'POST',
+                                   datatype: 'json',
+                                   processData: "application/json",
+                                   data: {
+                                   movieid: movieid,
+                                   type: 'add-tag',
+                                   username : username,
+                                   tag : nameTag
+                                    }
+                                    }).done(function (data) {
+                                if (data.mess == 'error') {
+                                    Swal.fire('You have tagged this movie already')
+                                } else {
+                                    Swal.fire(
+                                      'Good job!',
+                                      'You clicked the button!',
+                                      'success'
+                                    )
+                                    $('#nameTag').val('');
+                                    console.log(data);
+
+                                    $('#addTagClass').append(
+                                                            '<div class="input-group ">' +
+                                                            '<div class="input-group-prepend">'+
+                                                            '<button class="btn btn-outline-secondary" >' + 'x'+ data.count +
+                                                            '</button>' +
+                                                            '</div>' +
+                                                            '<button class="w-10 p-2"  aria-describedby="basic-addon2">' +data.tags + '</button>' +
+                                                            '<div class="input-group-append">' +
+                                                            '<button class="btn btn-outline-secondary" type="button">' + '+' + '</button>'+
+                                                            '</div>'+
+                                                            '</div>');
+
+                                }
+                            })
+                        }
+                    </script>
+
+                    <p><b>Tags Comunity : </b></p>
+                    {% if dict_tags %}
+                        <div class="input-group ">
+                                {% for tag,count in dict_tags.items %}
+                                    {% if count > 10 %}
+                                        <div class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary" >{{ count }}</button>
+                                        </div>
+                                        <button class="w-5 p-1"  aria-describedby="basic-addon2">{{ tag }} </button>
+
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button">+</button>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                        </div>
+                    {% endif %}
 
                 </div>
             </div>
@@ -229,23 +315,16 @@
         </script>
     </div>
 
-    <div class="h2Container gradientHeaderContainer">
-        <h4>Comunity Reviews</h4>
-    </div>
 
 
 
-    <hr>
 
-    <div class="container">
-    Diem trung binh cac thu o day
-    </div>
 
-    <hr>
+
     {% if form_flag != -1 %}
         <div class="comment-block">
                     <div id="form-comment" class="form-group">
-                        <textarea class="form-control" id="review-textarea" rows="2" placeholder="Reviews  {{object.title}}..."></textarea>
+                        <textarea class="form-control" id="review-textarea" rows="2" placeholder="Reviews   {{object.title}}..."></textarea>
                         <div class="media-feed-control clearfix">
                             <button onclick="review()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
                         </div>
@@ -284,107 +363,104 @@
     </script>
 
     <ul class="list-unstyled mt-5">
-                            <li class="media">
+        <li class="media">
+            <div id="comment-body" class="media-body">
+                <div class="media-body-reply-block">
+                    <li id="list-comment"  class="list-unstyled">
+                        {% for review in reviews %}
+                            <li id="li-comment" class="media mt-4">
+                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                    <img src="{{ review.user.profile.profile_picture.url}}" width="44" height="44">
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-title mt-0 mb-1">
+                                        <a href="{{ review.user.profile.get_absolute_url }}">{{ review.user.username }}</a> <small> {{ review.date_posted }}</small>
+                                    </div>
+                                    <b> {{ review.review }} </b>
 
-                                <div id="comment-body" class="media-body">
+                                        <div class="media-feed-control">
+                                            <a href="" id="likeButton">
+                                                <input type="hidden" name="likePostID" value="{{ post.id }}">
+                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{review.total_likes}}) </span>
+                                            </a>
 
-                                    <div class="media-body-reply-block">
-                                        <li id="list-comment"  class="list-unstyled">
-                                            {% for review in reviews %}
-                                                <li id="li-comment" class="media mt-4">
-                                                    <div class="profile-picture bg-gradient bg-primary mb-4">
-                                                        <img src="{{ review.user.profile.profile_picture.url}}" width="44" height="44">
-                                                    </div>
-                                                    <div class="media-body">
-                                                        <div class="media-title mt-0 mb-1">
-                                                            <a href="{{ review.user.profile.get_absolute_url }}">{{ review.user.username }}</a> <small> {{ review.date_posted }}</small>
-                                                        </div>
-                                                        <b> {{ review.review }} </b>
+                                            <a href="#">
+                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{review.total_reply}}) </span>
+                                            </a>
 
-                                                            <div class="media-feed-control">
-                                                                <a href="" id="likeButton">
-                                                                    <input type="hidden" name="likePostID" value="{{ post.id }}">
-                                                                    <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{review.total_likes}}) </span>
-                                                                </a>
-
-                                                                <a href="#">
-                                                                    <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{review.total_reply}}) </span>
-                                                                </a>
-
-                                                                <a href="" id="reportButton">
-                                                                    <input type="hidden" name="reportPostID" value="{{ post.id }}">
-                                                                </a>
-                                                        </div>
-                                                    </div>
-                                                    <li class="comment-reply" id="comment-reply">
-                                                        {% for reply  in review.get_all_reply %}
-                                                            <div class="media-title mt-0 mb-1" name="replyContent">
-                                                                <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> {{ reply.date_posted }}</small>
-                                                            </div>
-                                                             {{ reply.content }}
-                                                        {% endfor %}
-                                                        <hr>
-
-                                                        <li class="comment-reply-block mt-4">
-                                                            <div class="form-group clearfix">
-                                                                <input type="hidden" class="postID" name="reviewID" value="{{ review.id }}">
-                                                                <textarea name="content" class="form-control comment-reply-textarea" rows="2" placeholder="Reply review here..."></textarea>
-                                                                <button type="button" class="replyButton">Reply</button>
-                                                            </div>
-                                                        </li>
-                                                    </li>
-                                                </ul>
-
-                                                        <script>
-
-                                                        $(document).on('click', '.replyButton', function (event) {
-                                                            event.preventDefault();
-                                                            var $form = $(this).parent();
-                                                            var $content = $form.find("textarea[name='content']");
-                                                            var content = $content.val();
-                                                            var review_id = $form.find("input[name='reviewID']").val();
-                                                            var username = '{{ user.username }}';
-
-                                                            console.log(content);
-                                                            console.log(review_id);
-
-                                                            $.ajax({
-                                                                type: "POST",
-                                                                // bo sung dau gach cheo moi duoc
-                                                                url: "{% url 'reply-review' %}",
-                                                                data: {content: content, type : 'reply', review_id: review_id, 'username':username},
-                                                                processData: "application/json",
-                                                                dataType: "json",
-
-                                                            }).done(function (data) {
-                                                                console.log(data);
-                                                                $content.val('');
-                                                                $content.attr("placeholder", "Reply review here ...");
-                                                                {#$replyContent = $form.parent().find("div[name='replyContent']");#}
-                                                                $form.parent().parent().find("div[name='replyContent']").prepend( '<div class="media-title mt-0 mb-1">' +
-                                                                '<a href="' + data.send_user_url + ' ">' + data.username  + '</a>' +  '<small>'  +  data.date_posted + '</small>' +
-                                                                '</div>' + data.content + '<br>');
-
-                                                            });
-
-
-
-                                                        });
-                                                        </script>
-
-                                                    </li>
-
-                                                </li>
-                                                <hr>
-                                            {% endfor %}
-
-                                        </ul>
+                                            <a href="" id="reportButton">
+                                                <input type="hidden" name="reportPostID" value="{{ post.id }}">
+                                            </a>
                                     </div>
                                 </div>
+                                <li class="comment-reply" id="comment-reply">
+                                    {% for reply  in review.get_all_reply %}
+                                        <div class="media-title mt-0 mb-1" name="replyContent">
+                                            <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> {{ reply.date_posted }}</small>
+                                        </div>
+                                         {{ reply.content }}
+                                    {% endfor %}
+                                    <hr>
+
+                                    <li class="comment-reply-block mt-4">
+                                        <div class="form-group clearfix">
+                                            <input type="hidden" class="postID" name="reviewID" value="{{ review.id }}">
+                                            <textarea name="content" class="form-control comment-reply-textarea" rows="2" placeholder="Reply review here..."></textarea>
+                                            <button type="button" class="replyButton">Reply</button>
+                                        </div>
+                                    </li>
+                                </li>
+                            </ul>
+
+                                    <script>
+
+                                    $(document).on('click', '.replyButton', function (event) {
+                                        event.preventDefault();
+                                        var $form = $(this).parent();
+                                        var $content = $form.find("textarea[name='content']");
+                                        var content = $content.val();
+                                        var review_id = $form.find("input[name='reviewID']").val();
+                                        var username = '{{ user.username }}';
+
+                                        console.log(content);
+                                        console.log(review_id);
+
+                                        $.ajax({
+                                            type: "POST",
+                                            // bo sung dau gach cheo moi duoc
+                                            url: "{% url 'reply-review' %}",
+                                            data: {content: content, type : 'reply', review_id: review_id, 'username':username},
+                                            processData: "application/json",
+                                            dataType: "json",
+
+                                        }).done(function (data) {
+                                            console.log(data);
+                                            $content.val('');
+                                            $content.attr("placeholder", "Reply review here ...");
+                                            {#$replyContent = $form.parent().find("div[name='replyContent']");#}
+                                            $form.parent().parent().find("div[name='replyContent']").prepend( '<div class="media-title mt-0 mb-1">' +
+                                            '<a href="' + data.send_user_url + ' ">' + data.username  + '</a>' +  '<small>'  +  data.date_posted + '</small>' +
+                                            '</div>' + data.content + '<br>');
+
+                                        });
+
+
+
+                                    });
+                                    </script>
+
+                                </li>
+
                             </li>
-                        </ul>
+                            <hr>
+                        {% endfor %}
+
+                    </li>
+                </div>
+            </div>
+        </li>
+    </ul>
+
+
 
 {% endblock %}
-
-
-

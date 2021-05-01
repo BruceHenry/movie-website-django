@@ -110,7 +110,14 @@ class ReplyToReview(models.Model):
         return self.user.username + '|' + str(self.review) + '|' + str(self.content)
 
 
+class MovieTags(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, default=1, on_delete=models.CASCADE)
+    tags =  models.CharField(max_length=150)
 
+
+    def __str__(self):
+        return str(self.movie) + '|' + str(self.tags)
 
 
 

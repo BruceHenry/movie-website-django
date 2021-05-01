@@ -28,4 +28,9 @@ urlpatterns = [
     path('reply_review/', views.reply_review, name='reply-review'),
     path('rate_movie/', views.rate_movie, name='rate-movie'),
     path('top_movie/', views.top_movie, name='top_movie'),
+    path('add_tag/', views.add_tag, name='add-tag'),
+
+    #get comunity tags
+
+    # path('comunity_tags/', views.)
 ]
