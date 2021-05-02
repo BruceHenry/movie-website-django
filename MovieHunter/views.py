@@ -4,7 +4,8 @@ from movie.models import *
 import operator
 import random
 from movie.initializer import search_index
-from movie.views import top_movie
+from movie.views import top_movie, favourite_movie, get_recommend_by_jaccard, get_recommend_by_cosine
+from django.http import HttpResponse, JsonResponse
 
 @csrf_protect
 def index(request):
@@ -22,6 +23,7 @@ def index(request):
     data['popular'] = popular
     popular_movie_list = [movie_dict[movie.movieid_id] for movie in popular_movies[:5]]
     data['recommendation'] = get_recommendation(request, popular_movie_list)
+    print('top movie: ')
     data['top_movie'] = top_movie(request)
     return render(request, 'base.html', data)
 
@@ -35,31 +37,39 @@ def get_recommendation(request, popular_movie_list):
         watched_movies = set([movie_dict[movie.movieid_id] for movie in Seen.objects.filter(username=username)] +
                              [movie_dict[movie.movieid_id] for movie in Expect.objects.filter(username=username)])
         unwatched_movies = set(search_index.data_in_memory['movie_list']) - watched_movies - set(popular_movie_list)
-        genre_stats = {}
-        for movie in watched_movies:
-            for genre in movie.genres.split('|'):
-                genre_stats[genre] = genre_stats.get(genre, 0) + 1
-        movie_score = {}
-        for movie in unwatched_movies:
-            movie_score[movie.movieid] = movie.rate
-            for genre in movie.genres.split('|'):
-                # Da fix loi vi chua xem phim nao nen chia cho 0 
-                movie_score[movie.movieid] += genre_stats.get(genre, 0) / (len(watched_movies)+1)
-        sorted_list = sorted(movie_score.items(), key=operator.itemgetter(1), reverse=True)
-        for item in sorted_list:
-            movie = movie_dict[item[0]]
-            result.append({'movieid': movie.movieid, 'poster': movie.poster})
-            added_movie_list.append(movie)
-            if len(result) == 8:
-                break
-    sorted_list = sorted(search_index.data_in_memory['movie_rating'].items(), key=operator.itemgetter(1), reverse=True)
-    for item in sorted_list:
-        movie = movie_dict[item[0]]
-        if movie not in popular_movie_list and movie not in added_movie_list:
-            result.append({'movieid': movie.movieid, 'poster': movie.poster})
-        if len(result) == 20:
-            break
-            # if not good movie for user, sample list in range
-    #print(result)
-    #print(len(result))
-    return [result[i] for i in random.sample(range(len(result)), 11 )]
+        # ecpect is add favourite movie
+        user = request.user
+        liked_movie = favourite_movie(user)
+        # print(unwatched_movies())
+        if len(liked_movie) == 0:
+            for movie in unwatched_movies:
+                result.append({'movieid': movie.movieid, 'poster': movie.poster})
+                if len(result) == 11:
+                    break
+        else:
+            if len(liked_movie) == 1:
+                print('helloword')
+                # use Jaccard Index
+                recommend_movie = get_recommend_by_jaccard('tt1038988')
+                movie_object_list = []
+                for movieid in recommend_movie:
+                    movie_object_list.append(Movie.objects.get(movieid=movieid))
+                for movie in movie_object_list:
+                    result.append({'movieid': movie.movieid, 'poster': movie.poster})
+
+                print('recommend here ')
+                print(len(result))
+
+                return result
+            else:
+                # user cosine similarity
+                recommend_movie = get_recommend_by_cosine(liked_movie)
+                movie_object_list = []
+                for movieid in recommend_movie:
+                    movie_object_list.append(Movie.objects.get(movieid=movieid))
+                for movie in movie_object_list:
+                    if movie in unwatched_movies:
+                        result.append({'movieid': movie.movieid, 'poster': movie.poster})
+
+
+                return [result[i] for i in random.sample(range(len(result)), 11)]

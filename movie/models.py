@@ -16,6 +16,9 @@ class Movie(models.Model):
     poster = models.URLField(default='')
     plot = models.CharField(max_length=500)
     trailer = models.URLField(default='')
+    #addd
+    movielenid = models.IntegerField(default=0)
+    youtubeid = models.CharField(max_length=500)
 
     def __str__(self):
         return self.movieid + '|' + self.title

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+    <div id="container">
+        {{ object }}
+        {% if object %}
+            <div id=detail-infro>
+                <h1>{{ object.name }}kkk</h1>
+                <p><a href="http://www.imdb.com/name/{{ object.actorid }}" target="_self">See in IMDB</a></p>
+            </div>
+            <div id="main-pic">
+                <img border="0" src="{{ object.photo }}" alt="Cannot load photo, sorry!" width="350" height="500">
+            </div>
+
+
+            <h2>{{ object.name }} in the following movie(s):</h2>
+            <hr>
+        {% endif %}
+
+
+        {% for item in items %}
+            <table>
+                <td>
+                    <img border="0" src="{{ item.poster }}" alt="Cannot load photo, sorry!" width="180" height="250"
+                         style="padding: 10px;">
+                </td>
+                <td style="vertical-align: top;text-align: left;padding: 10px;">
+                    <h3><a href="/movie/movie_detail/{{ item.movieid }}"
+                           target="_self">{{ item.title }}({{ item.year }})</a></h3>
+
+                    <span class="stars">{{ item.rate }}</span>
+                    <p class="stars">Rate: {{ item.rate }}</p>
+                    <br>
+                    <cite>{{ item.plot }}</cite>
+                </td>
+            </table>
+            <hr>
+        {% endfor %}
+
+        {% if pages %}
+            <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+            {% if current_page != 1 %}
+                <a href="/movie/movie_all/{{ 1 }}" target="_self">First</a>
+                <a href="/movie/movie_all/{{ current_page|add:-1 }}" target="_self">Previous</a>
+            {% endif %}
+
+            {% for page in pages %}
+                {% if page == current_page %}
+                    <b>{{ page }}</b>
+                {% else %}
+                    <a href="/movie/movie_all/{{ page }}" target="_self">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if current_page != page_number %}
+                <a href="/movie/movie_all/{{ current_page|add:1 }}" target="_self">Next</a>
+                <a href="/movie/movie_all/{{ page_number }}" target="_self">Last</a>
+            {% endif %}
+        {% endif %}
+
+        <script>
+            $(function () {
+                $('span.stars').stars();
+            });
+            $.fn.stars = function () {
+                return $(this).each(function () {
+                    $(this).html($('<span />').width(Math.max(0, (Math.min(10, parseFloat($(this).html())))) * 8));
+                });
+            }
+
+        </script>
+    </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block mainbody %}
+    <div id="container">
+
+        {% for item in items %}
+            <table>
+                <td>
+                    <img border="0" src="{{ item.photo }}" alt="Cannot load photo, sorry!" width="180" height="250"
+                         style="padding: 10px;">
+                </td>
+                <td style="vertical-align: top;text-align: left;padding: 10px;">
+                    <h3><a href="/movie/actor_detail/{{ item.actorid }}"
+                           target="_self">{{ item.name }} </a></h3>
+                </td>
+            </table>
+            <hr>
+        {% endfor %}
+
+        {% if pages %}
+            <p>You are in the {{ current_page }} page, {{ page_number }} pages in total</p>
+            {% if current_page != 1 %}
+                <a href="/movie/movie_all/{{ 1 }}" target="_self">First</a>
+                <a href="/movie/movie_all/{{ current_page|add:-1 }}" target="_self">Previous</a>
+            {% endif %}
+
+            {% for page in pages %}
+                {% if page == current_page %}
+                    <b>{{ page }}</b>
+                {% else %}
+                    <a href="/movie/movie_all/{{ page }}" target="_self">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if current_page != page_number %}
+                <a href="/movie/movie_all/{{ current_page|add:1 }}" target="_self">Next</a>
+                <a href="/movie/movie_all/{{ page_number }}" target="_self">Last</a>
+            {% endif %}
+        {% endif %}
+
+        <script>
+            $(function () {
+                $('span.stars').stars();
+            });
+            $.fn.stars = function () {
+                return $(this).each(function () {
+                    $(this).html($('<span />').width(Math.max(0, (Math.min(10, parseFloat($(this).html())))) * 8));
+                });
+            }
+
+        </script>
+    </div>
+    </div>
+
+{% endblock %}

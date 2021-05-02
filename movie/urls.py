@@ -5,10 +5,10 @@ from django.urls import include, path
 
 
 urlpatterns = [
-    url(r'^movie_all/(?P<page>\d*)', views.whole_list, {'model': models.Movie}, name='whole_list'),
-    url(r'^actor_all/(?P<page>\d*)', views.whole_list, {'model': models.Actor}, name='whole_list'),
-    url(r'^movie_detail/(?P<id>.*)', views.detail, {'model': models.Movie}, name='movie_detail'),
-    url(r'^actor_detail/(?P<id>.*)', views.detail, {'model': models.Actor}, name='actor_detail'),
+    url(r'^movie_all/(?P<page>\d*)', views.movie_whole_list, {'model': models.Movie}, name='movie_whole_list'),
+    url(r'^actor_all/(?P<page>\d*)', views.actor_whole_list, {'model': models.Actor}, name='actor_whole_list'),
+    url(r'^movie_detail/(?P<id>.*)', views.movie_detail, {'model': models.Movie}, name='movie_detail'),
+    url(r'^actor_detail/(?P<id>.*)', views.actor_detail, {'model': models.Actor}, name='actor_detail'),
     url(r'^search/(?P<item>.*)/(?P<query_string>.*)/(?P<page>\d*).*', views.search, name='search'),
     url(r'^seen/(?P<movie_id>.*)', views.seen, name='seen'),
     url(r'^add_seen/(?P<movie_id>.*)', views.add_seen, name='seen'),
@@ -31,6 +31,7 @@ urlpatterns = [
     path('add_tag/', views.add_tag, name='add-tag'),
 
     #get comunity tags
+    path('favourite_movie/', views.favourite_movie, name='favourite-movie'),
 
     # path('comunity_tags/', views.)
 ]

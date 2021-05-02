@@ -67,16 +67,16 @@ def rate_movie(request):
                 rate_movie = User_Rate.objects.get(user=user, movie=movie)
                 rate_movie.rate = int(rate_score)
                 rate_movie.save()
-                print(rate_movie)
+                # print(rate_movie)
                 data = {'type': 'rated', 'rate_score':rate_score }
-                print(data)
+                # print(data)
                 return JsonResponse(data)
             except:
                 rate_movie = User_Rate(movie=movie, user=user, rate=rate_score)
                 rate_movie.save()
-                print(rate_movie)
+                # print(rate_movie)
                 data = {'type': 'rated' , 'rate_score':rate_score}
-                print(data)
+                # print(data)
                 return JsonResponse(data)
 
     return JsonResponse({'type':'error'})
@@ -192,7 +192,7 @@ def add_tag(request):
 
 
 @csrf_protect
-def detail(request, model, id):
+def movie_detail(request, model, id):
     #set rate score
     items = []
     rate_score = 0
@@ -221,6 +221,7 @@ def detail(request, model, id):
                     object.flag = 2
             for query in records:
                 for actor in Actor.objects.filter(actorid=query.actorid_id):
+                    print(actor)
                     items.append(actor)
             # add rated movie for user
             review_form_flag = 1
@@ -253,28 +254,32 @@ def detail(request, model, id):
                 print('empty')
                 dict_tags = {}
 
-
-        if model.get_name() == 'actor':
-            label = 'movie'
-            object = model.objects.get(actorid=id)
-            records = Act.objects.filter(actorid_id=id)
-            for query in records:
-                for movie in Movie.objects.filter(movieid=query.movieid_id):
-                    items.append(movie)
     except:
         return render(request, '404.html')
 
-    print(review_form_flag)
-    return render(request, '{}_list.html'.format(label), {'items': items ,'dict_tags': dict_tags ,'number': len(items), 'object': object,'form_flag': review_form_flag , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+    # print(review_form_flag)
+    return render(request, 'movie_detail.html', {'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+
+@csrf_exempt
+def actor_detail(request, model, id):
+    items = []
+    if model.get_name() == 'actor':
+        label = 'movie'
+        object = model.objects.get(actorid=id)
+        records = Act.objects.filter(actorid_id=id)
+        for query in records:
+            for movie in Movie.objects.filter(movieid=query.movieid_id):
+                items.append(movie)
+
+    return render(request, 'movie_list_all.html', {'items': items, 'number': len(items), 'object': object})
 
 
 
-
-
-def whole_list(request, model, page):
+def movie_whole_list(request, model, page):
     if page is None:
         return render(request, '404.html')
     page = int(page)
+    #movie
     objects = model.objects.all()
     total_page = int(math.ceil(len(objects) / 10))
     if page > total_page:
@@ -287,10 +292,41 @@ def whole_list(request, model, page):
     for i in range(start_page_num, end_page_num + 1):
         if 1 <= i <= total_page:
             pages.append(i)
+    # print(objects)
+    objects =  objects[ 2:]
     data = {'items': objects[10 * (page - 1):last_item_index], 'current_page': page, 'page_number': total_page,
             'pages': pages}
-    return render(request, '{}_list.html'.format(model.get_name()), data)
+    return render(request, 'movie_list_all.html'.format(model.get_name()), data)
 
+
+
+def actor_whole_list(request, model, page):
+    if page is None:
+        return render(request, '404.html')
+    page = int(page)
+    #actor
+    objects = model.objects.all()
+    print(objects)
+    total_page = int(math.ceil(len(objects) / 10))
+    if page > total_page:
+        return render(request, '404.html')
+    last_item_index = 10 * page if page != total_page else len(objects)
+    pages = []
+    end_distance = total_page - page
+    start_page_num = page - 5 if end_distance >= 5 else page - 10 + end_distance
+    end_page_num = page + 5 if page > 5 else 10
+    for i in range(start_page_num, end_page_num + 1):
+        if 1 <= i <= total_page:
+            pages.append(i)
+    # print(objects)
+    # objects =  objects[ 2:]
+
+    # for actor in objects[10 * (page - 1):last_item_index]:
+    #     print(actor.photo)
+
+    data = {'items': objects[10 * (page - 1):last_item_index], 'current_page': page, 'page_number': total_page,
+            'pages': pages}
+    return render(request, 'actor_list_all.html', data)
 
 def search(request, item, query_string, page):
     if item is None or query_string is None or page is None:
@@ -375,9 +411,138 @@ def expect(request, movie_id):
 
 def top_movie(request):
     top_movie = Movie.objects.order_by('-rate')[:30]
+
     result = list(top_movie)
     # print(top_movie)
 
     top_movie = [result[i] for i in random.sample(range(len(result)), 11 )]
-
     return top_movie
+
+
+# get favourite movie of user
+def favourite_movie(user):
+    try:
+        # filter with source code https://stackoverflow.com/questions/10040143/how-to-do-a-less-than-or-equal-to-filter-in-django-queryset
+        # list_movie = User_Rate.objects.filter(user=request.user, rate_gte=4)
+        # print(user)
+        # tinh trung binh luot rate
+        user_rate = User_Rate.objects.filter(user=user)
+        count = User_Rate.objects.filter(user=user).count()
+        sum_rate = 0
+        for rate in user_rate:
+            sum_rate += rate.rate
+        medium = sum_rate/count
+        # print(medium)
+        list_rate_good = User_Rate.objects.filter(user=user, rate__gte=medium)
+        print('list movieid liked : ')
+        list_movie = [rate.movie.movieid for rate in list_rate_good]
+        # print(list_movie)
+
+    except:
+        list_movie = []
+
+    return list_movie
+
+import pandas as pd
+import numpy as np
+
+def get_recommend_by_jaccard(movieid):
+    # get data file
+    mv_genres = pd.read_csv('data/data_movie.csv')
+    mv_tags = pd.read_csv('data/genome_scores_data.csv')
+    mv_tags_desc = pd.read_csv('data/genome-tags.csv')
+
+    print(mv_tags.head())
+    print(mv_genres.head())
+    print(mv_tags_desc.head())
+
+    movie = {}
+    movie = pd.DataFrame(data=movie)
+
+    movie['imdbId'] = mv_genres['movieid']
+    movie['movieId'] = mv_genres['movielenid']
+
+    #prepare
+    mv_tags_denorm = mv_tags.merge(mv_tags_desc, on='tagId').merge(movie, on='movieId')
+    mv_tags_denorm['relevance_rank'] = mv_tags_denorm.groupby("movieId")["relevance"].\
+        rank(method="first",ascending=False).astype('int64')
+
+    mv_tags_list = mv_tags_denorm[mv_tags_denorm.relevance_rank <= 50].groupby(['movieId', 'imdbId'])['tag'].apply(lambda x: ','.join(x)).reset_index()
+    mv_tags_list['tag_list'] = mv_tags_list.tag.map(lambda x: x.split(','))
+
+    #example
+
+    target_movie_id = movieid
+
+    # print(target_movie_id)
+
+    target_tag_list = mv_tags_list[mv_tags_list.imdbId == target_movie_id].tag_list.values[0]
+    mv_tags_list_sim = mv_tags_list[['movieId', 'imdbId', 'tag_list', 'tag']]
+    mv_tags_list_sim['jaccard_sim'] = mv_tags_list_sim.tag_list.map(
+        lambda x: len(set(x).intersection(set(target_tag_list))) / len(set(x).union(set(target_tag_list))))
+    # print(f'Movies most similar to {target_movie_id} based on tags:')
+
+    recommend_movie = mv_tags_list_sim.sort_values(by='jaccard_sim', ascending=False).head(12)['imdbId']
+
+    recommend_movie = recommend_movie[1:]
+
+
+    return list(recommend_movie)
+
+
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+
+def get_recommend_by_cosine(list_movie_id):
+
+    mv_genres = pd.read_csv('data/data_movie.csv')
+    mv_tags = pd.read_csv('data/genome_scores_data.csv')
+    mv_tags_desc = pd.read_csv('data/genome-tags.csv')
+
+    # print(mv_tags.head())
+    # print(mv_genres.head())
+    # print(mv_tags_desc.head())
+
+    movie = {}
+    movie = pd.DataFrame(data=movie)
+
+    movie['imdbId'] = mv_genres['movieid']
+    movie['movieId'] = mv_genres['movielenid']
+
+    # prepare
+    mv_tags_denorm = mv_tags.merge(mv_tags_desc, on='tagId').merge(movie, on='movieId')
+    mv_tags_denorm['relevance_rank'] = mv_tags_denorm.groupby("movieId")["relevance"]. \
+        rank(method="first", ascending=False).astype('int64')
+
+    mv_tags_list = mv_tags_denorm[mv_tags_denorm.relevance_rank <= 50].groupby(['movieId', 'imdbId'])['tag'].apply(
+        lambda x: ','.join(x)).reset_index()
+    mv_tags_list['tag_list'] = mv_tags_list.tag.map(lambda x: x.split(','))
+
+
+    #model
+    model = Doc2Vec.load('model/model_version1')
+    mv_tags_vectors = model.dv.vectors
+
+    #generate movie recommendation for user
+    # compute user vector as an average of movie vectors seen by that user
+    user_movie_vector = np.zeros(shape=mv_tags_vectors.shape[1])
+    for movie_id in list_movie_id:
+        mv_index = mv_tags_list[mv_tags_list["imdbId"] == movie_id].index.values[0]
+        user_movie_vector += mv_tags_vectors[mv_index]
+
+    user_movie_vector /= len(list_movie_id)
+
+    #  find movies similar to user vector to generate movie recommendations
+
+    print('Movie Recommendations:')
+
+    sims = model.docvecs.most_similar(positive=[user_movie_vector], topn=30)
+    results = []
+    for i, j in sims:
+        movie_sim = mv_tags_list.loc[int(i), "imdbId"].strip()
+        if movie_sim not in list_movie_id:
+            # print(movie_sim)
+            results.append(movie_sim)
+
+    return results
+
+
