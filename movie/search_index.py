@@ -146,6 +146,7 @@ class Index:
         return self.data_in_memory['movie_dict'][movie_id].rate
 
     def get_actor_act_num(self, actor_id):
+        # print(actor_id)
         return self.data_in_memory['actor_act_num'][actor_id]
 
     @staticmethod

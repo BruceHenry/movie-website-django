@@ -359,6 +359,12 @@ def search(request, item, query_string, page):
 
 def search_suggest(request, query_string):
     result = search_cache.get(query_string)
+    print(query_string)
+    #save to the db search
+    search_query = User_Search(content=query_string, user = request.user)
+    search_query.save()
+
+
     if result is not None:
         return HttpResponse(json.dumps(result, ensure_ascii=False))
     movie_list, actor_list = [], []

@@ -123,5 +123,12 @@ class MovieTags(models.Model):
         return str(self.movie) + '|' + str(self.tags)
 
 
+class User_Search(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_posted = models.DateTimeField(default=timezone.now)
+    content = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.user.username + '|' + str(self.content) + '|' + str(self.date_posted)
 
 

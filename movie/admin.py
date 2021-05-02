@@ -19,4 +19,5 @@ admin.site.register(User_Rate)
 admin.site.register(ReplyToReview)
 admin.site.register(MovieTags)
 
+admin.site.register(User_Search)
 
