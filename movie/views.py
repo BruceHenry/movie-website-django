@@ -359,10 +359,11 @@ def search(request, item, query_string, page):
 
 def search_suggest(request, query_string):
     result = search_cache.get(query_string)
+    # print(result)
     print(query_string)
     #save to the db search
-    search_query = User_Search(content=query_string, user = request.user)
-    search_query.save()
+    #search_query = User_Search(content=query_string, user = request.user)
+    #search_query.save()
 
 
     if result is not None:
@@ -551,4 +552,46 @@ def get_recommend_by_cosine(list_movie_id):
 
     return results
 
+from django.utils import timezone
+import humanize
+import datetime as dt
+from datetime import timedelta
 
+
+@csrf_exempt
+def get_search_value(request):
+    print('Get search value here ... ')
+    if request.method == 'POST':
+        if request.is_ajax():
+            user_id = request.POST.get('user_id')
+            content = request.POST.get('content')
+
+            user = User.objects.get(id = user_id)
+
+
+            date_posted = timezone.now()
+            # print(date_posted)
+            try:
+                # print('da co roi')
+                user_search_session = User_Search.objects.filter(user=user).latest('date_posted')
+                time_out = date_posted-user_search_session.date_posted
+
+                # print(user_search_session.content)
+                # print(content)
+                print(content)
+                print(user_search_session.content)
+
+                if content.find(user_search_session.content) != -1:
+                    user_search_session.content = content
+                    user_search_session.save()
+                    print('1')
+                else:
+                    print('2')
+                    new_session = User_Search(user=user, content=content)
+                    new_session.save()
+            except:
+                user_search = User_Search(user=user, content=content, date_posted=date_posted)
+                user_search.save()
+
+            return JsonResponse({'mess':'succsess'})
+    return JsonResponse({'mess': 'error'})

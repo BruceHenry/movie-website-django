@@ -62,7 +62,7 @@
                 <input type="text" name="title" id="search-input" class="form-control"
                        placeholder="Search Movies or Actors"
                        onkeyup="start_timer()" size="55" autocomplete="off" required/>
-                <input type="submit" class="btn btn-default" name="search" value="Submit"/>
+                <input type="submit" class="btn btn-default" name="search" value="Search"/>
 
                 <div class="searchlistdiv"
                      style="position:absolute;top:42px;left:295px;user-select:none;display:none;width: 380px;"
@@ -226,18 +226,24 @@
         }, 150);
     });
     var last_input_time = Date.now();
+    var list_search = []
 
     function start_timer() {
         var this_input_time = Date.now();
         last_input_time = this_input_time;
         setTimeout(
             function (this_input_time) {
-                if (last_input_time === this_input_time)
-                    showResult(document.getElementById('search-input').value);
-            }, 150, this_input_time);
+                if (last_input_time === this_input_time){
+                    list_search.push(document.getElementById('search-input').value);
+                     showResult(document.getElementById('search-input').value);
+                }
+                    {#showResult(document.getElementById('search-input').value);#}
+            }, 500, this_input_time);
     }
 
+
     function showResult(str) {
+        console.log(str);
         if (str.length === 0) {
             $(".searchlistdiv").hide();
             return;
@@ -252,7 +258,13 @@
                 var img = "<img src='" + data.movie[i].poster + "' width='60' height='75'></img>";
                 var link = "<div class='suggest' onclick=\"location.href='/movie/movie_detail/"
                     + data.movie[i].movieid + "'\">" + img + "<b>" + data.movie[i].title + "</b></div>";
-                $(".search-movie").after(link)
+
+                {#var link = "<div class='suggest' onclick = " + "alert('hello word')" + ">" + img + "<b>" + data.movie[i].title + "</b></div>";#}
+                //var link = '<div class="suggest"' + 'onclick=alert("hello world")' + '>' + img + "<b>" + data.movie[i].title + "</b></div>";
+
+
+                $(".search-movie").after(link);
+                {#console.log(link);#}
             }
             if (data.movie.length === 0)
                 $(".search-movie").after("<div class='no_suggest'><b>No suggestion!</b></div>")
@@ -268,6 +280,45 @@
 
             $(".searchlistdiv").show();
         });
+
+        function send_keyvalue(){
+        console.log(list_search);
+        var user_id = '{{ request.user.id }}' ;
+
+        $.ajax({
+                               url : "{% url 'get-search-value' %}",
+                               type: 'POST',
+                               datatype: 'json',
+                               processData: "application/json",
+                               data: {
+                               user_id: user_id,
+                               content: list_search.toString(),
+                                }
+                                }).done(function (data) {
+            if (data.mess == 'error') {
+                console.log('send search value error !');
+            } else {
+                console.log('Send search value success !');
+            }
+        })
+    }
+        function removeItemAll(arr, value) {
+          var i = 0;
+          while (i < arr.length) {
+            if (arr[i] === value) {
+              arr.splice(i, 1);
+            } else {
+              ++i;
+            }
+          }
+          return arr;
+        }
+
+        if(removeItemAll(list_search, '').length >=5) {
+            send_keyvalue();
+        }
+
+
     }
 </script>
 {% block mainbody %}

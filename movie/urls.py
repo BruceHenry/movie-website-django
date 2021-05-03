@@ -32,6 +32,7 @@ urlpatterns = [
 
     #get comunity tags
     path('favourite_movie/', views.favourite_movie, name='favourite-movie'),
+    path('get_search_value/', views.get_search_value, name='get-search-value'),
 
     # path('comunity_tags/', views.)
 ]
