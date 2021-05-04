@@ -61,15 +61,18 @@ def get_recommendation(request, popular_movie_list):
                 print(len(result))
 
                 return result
-            else:
+            elif len(liked_movie) >=2 :
+                print(liked_movie)
                 # user cosine similarity
                 recommend_movie = get_recommend_by_cosine(liked_movie)
                 movie_object_list = []
-                for movieid in recommend_movie:
-                    movie_object_list.append(Movie.objects.get(movieid=movieid))
-                for movie in movie_object_list:
-                    if movie in unwatched_movies:
-                        result.append({'movieid': movie.movieid, 'poster': movie.poster})
+                print(recommend_movie[:5])
+                if len(recommend_movie) >=20:
+                    for movieid in recommend_movie:
+                        movie_object_list.append(Movie.objects.get(movieid=movieid))
+                    for movie in movie_object_list:
+                        if movie in unwatched_movies:
+                            result.append({'movieid': movie.movieid, 'poster': movie.poster})
 
-
-                return [result[i] for i in random.sample(range(len(result)), 11)]
+                    return [result[i] for i in random.sample(range(len(result)), 11)]
+                return []

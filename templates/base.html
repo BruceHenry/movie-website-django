@@ -10,6 +10,7 @@
 {#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">#}
     <link href="{% static "css/navbar.css" %}" rel="stylesheet">
     <script src="{% static "js/jquery-1.10.2.min.js.download" %}"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="{% static "js/bootstrap.min.js.download" %}"></script>
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
     <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
@@ -226,7 +227,7 @@
         }, 150);
     });
     var last_input_time = Date.now();
-    var list_search = []
+    var list_search = [];
 
     function start_timer() {
         var this_input_time = Date.now();
@@ -235,11 +236,39 @@
             function (this_input_time) {
                 if (last_input_time === this_input_time){
                     list_search.push(document.getElementById('search-input').value);
-                     showResult(document.getElementById('search-input').value);
+                    var list_search_clean = removeItemAll(list_search, '');
+                    if(list_search_clean.length > 4){
+                        // o day se gui du lieu search nay den server 
+                        //server nhan duoc lien tinh toan gui lai ket qua va no se search  theo
+                        // key word moi 
+                                $.ajax({
+                               url : "{% url 'get-search-value' %}",
+                               type: 'POST',
+                               datatype: 'json',
+                               processData: "application/json",
+                               data: {
+                               user_id: '{{request.user.id}}',
+                               content: list_search_clean.toString(),
+                               keyup_now : document.getElementById('search-input').value,
+                                }
+                                }).done(function (data) {
+                                    console.log(data);
+                                    if (data.check_recommend === 'true') {
+                                        console.log('Recommend model ');
+                                        showResult(data.key_recommend);
+                                    } else {
+                                        console.log('Normal model ');
+                                        showResult(document.getElementById('search-input').value);
+                                    }
+                                })
+                    }
+                    else
+                    {
+                        showResult(document.getElementById('search-input').value);
+                    }
                 }
-                    {#showResult(document.getElementById('search-input').value);#}
             }, 500, this_input_time);
-    }
+    };
 
 
     function showResult(str) {
@@ -251,20 +280,17 @@
         var path = "/movie/search_suggest/" + str;
         $.get(path, function (data) {
             data = JSON.parse(data);
-            if (document.getElementById('search-input').value !== data.text)
-                return;
+            // turn of
+            //if (document.getElementById('search-input').value !== data.text)
+            //    return;
             $(".search-movie").siblings().not(".search-actor").remove();
             for (var i = data.movie.length - 1; i >= 0; i--) {
                 var img = "<img src='" + data.movie[i].poster + "' width='60' height='75'></img>";
                 var link = "<div class='suggest' onclick=\"location.href='/movie/movie_detail/"
                     + data.movie[i].movieid + "'\">" + img + "<b>" + data.movie[i].title + "</b></div>";
 
-                {#var link = "<div class='suggest' onclick = " + "alert('hello word')" + ">" + img + "<b>" + data.movie[i].title + "</b></div>";#}
-                //var link = '<div class="suggest"' + 'onclick=alert("hello world")' + '>' + img + "<b>" + data.movie[i].title + "</b></div>";
-
 
                 $(".search-movie").after(link);
-                {#console.log(link);#}
             }
             if (data.movie.length === 0)
                 $(".search-movie").after("<div class='no_suggest'><b>No suggestion!</b></div>")
@@ -280,46 +306,23 @@
 
             $(".searchlistdiv").show();
         });
-
-        function send_keyvalue(){
-        console.log(list_search);
-        var user_id = '{{ request.user.id }}' ;
-
-        $.ajax({
-                               url : "{% url 'get-search-value' %}",
-                               type: 'POST',
-                               datatype: 'json',
-                               processData: "application/json",
-                               data: {
-                               user_id: user_id,
-                               content: list_search.toString(),
-                                }
-                                }).done(function (data) {
-            if (data.mess == 'error') {
-                console.log('send search value error !');
-            } else {
-                console.log('Send search value success !');
-            }
-        })
     }
-        function removeItemAll(arr, value) {
-          var i = 0;
-          while (i < arr.length) {
-            if (arr[i] === value) {
-              arr.splice(i, 1);
-            } else {
-              ++i;
-            }
-          }
-          return arr;
+
+
+
+    function removeItemAll(arr, value) {
+      var i = 0;
+      while (i < arr.length) {
+        if (arr[i] === value) {
+          arr.splice(i, 1);
+        } else {
+          ++i;
         }
-
-        if(removeItemAll(list_search, '').length >=5) {
-            send_keyvalue();
-        }
-
-
+      }
+      return arr;
     }
+
+
 </script>
 {% block mainbody %}
     {% load static %}

@@ -6,7 +6,6 @@ import json
 import math
 import random
 from movie.initializer import search_cache, search_index
-
 #import sort value for dict
 import operator
 
@@ -524,7 +523,6 @@ def get_recommend_by_cosine(list_movie_id):
         lambda x: ','.join(x)).reset_index()
     mv_tags_list['tag_list'] = mv_tags_list.tag.map(lambda x: x.split(','))
 
-
     #model
     model = Doc2Vec.load('model/model_version1')
     mv_tags_vectors = model.dv.vectors
@@ -532,7 +530,17 @@ def get_recommend_by_cosine(list_movie_id):
     #generate movie recommendation for user
     # compute user vector as an average of movie vectors seen by that user
     user_movie_vector = np.zeros(shape=mv_tags_vectors.shape[1])
+
+    # remove data with not tag in data
+    for movieid in list_movie_id:
+        if mv_tags_list[mv_tags_list["imdbId"] == movieid].empty:
+            # print(movieid)
+            list_movie_id.remove(movieid)
+
+    # print(list_movie_id)
+
     for movie_id in list_movie_id:
+
         mv_index = mv_tags_list[mv_tags_list["imdbId"] == movie_id].index.values[0]
         user_movie_vector += mv_tags_vectors[mv_index]
 
@@ -565,33 +573,89 @@ def get_search_value(request):
         if request.is_ajax():
             user_id = request.POST.get('user_id')
             content = request.POST.get('content')
+            keyup_now = request.POST.get('keyup_now')
 
             user = User.objects.get(id = user_id)
 
-
-            date_posted = timezone.now()
-            # print(date_posted)
+            # recommend now 
             try:
-                # print('da co roi')
-                user_search_session = User_Search.objects.filter(user=user).latest('date_posted')
-                time_out = date_posted-user_search_session.date_posted
+                all_sessions = User_Search.objects.all()
+                print('len all_sessions:', len(all_sessions))
+                all_search_value = [session.content for  session in  all_sessions]
 
-                # print(user_search_session.content)
-                # print(content)
-                print(content)
-                print(user_search_session.content)
+                #search in all_search_value , which the best similarity 
+                sort_search_value = sorted(all_search_value , key = lambda value: jaccard_similarity(content, value)[0])
+                
+                best_similarity_session_content = sort_search_value[-1]
+                jaccard_value = jaccard_similarity(content, best_similarity_session_content)[0]
+                list_key_recommend = jaccard_similarity(content, best_similarity_session_content)[1]
+                # if jaccard similarity > 0.5 
+                if jaccard_value > 0.5:
+                    list_key_success = []
+                    for key_recommend in list_key_recommend :
+                        if key_recommend.find(keyup_now) != -1 and len(key_recommend) > len(keyup_now):
+                            list_key_success.append(key_recommend)
+                            print('2')
+                            print('Exactly recommend key :', key_recommend)
+                        
+                    if len(list_key_success) > 0:
+                        #recommend for last search by diffrent user ....
+                        longest_key = max(list_key_success, key=len)
+                        return JsonResponse({'mess': 'succsess','check_recommend' : 'true'  ,'key_recommend': longest_key})
 
-                if content.find(user_search_session.content) != -1:
-                    user_search_session.content = content
-                    user_search_session.save()
-                    print('1')
                 else:
-                    print('2')
-                    new_session = User_Search(user=user, content=content)
-                    new_session.save()
-            except:
-                user_search = User_Search(user=user, content=content, date_posted=date_posted)
-                user_search.save()
+                    return JsonResponse({'mess': 'succsess','check_recommend' : 'false'  })
 
-            return JsonResponse({'mess':'succsess'})
-    return JsonResponse({'mess': 'error'})
+            except:
+                    return JsonResponse({'mess': 'succsess','check_recommend' : 'false'  })
+
+    return JsonResponse({'mess': 'error','check_recommend' : 0  })
+
+                
+
+
+            # save query after 
+
+            # try:
+            #     user_search_session = User_Search.objects.filter(user=user).latest('date_posted')
+
+            #     # print(content)
+            #     # print(user_search_session.content)
+
+            #     if content.find(user_search_session.content) != -1:
+            #         user_search_session.content = content
+            #         user_search_session.save()
+            #         print('1')
+            #     else:
+            #         print('2')
+            #         user_search_session = User_Search(user=user, content=content)
+            #         user_search_session.save()
+            # except:
+            #     # new record user search
+            #     user_search_session = User_Search(user=user, content=content, date_posted=date_posted)
+            #     user_search_session.save()
+
+            # #recommend here ...
+
+            # all_sessions = User_Search.objects.all()
+            # all_search_value = [session.content for  session in  all_sessions]
+
+            # sort_all_sessions = sorted(all_search_value, key = lambda value: jaccard_similarity(content, value)[0])
+
+            # key_recommend = jaccard_similarity(content, sort_all_sessions[0])[1]
+            # print(keyup_now)
+            # print(key_recommend)
+            # # get key recommend to autocomplete to search recommend
+            # for key in key_recommend:
+            #     print('1')
+            #     if key.find(keyup_now) != -1:
+            #         print('0')
+            #         return JsonResponse({'mess':'succsess','check_recommend' : 1 ,'key_recommend': str(key)})
+
+
+def jaccard_similarity(text1, text2):
+    list1 = text1.split(',')
+
+    list2 = text2.split(',')
+    # print(text1, text2, len(set(list1).intersection(set(list2))) / len(set(list1).union(set(list2))), set(list2) - set(list1) )
+    return (len(set(list1).intersection(set(list2))) / len(set(list1).union(set(list2))), set(list2) - set(list1))
