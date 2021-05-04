@@ -8,6 +8,7 @@ import random
 from movie.initializer import search_cache, search_index
 #import sort value for dict
 import operator
+from django.contrib.auth.decorators import login_required
 
 def add_seen(request, movie_id):
     print('oke')
@@ -399,7 +400,7 @@ def seen(request, movie_id):
         movies.append(Movie.objects.get(movieid=movie_id))
     return render(request, 'seen.html', {'items': movies, 'number': len(movies)})
 
-
+@login_required
 def expect(request, movie_id):
     if request.POST:
         try:
@@ -565,19 +566,19 @@ import humanize
 import datetime as dt
 from datetime import timedelta
 
-
+@login_required
 @csrf_exempt
 def get_search_value(request):
     print('Get search value here ... ')
+    data = {}
     if request.method == 'POST':
         if request.is_ajax():
             user_id = request.POST.get('user_id')
             content = request.POST.get('content')
             keyup_now = request.POST.get('keyup_now')
 
-            user = User.objects.get(id = user_id)
-
-            # recommend now 
+            user = User.objects.get(id=user_id)
+             
             try:
                 all_sessions = User_Search.objects.all()
                 print('len all_sessions:', len(all_sessions))
@@ -589,6 +590,8 @@ def get_search_value(request):
                 best_similarity_session_content = sort_search_value[-1]
                 jaccard_value = jaccard_similarity(content, best_similarity_session_content)[0]
                 list_key_recommend = jaccard_similarity(content, best_similarity_session_content)[1]
+                print(jaccard_value)
+                print(list_key_recommend)
                 # if jaccard similarity > 0.5 
                 if jaccard_value > 0.5:
                     list_key_success = []
@@ -601,57 +604,39 @@ def get_search_value(request):
                     if len(list_key_success) > 0:
                         #recommend for last search by diffrent user ....
                         longest_key = max(list_key_success, key=len)
-                        return JsonResponse({'mess': 'succsess','check_recommend' : 'true'  ,'key_recommend': longest_key})
+                        data['mess'] = 'success'
+                        data['check_recommend'] = 'true'
+                        data['key_recommend'] = longest_key
 
                 else:
-                    return JsonResponse({'mess': 'succsess','check_recommend' : 'false'  })
-
+                    data['mess'] = 'success'
+                    data['check_recommend'] = 'false'
+                    data['key_recommend'] = 'false'
             except:
-                    return JsonResponse({'mess': 'succsess','check_recommend' : 'false'  })
+                data['mess'] = 'false'
+                data['check_recommend'] = 'false'
+                data['key_recommend'] = 'false'
+            
+            
+            #save search value to database 
+            
+            try:
+                now_user_session = User_Search.objects.filter(user=user).latest('date_posted')
+                if content.find(now_user_session.content) != -1:
+                    now_user_session.content = content
+                    now_user_session.save()
+                else:
+                    new_user_session = User_Search(user=user, content=content)
+                    new_user_session.save()
+            except:
+                # first user create session 
+                new_user_session = User_Search(user=user, content=content)
+                new_user_session.save()
 
-    return JsonResponse({'mess': 'error','check_recommend' : 0  })
+
+    return JsonResponse(data)
 
                 
-
-
-            # save query after 
-
-            # try:
-            #     user_search_session = User_Search.objects.filter(user=user).latest('date_posted')
-
-            #     # print(content)
-            #     # print(user_search_session.content)
-
-            #     if content.find(user_search_session.content) != -1:
-            #         user_search_session.content = content
-            #         user_search_session.save()
-            #         print('1')
-            #     else:
-            #         print('2')
-            #         user_search_session = User_Search(user=user, content=content)
-            #         user_search_session.save()
-            # except:
-            #     # new record user search
-            #     user_search_session = User_Search(user=user, content=content, date_posted=date_posted)
-            #     user_search_session.save()
-
-            # #recommend here ...
-
-            # all_sessions = User_Search.objects.all()
-            # all_search_value = [session.content for  session in  all_sessions]
-
-            # sort_all_sessions = sorted(all_search_value, key = lambda value: jaccard_similarity(content, value)[0])
-
-            # key_recommend = jaccard_similarity(content, sort_all_sessions[0])[1]
-            # print(keyup_now)
-            # print(key_recommend)
-            # # get key recommend to autocomplete to search recommend
-            # for key in key_recommend:
-            #     print('1')
-            #     if key.find(keyup_now) != -1:
-            #         print('0')
-            #         return JsonResponse({'mess':'succsess','check_recommend' : 1 ,'key_recommend': str(key)})
-
 
 def jaccard_similarity(text1, text2):
     list1 = text1.split(',')

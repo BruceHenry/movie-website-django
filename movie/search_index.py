@@ -27,6 +27,8 @@ class Index:
             self.data_in_memory['actor_list'].append(actor)
         for act in Act.objects.all():
             actor_id = act.actorid_id
+            # print(actor_id)
+            # print('debug here !!')
             self.data_in_memory['actor_act_num'][actor_id] = self.data_in_memory['actor_act_num'].get(actor_id, 0) + 1
 
     def __build_index(self):
@@ -146,7 +148,6 @@ class Index:
         return self.data_in_memory['movie_dict'][movie_id].rate
 
     def get_actor_act_num(self, actor_id):
-        # print(actor_id)
         return self.data_in_memory['actor_act_num'][actor_id]
 
     @staticmethod

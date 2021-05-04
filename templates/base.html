@@ -228,7 +228,6 @@
     });
     var last_input_time = Date.now();
     var list_search = [];
-
     function start_timer() {
         var this_input_time = Date.now();
         last_input_time = this_input_time;
@@ -247,17 +246,17 @@
                                datatype: 'json',
                                processData: "application/json",
                                data: {
-                               user_id: '{{request.user.id}}',
-                               content: list_search_clean.toString(),
-                               keyup_now : document.getElementById('search-input').value,
-                                }
-                                }).done(function (data) {
-                                    console.log(data);
-                                    if (data.check_recommend === 'true') {
-                                        console.log('Recommend model ');
-                                        showResult(data.key_recommend);
-                                    } else {
-                                        console.log('Normal model ');
+                                    user_id: '{{request.user.id}}',
+                                    content: list_search_clean.toString(),
+                                    keyup_now : document.getElementById('search-input').value,
+                                        }
+                                    }).done(function (data) {
+                                        console.log(data);
+                                        if (data.check_recommend === 'true') {
+                                            console.log('Recommend model ');
+                                            showResult(data.key_recommend);
+                                        } else {
+                                            console.log('Normal model ');
                                         showResult(document.getElementById('search-input').value);
                                     }
                                 })
@@ -363,3 +362,4 @@
 
 </body>
 </html>
+
