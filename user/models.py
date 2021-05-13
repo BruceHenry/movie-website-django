@@ -25,6 +25,9 @@ import datetime as dt
 # user's activity 
 from movie.models import User_Rate
 
+# human time 
+from django.contrib.humanize.templatetags import humanize
+
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
@@ -127,5 +130,8 @@ class Activity(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return 'Activity by '+ str(self.user)
+        return 'Activity by '+ str(self.user) + str(self.type)
+
+    def get_date(self):
+        return humanize.naturaltime(self.date_posted)
 

@@ -107,6 +107,7 @@ def review_movie(request):
                 except:
                     rate_movie = User_Rate(movie=movie, user=user, review=content)
                     rate_movie.save()
+                    # every one create 1 review => create here !!!
                     Activity.objects.create(review = rate_movie, user = request.user, type = 3)
                     print(rate_movie)
 

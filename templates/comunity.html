@@ -6,17 +6,14 @@
 
 <div class="container bootstrap snippets bootdeys">
     <div class="col-md-7 col-md-offset-2">
-        <div class="panel">
+        {% comment %} <div class="panel">
             <div class="panel-body">
         		<textarea class="form-control" rows="2" placeholder="What are you thinking?"></textarea>
         		<div class="mar-top clearfix">
         			<button class="btn btn-sm btn-primary pull-right" type="submit"><i class="fa fa-pencil fa-fw"></i> Share</button>
-        			<a class="btn btn-trans btn-icon fa fa-video-camera add-tooltip" href="#" data-original-title="Add Video" data-toggle="tooltip"></a>
-        			<a class="btn btn-trans btn-icon fa fa-camera add-tooltip" href="#" data-original-title="Add Photo" data-toggle="tooltip"></a>
-        			<a class="btn btn-trans btn-icon fa fa-file add-tooltip" href="#" data-original-title="Add File" data-toggle="tooltip"></a>
         		</div>
         	</div>
-        </div>
+        </div> {% endcomment %}
         <div class="panel panel-body">
     		<!-- Timeline -->
     		<!--===================================================-->
@@ -33,10 +30,10 @@
                         <div class="timeline-stat">
                             <div class="timeline-icon bg-purple"><i class="fa fa-check fa-lg"></i>
                             </div>
-                            <div class="timeline-time">5 Hours ago</div>
+                            <div class="timeline-time">{{activity.get_date}}</div>
                         </div>
                         <div class="timeline-label">
-                            <img class="img-xs img-circle" src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="Profile picture">
+                            <img class="img-xs img-circle" src="{{activity.user.profile.profile_picture.url}}" alt="Profile picture">
                             <a href="" class="btn-link text-semibold">{{activity.user.username}}</a> followed {{activity.follow.user2.username}}.
                         </div>
     			    </div>
@@ -45,27 +42,27 @@
                      {% if activity.type == 2 %}
                         <div class="timeline-entry">
                             <div class="timeline-stat">
-                                <div class="timeline-icon"><img src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="Profile picture">
+                                <div class="timeline-icon"><img src="{{activity.user.profile.profile_picture.url}}" alt="Profile picture">
                                 </div>
-                                <div class="timeline-time">3 Hours ago</div>
+                                <div class="timeline-time">{{activity.get_date}}</div>
                             </div>
                             <div class="timeline-label">
-                                <p class="mar-no pad-btm"><a href="#" class="btn-link text-semibold">{{activity.user.username}}</a> posted on <a href="#">{{activity.post.to_user.username}}</a>
+                                <p class="mar-no pad-btm"><a href="{{activity.user.profile.get_absolute_url}}" class="btn-link text-semibold">{{activity.user.username}}</a> posted on <a href="#">{{activity.post.to_user.username}}</a>
                                 </p>
                                 <blockquote class="bq-sm bq-open">{{activity.post.content}}</blockquote>
                             </div>
     			        </div>
                     {% endif %}
-                    
+
                      {% if activity.type == 3 %}
                         <div class="timeline-entry">
                             <div class="timeline-stat">
-                                <div class="timeline-icon"><img src="https://bootdey.com/img/Content/avatar/avatar6.png" alt="Profile picture">
+                                <div class="timeline-icon"><img src="{{activity.user.profile.profile_picture.url}}" alt="Profile picture">
                                 </div>
-                                <div class="timeline-time">3 Hours ago</div>
+                                <div class="timeline-time">{{activity.get_date}}</div>
                             </div>
                             <div class="timeline-label">
-                                <p class="mar-no pad-btm"><a href="#" class="btn-link text-semibold">{{activity.user.username}}</a> reviewed on  <a href="#">{{activity.review.movie.title}}</a>
+                                <p class="mar-no pad-btm"><a href="{{activity.user.profile.get_absolute_url}}" class="btn-link text-semibold">{{activity.user.username}}</a> reviewed on  <a href="/movie/movie_detail/{{activity.review.movie.movieid }}">{{activity.review.movie.title}}</a>
                                 </p>
                                 <blockquote class="bq-sm bq-open">{{activity.review.review}}</blockquote>
                             </div>
