@@ -20,19 +20,23 @@
                                 {% if profile_flag == 1 %}
                                     <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" href="{% url 'detail-edit-profile'  %}"> Edit Profile </a>
                                 {% else %}
-                                    <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" onclick='follow()' >Follow </a>
+                                    {% if follow_flag == 1  %}
+                                        <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" id='follow' onclick='follow()'>Unfollow </a>
+                                    {% else %}
+                                        <a class="btn btn-primary btn-block btn-gradient waves-effect waves-light" id='follow' onclick='follow()'> Follow </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="my-0">Followers</h5>
                                 <div class="h3 my-0">
-                                    <a href="#">682</a>
+                                    <a id = 'count_followers'>{{followers}}</a>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="my-0">Following</h5>
                                 <div class="h3 my-0">
-                                    <a href="#">341</a>
+                                    <a id = 'count_following'>{{following}}</a>
                                 </div>
                             </div>
                         </div>
@@ -205,11 +209,19 @@
                 data : {user2 : user2},
                 processData: "application/json"
             }).done(function(data){
-                 Swal.fire(
-                    'Follow success !',
-                    'You just follow ',
-                    'success'
-                );
+                if(data.mess ==='follow'){
+                    $('#follow').text('Unfollow');
+                    count_followers = parseInt($('#count_followers').text()) +1;
+                    $('#count_followers').text(count_followers.toString());
+
+                }
+                if(data.mess ==='unfollow'){
+                    $('#follow').text('Follow');
+                    count_followers = parseInt($('#count_followers').text()) -1;
+                    $('#count_followers').text(count_followers.toString());
+                }
+                
+                
                 console.log(data);
             })
         };

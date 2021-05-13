@@ -5,4 +5,4 @@ from .models import *
 admin.site.register(Profile)
 admin.site.register(CommentToPost)
 admin.site.register(PostToUser)
-
+admin.site.register(Follow)

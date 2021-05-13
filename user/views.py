@@ -20,7 +20,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
-from .models import Profile, PostToUser, CommentToPost
+from .models import Profile, PostToUser, CommentToPost, Follow
 
 # add date time and time ago - humaize
 import datetime
@@ -163,72 +163,82 @@ def comunity(request):
 @csrf_exempt
 @login_required
 def detail_user(request, profile_id):
-        print('vao day 1')
-        # check request user , profile's user
-        if request.user.profile.id == profile_id:
-            profile_flag = 1
+    profile = get_object_or_404(Profile, pk=profile_id)
+    post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
+    print('vao day 1')
+    # check request user , profile's user
+    if request.user.profile.id == profile_id:
+        profile_flag = 1
+    else:
+        profile_flag = 0
+        # check follow , user follow profile's user
+        record = Follow.objects.filter(user1=request.user, user2 = profile.user)
+        print(record)
+        if len(record) >= 1:
+            follow_flag = 1
         else:
-            profile_flag = 0
-        profile = get_object_or_404(Profile, pk=profile_id)
-        post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
-        if request.method == 'POST':
-            print('vao day 2')
+            follow_flag = 0
+    # count followers , following 
+    following = Follow.objects.filter(user1 = profile.user).count()
+    followers = Follow.objects.filter(user2 = profile.user).count()
+    if request.method == 'POST':
+        print('vao day 2')
 
-            if request.is_ajax():
-                print('vao day 3')
+        if request.is_ajax():
+            print('vao day 3')
 
-                type = request.POST.get('type')
-                print('o day type la gi ', type)
-                if type == 'comment':
-                    print('vao day 4')
+            type = request.POST.get('type')
+            print('o day type la gi ', type)
+            if type == 'comment':
+                print('vao day 4')
+                content = request.POST.get('content')
+                date_posted = datetime.datetime.now()
+                print(content)
+
+                new_post = PostToUser(content = content, author = request.user, to_user = profile.user, date_posted = date_posted)
+                new_post.save()
+
+
+                data = {
+                    'send_user': request.user.username,
+                    'to_user': profile.user.username,
+                    'content': content,
+                    'date_posted': 'just now',
+                    'send_user_url': request.user.profile.get_absolute_url(),
+                    'send_user_avatar': request.user.profile.profile_picture.url,
+                    'post_id': new_post.id,
+                }
+
+                return JsonResponse(data)
+            else:
+                if type == 'reply':
+                    print('vao day 5')
+                    print('ban da vao day : reply .....')
                     content = request.POST.get('content')
                     date_posted = datetime.datetime.now()
-                    print(content)
+                    postID = request.POST.get('postID')
+                    post = get_object_or_404(PostToUser, pk=int(postID))
 
-                    new_post = PostToUser(content = content, author = request.user, to_user = profile.user, date_posted = date_posted)
-                    new_post.save()
+                    print(content)
+                    print(postID)
+
+                    reply =  CommentToPost(post = post, author = request.user, date_posted = date_posted, content = content)
+                    reply.save()
 
 
                     data = {
                         'send_user': request.user.username,
-                        'to_user': profile.user.username,
+                        'to_post': postID,
                         'content': content,
                         'date_posted': 'just now',
                         'send_user_url': request.user.profile.get_absolute_url(),
+                        # bug ig you not have image avatar => bug here to ajax
                         'send_user_avatar': request.user.profile.profile_picture.url,
-                        'post_id': new_post.id,
+                        'count_comments': post.total_comments(),
                     }
 
                     return JsonResponse(data)
-                else:
-                    if type == 'reply':
-                        print('vao day 5')
-                        print('ban da vao day : reply .....')
-                        content = request.POST.get('content')
-                        date_posted = datetime.datetime.now()
-                        postID = request.POST.get('postID')
-                        post = get_object_or_404(PostToUser, pk=int(postID))
-
-                        print(content)
-                        print(postID)
-
-                        reply =  CommentToPost(post = post, author = request.user, date_posted = date_posted, content = content)
-                        reply.save()
-
-
-                        data = {
-                            'send_user': request.user.username,
-                            'to_post': postID,
-                            'content': content,
-                            'date_posted': 'just now',
-                            'send_user_url': request.user.profile.get_absolute_url(),
-                            # bug ig you not have image avatar => bug here to ajax
-                            'send_user_avatar': request.user.profile.profile_picture.url,
-                            'count_comments': post.total_comments(),
-                        }
-
-                        return JsonResponse(data)
-        return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag})
+    return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag, 'follow_flag': follow_flag, 'followers': followers, 'following': following})
 
 #profile request user
 def user_detail(request, format=None):
@@ -293,7 +303,12 @@ def follow(request):
             user2_Id =  request.POST.get('user2')
             user1 = request.user
             user2 = User.objects.get(id = user2_Id)
-            print(user1)
-            print(user2)
-            return JsonResponse({'oke':'oke'})
-    return JsonResponse({'oke':'oke'})
+            record = Follow.objects.filter(user1 = user1, user2 = user2)
+            if len(record) >=1:
+                record[0].delete()
+                return JsonResponse({'mess': 'unfollow'})
+            else:
+                new_record = Follow(user1 = user1, user2 = user2)
+                new_record.save()
+                return JsonResponse({'mess': 'follow'})
+    return JsonResponse({'mess':'error'})
