@@ -6,6 +6,7 @@ from django.utils import timezone
 import humanize
 import datetime as dt
 
+
 class Movie(models.Model):
     movieid = models.CharField(max_length=20, primary_key=True)
     title = models.CharField(max_length=30)
@@ -82,6 +83,12 @@ class User_Rate(models.Model):
 
     def __str__(self):
         return self.movie.movieid + '|' + str(self.user.username) + '|' + str(self.rate) + '|' + str(self.review)
+
+    # def save(self, *args, **kwargs):
+    #     created = not self.pk
+    #     super().save(*args,**kwargs)
+    #     if created:
+    #         Activity.objects.create(review=self, user = self.user, type = 3)
 
     def total_likes(self):
 

@@ -76,11 +76,11 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                     <li>
-                        <p class="navbar-text" style="color:#fff9">
-                            Welcome, <a href="/user/detail/" > {{ user.username }} </a>
-                        </p>
                         <p class="navbar-text" >
                             <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
+                        </p>
+                        <p class="navbar-text" style="color:#fff9">
+                            Welcome, <a href="/user/detail/" > {{ user.username }} </a>
                         </p>
                     </li>
                     <li style="align-items: center">

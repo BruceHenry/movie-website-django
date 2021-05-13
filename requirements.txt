@@ -1,3 +1,4 @@
 django==2.2
 humanize
  django-social-share
+channels

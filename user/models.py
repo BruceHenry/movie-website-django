@@ -22,6 +22,10 @@ from django.utils import timezone
 import humanize
 import datetime as dt
 
+# user's activity 
+from movie.models import User_Rate
+
+
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
     location = models.CharField(max_length=140, null=True)
@@ -61,6 +65,12 @@ class PostToUser(models.Model):
 
     def __str__(self):
         return self.content
+    
+    def save(self, *args,**kwargs):
+        created = not self.pk
+        super().save(*args,**kwargs)
+        if created:
+            Activity.objects.create(post=self, user = self.author, type = 2)
 
     #def get_absolute_url(self):
     #    return reverse('beets:beets-detail', kwargs={'pk': self.pk})
@@ -98,3 +108,24 @@ class Follow(models.Model):
 
     def __str__(self):
         return str(self.user1) + '|' + str(self.user2)
+
+    # Override the save() method of your User model or extended Usermodel
+    # link https://stackoverflow.com/questions/52196365/django-automatically-create-a-model-instance-when-another-model-instance-is-cr/52196467
+    
+    def save(self, *args,**kwargs):
+        created = not self.pk
+        super().save(*args,**kwargs)
+        if created:
+            Activity.objects.create(follow=self, user = self.user1, type = 1)
+
+class Activity(models.Model):
+    follow = models.ForeignKey(Follow, on_delete = models.CASCADE, blank=True, null=True)
+    review = models.ForeignKey(User_Rate, on_delete = models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(PostToUser, on_delete = models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    type = models.IntegerField() # 1 follow, 2 post , 3 review
+    date_posted = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return 'Activity by '+ str(self.user)
+

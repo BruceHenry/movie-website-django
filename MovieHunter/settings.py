@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     #add time ago ... load humanize
     'django.contrib.humanize',
     'django_social_share',
+    
+    #chennels - websocket
+    # 'channels',
 
 ]
 
@@ -183,3 +186,7 @@ ABSOLUTE_URL_OVERRIDES = {
 }
 
 # timezone
+
+
+#add channels - websocket 
+#ASGI_APPLICATION = 'MovieHunter.routing.application'

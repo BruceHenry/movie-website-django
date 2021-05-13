@@ -20,7 +20,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
-from .models import Profile, PostToUser, CommentToPost, Follow
+from .models import Profile, PostToUser, CommentToPost, Follow, Activity
 
 # add date time and time ago - humaize
 import datetime
@@ -151,12 +151,8 @@ def user_detail_edit_profile(request):
 
 @login_required
 def comunity(request):
-    users = User.objects.all()
-    for user in users:
-        print(user)
-        # print(get_abouste_url(user))
-        # print(user.get_abouste_url())
-    return render(request, 'comunity.html', {'users': users})
+    activitys = Activity.objects.order_by('-date_posted')
+    return render(request, 'comunity.html', {'activitys': activitys})
 
 # get profile by id ...
 
@@ -167,6 +163,7 @@ def detail_user(request, profile_id):
     post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
     print('vao day 1')
     # check request user , profile's user
+    follow_flag = -1
     if request.user.profile.id == profile_id:
         profile_flag = 1
     else:

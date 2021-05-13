@@ -10,6 +10,8 @@ from movie.initializer import search_cache, search_index
 import operator
 from django.contrib.auth.decorators import login_required
 
+from user.models import Activity
+
 def add_seen(request, movie_id):
     print('oke')
     if request.is_ajax():
@@ -105,6 +107,7 @@ def review_movie(request):
                 except:
                     rate_movie = User_Rate(movie=movie, user=user, review=content)
                     rate_movie.save()
+                    Activity.objects.create(review = rate_movie, user = request.user, type = 3)
                     print(rate_movie)
 
                 return JsonResponse({'mess':'success'})
