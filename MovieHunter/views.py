@@ -4,7 +4,7 @@ from movie.models import *
 import operator
 import random
 from movie.initializer import search_index
-from movie.views import top_movie, favourite_movie, get_recommend_by_jaccard, get_recommend_by_cosine
+from movie.views import top_movie, favourite_movie, get_recommend_by_jaccard, get_recommend_by_cosine, action_movie, comedy_movie
 from django.http import HttpResponse, JsonResponse
 
 @csrf_protect
@@ -25,6 +25,9 @@ def index(request):
     data['recommendation'] = get_recommendation(request, popular_movie_list)
     print('top movie: ')
     data['top_movie'] = top_movie(request)
+    data['action_movie'] = action_movie(request)
+    data['comedy_movie'] = comedy_movie(request)
+
     return render(request, 'base.html', data)
 
 
@@ -75,4 +78,4 @@ def get_recommendation(request, popular_movie_list):
                             result.append({'movieid': movie.movieid, 'poster': movie.poster})
 
                     return [result[i] for i in random.sample(range(len(result)), 11)]
-                return []
+    return result

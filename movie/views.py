@@ -644,3 +644,27 @@ def jaccard_similarity(text1, text2):
     list2 = text2.split(',')
     # print(text1, text2, len(set(list1).intersection(set(list2))) / len(set(list1).union(set(list2))), set(list2) - set(list1) )
     return (len(set(list1).intersection(set(list2))) / len(set(list1).union(set(list2))), set(list2) - set(list1))
+
+
+def action_movie(request):
+    all_action_movie = Movie.objects.order_by('-rate')[:200]
+    results = []
+    for movie in all_action_movie:
+        if check_genres(movie, 'Action'):
+            results.append(movie)
+    return [results[i] for i in random.sample(range(len(results)), 11 )]
+    
+
+def comedy_movie(request):
+    all_action_movie = Movie.objects.order_by('-rate')[:200]
+    results = []
+    for movie in all_action_movie:
+        if check_genres(movie, 'Comedy'):
+            results.append(movie)
+    return [results[i] for i in random.sample(range(len(results)), 11 )]
+
+def check_genres(movie, genre):
+    print(movie.genres)
+    if movie.genres.find(genre)!=-1:
+        return True
+    return False

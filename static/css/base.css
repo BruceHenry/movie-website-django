@@ -134,3 +134,13 @@ h3{
     line-height: 2.5rem;
     font-size: 2rem;
 }
+
+/* add hover poster website */
+
+.img-rounded {
+    transition: transform .01s; /* Animation */
+  }
+
+.img-rounded:hover {
+    transform: scale(1.2); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+  }
