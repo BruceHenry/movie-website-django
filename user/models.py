@@ -92,4 +92,9 @@ class CommentToPost(models.Model):
 
 
 
+class Follow(models.Model):
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user1')
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user2')
 
+    def __str__(self):
+        return self.user1 + '|' + self.user2

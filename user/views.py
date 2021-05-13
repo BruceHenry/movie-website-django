@@ -116,63 +116,6 @@ def facebook(request):
         login(request, user)
     return HttpResponse()
 
-# def user_detail(request, format=None):
-#     username = request.user.get_username()
-#     profile = Profile.objects.filter(user=request.user).order_by('-id')[0]
-#     post_comments = PostToUser.objects.filter(to_user=request.user).order_by('-date_posted')
-#
-#     if request.method == 'POST':
-#         print('vao day 2')
-#         if request.is_ajax():
-#             print('vao day 3')
-#             type = request.POST.get('type')
-#             print('o day type la gi ', type)
-#             if type == 'comment':
-#                 print('vao day 4')
-#                 content = request.POST.get('content')
-#                 date_posted = datetime.datetime.now()
-#                 print(content)
-#
-#                 new_post = PostToUser(content=content, author=request.user, to_user=profile.user,
-#                                       date_posted=date_posted)
-#                 new_post.save()
-#
-#                 data = {
-#                     'send_user': request.user.username,
-#                     'to_user': profile.user.username,
-#                     'content': content,
-#                     'date_posted': 'just now',
-#                     'send_user_url': request.user.profile.get_absolute_url(),
-#                     'send_user_avatar': request.user.profile.profile_picture.url,
-#                 }
-#
-#                 return JsonResponse(data)
-#             else:
-#                 if type == 'reply':
-#                     print('vao day 5')
-#                     print('ban da vao day : reply .....')
-#                     content = request.POST.get('content')
-#                     date_posted = datetime.datetime.now()
-#                     postID = request.POST.get('postID')
-#                     post = get_object_or_404(PostToUser, pk=int(postID))
-#
-#                     print(content)
-#                     print(postID)
-#
-#                     reply = CommentToPost(post=post, author=request.user, date_posted=date_posted, content=content)
-#                     reply.save()
-#
-#                     data = {
-#                         'send_user': request.user.username,
-#                         'to_post': postID,
-#                         'content': content,
-#                         'date_posted': 'just now',
-#                         'send_user_url': request.user.profile.get_absolute_url(),
-#                         'send_user_avatar': request.user.profile.profile_picture.url,
-#                     }
-#
-#                     return JsonResponse(data)
-#     return render(request, 'user_detail.html', {'user': request.user, 'profile': profile, 'posts': post_comments})
 
 @login_required
 def user_detail_edit_profile(request):
@@ -221,6 +164,11 @@ def comunity(request):
 @login_required
 def detail_user(request, profile_id):
         print('vao day 1')
+        # check request user , profile's user
+        if request.user.profile.id == profile_id:
+            profile_flag = 1
+        else:
+            profile_flag = 0
         profile = get_object_or_404(Profile, pk=profile_id)
         post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
         if request.method == 'POST':
@@ -280,8 +228,9 @@ def detail_user(request, profile_id):
                         }
 
                         return JsonResponse(data)
-        return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments})
+        return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag})
 
+#profile request user
 def user_detail(request, format=None):
     profile_id = request.user.profile.id
     return  detail_user(request, profile_id)
@@ -336,4 +285,15 @@ def report_post(request):
 
 
 
-
+@csrf_exempt
+@login_required
+def follow(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            user2_Id =  request.POST.get('user2')
+            user1 = request.user
+            user2 = User.objects.get(id = user2_Id)
+            print(user1)
+            print(user2)
+            return JsonResponse({'oke':'oke'})
+    return JsonResponse({'oke':'oke'})
