@@ -28,7 +28,7 @@ SECRET_KEY = ')xttil7o#c&*nw8)d+n@nns-$py#7rv86!=l_t)-#9!ov65l5)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".localhost"]
+# ALLOWED_HOSTS = [".localhost"]
 
 # Application definition
 
@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'django_social_share',
     
     #chennels - websocket
-    # 'channels',
+    'channels',
 
 ]
 
@@ -188,5 +188,13 @@ ABSOLUTE_URL_OVERRIDES = {
 # timezone
 
 
-#add channels - websocket 
-#ASGI_APPLICATION = 'MovieHunter.routing.application'
+# Channels
+ASGI_APPLICATION = "MovieHunter.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}

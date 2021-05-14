@@ -23,7 +23,7 @@ import humanize
 import datetime as dt
 
 # user's activity 
-from movie.models import User_Rate
+from movie.models import User_Rate, ReplyToReview
 
 # human time 
 from django.contrib.humanize.templatetags import humanize
@@ -138,4 +138,37 @@ class Activity(models.Model):
 
     def get_date(self):
         return humanize.naturaltime(self.date_posted)
+
+# add notigications
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    follow = models.ForeignKey(Follow, on_delete = models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(PostToUser, on_delete = models.CASCADE, blank=True, null=True)
+    reply_to_post = models.ForeignKey(CommentToPost, on_delete = models.CASCADE, blank=True, null=True)
+    reply_to_review = models.ForeignKey(ReplyToReview, on_delete = models.CASCADE, blank=True, null=True)
+    NOTIFICATION_TYPES = ((1,'follow'), (2,'post'), (3, 'reply post'), (4, 'reply review'), (5, 'report'), (6, 'like review'), (7, 'like post'))
+    date_posted = models.DateTimeField(default=timezone.now)
+    is_seen = models.BooleanField(default=False)
+    type = models.IntegerField(choices=NOTIFICATION_TYPES)
+    link = models.CharField(max_length=140, null=True)
+
+    def __str__(self):
+        if self.type == 1:
+            return str(self.user) + ' follow you' 
+        if self.type == 2:
+            return str(self.user) + ' just posted on your wall' 
+        if self.type == 4:
+            return str(self.user) + ' just replied to the review about {}'.format(self.reply_to_review.review.movie.title) 
+        if self.type == 3:
+            return str(self.user) + ' just replied to your post'
+        if self.type == 5:
+            return str(self.user) + ' just reported to {}"s post'.format(self.post.author.username)
+        if self.type == 6:
+            return str(self.user) + ' liked your review'
+        if self.type == 7:
+            return str(self.user) + ' liked your post'
+
+
+            
+
 

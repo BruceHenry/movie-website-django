@@ -15,7 +15,6 @@
     <link href="{% static "css/font-awesome.min.css" %}" rel="stylesheet">
     <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/stars.css' %}"/>
 
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
@@ -76,6 +75,12 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
                     <li>
+                        <p class="navbar-text" >
+                            <a style="color:#fff" class="notification">
+                                <span>Notification</span>
+                                <span style="color: red" class="badge">3</span>
+                            </a>
+                        </p>
                         <p class="navbar-text" >
                             <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
                         </p>
@@ -305,7 +310,7 @@
 
             $(".searchlistdiv").show();
         });
-    }
+    };
 
 
 
@@ -319,8 +324,7 @@
         }
       }
       return arr;
-    }
-
+    };
 
 </script>
 {% block mainbody %}
@@ -376,7 +380,36 @@
         
 
 {% endblock %}
+<script>
+        //const roomName = 'notification';
+        var roomName = '{{request.user.id}}';
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
 
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log(data);
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        
+
+        document.querySelector('.notification').onclick = function(e) {
+            console.log('bat dau gui tin nhan');
+            chatSocket.send(JSON.stringify({
+                'message': 'hello world'
+            }));
+        };
+  
+</script>
 </body>
 </html>
 
