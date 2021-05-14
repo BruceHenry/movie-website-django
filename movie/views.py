@@ -668,7 +668,6 @@ def comedy_movie(request):
     return [results[i] for i in random.sample(range(len(results)), 11 )]
 
 def check_genres(movie, genre):
-    print(movie.genres)
     if movie.genres.find(genre)!=-1:
         return True
     return False

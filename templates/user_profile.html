@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block mainbody %}
 
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
+
 <main class="container bootdey">
 <main class="main-content p-5" role="main">
     <div class="row mb-4">
@@ -134,64 +137,63 @@
                         <hr>
 
                         <ul class="list-unstyled mt-5">
+                        {% for post in posts %}
                             <li class="media">
+                                <div class="profile-picture bg-gradient bg-primary mb-4">
+                                    <img src="{{post.author.profile.profile_picture.url}}" width="44" height="44">
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-title mt-0 mb-1">
+                                        <a href="{{post.author.profile.get_absolute_url}}"></a>{{ post.author.username }} <small> {{ post.get_date }}</small>
+                                    </div>
+                                    {{ post.content }}
+                                    <div class="media-feed-control">
+                                        <a href="" id="likeButton">
+                                            <input type="hidden" name="likePostID" value="{{ post.id }}">
+                                            <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{post.total_likes}}) </span>
+                                        </a>
+                                        <a href="#">
+                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_comments}}) </span>
+                                        </a>
+                                        <a href="" id="reportButton">
+                                            <input type="hidden" name="reportPostID" value="{{ post.id }}">
+                                            {% if request.user in post.reports.all %}
+                                                <i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>
+                                            {% else %}
+                                                <i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>
+                                            {% endif %}
 
-                                <div id="comment-body" class="media-body">
-
+                                        </a>
+                                    </div>
                                     <div class="media-body-reply-block">
-                                        <ul id="list-comment"  class="list-unstyled">
-                                            {% for post in posts %}
-                                                <li id="li-comment" class="media mt-4">
+                                        <ul class="list-unstyled">
+                                            {% comment %} <li class="comment-reply" id="comment-reply"> {% endcomment %}
+                                            {% for reply  in post.get_all_reply %}
+                                                <li class="media mt-4">
                                                     <div class="profile-picture bg-gradient bg-primary mb-4">
-                                                        <img src="{{ post.author.profile.profile_picture.url}}" width="44" height="44">
+                                                        <img src="{{reply.author.profile.profile_picture.url}}" width="44" height="44">
                                                     </div>
                                                     <div class="media-body">
                                                         <div class="media-title mt-0 mb-1">
-                                                            <a href="{{ post.author.profile.get_absolute_url }}">{{ post.author.username }}</a> <small> {{ post.date_posted }}</small>
+                                                            <a href="{{ reply.author.profile.get_absolute_url }}">{{ reply.author.username }}</a> <small> {{ reply.get_date }}</small>
                                                         </div>
-                                                        <b> {{ post.content }} </b>
-                                                        <div class="media-feed-control">
-                                                            <a href="" id="likeButton">
-                                                                <input type="hidden" name="likePostID" value="{{ post.id }}">
-                                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{post.total_likes}}) </span>
-                                                            </a>
-                                                            <a href="#">
-                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_comments}}) </span>
-                                                            </a>
-                                                            <a href="" id="reportButton">
-                                                                <input type="hidden" name="reportPostID" value="{{ post.id }}">
-                                                                {% if request.user in post.reports.all %}
-                                                                    <i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>
-                                                                {% else %}
-                                                                    <i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>
-                                                                {% endif %}
-
-                                                            </a>
-                                                        </div>
+                                                        {{reply.content}}
                                                     </div>
-                                                    <li class="comment-reply" id="comment-reply">
-                                                        {% for reply  in post.get_all_reply %}
-                                                            <div class="media-title mt-0 mb-1">
-                                                                <a href="{{ reply.author.profile.get_absolute_url }}">{{ reply.author.username }}</a> <small> {{ reply.date_posted }}</small>
-                                                            </div>
-                                                            <b> {{ reply.content }} </b>
-                                                        {% endfor %}
-                                                    <hr>
-                                                        <form method="POST" class="form-reply" enctype="multipart/form-data">
-                                                            {% csrf_token %}
-                                                            <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
-                                                            <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here ....."> </textarea>
-                                                            <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
-                                                        </form>
-                                                    </li>
-                                                </li>
-                                                <hr>
+                                                <li>
                                             {% endfor %}
-
+                                            <li class="comment-reply-block mt-4">
+                                                <form method="POST" class="form-reply" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
+                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="123-45-678"> </textarea>
+                                                    <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
+                                                </form>
+                                            </li>
                                         </ul>
                                     </div>
-                                </div>
+                                </div>          
                             </li>
+                        {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -249,8 +251,7 @@
                 console.log(data);
                 document.getElementById("comment-textarea").value = '' ;
 
-                 $("#comment-body").prepend(
-                     '<li class="media mt-4">' +
+                 $(".media").prepend(
                         '<div class="profile-picture bg-gradient bg-primary mb-4">' +
                             '<img src="' + data.send_user_avatar +'"'  + 'width="44" height="44">' +
                         '</div>' +
@@ -268,8 +269,14 @@
                                 '<a href="#">'+
                                     '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' ({{post.total_comments}})'  + '</span>' +
                                 '</a>' +
-                                '<a href="#">' +
-                                    '<i class="batch-icon batch-icon-flag"></i>' + 'Report' +
+                                '<a href="" id="reportButton">' +
+                                            '<input type="hidden" name="reportPostID" value="{{ post.id }}">' +
+                                            '{% if request.user in post.reports.all %}' +
+                                                '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>' +
+                                            '{% else %}'+
+                                                '<i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>' +
+                                            '{% endif %}'+
+
                                 '</a>'+
                             '</div>'+
                         '</div>'+
@@ -279,8 +286,7 @@
                             '<input type="hidden" class="postID" name="postID" value="' + data.post_id +  '">' +
                             '<textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here .....">' + '</textarea>' +
                             '<button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>'
-                        +'</form>' +
-                    '</li>'
+                        +'</form>' 
                 );
                 Swal.fire(
                     'Post success !',

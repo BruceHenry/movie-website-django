@@ -34,7 +34,7 @@
                         </div>
                         <div class="timeline-label">
                             <img class="img-xs img-circle" src="{{activity.user.profile.profile_picture.url}}" alt="Profile picture">
-                            <a href="" class="btn-link text-semibold">{{activity.user.username}}</a> followed {{activity.follow.user2.username}}.
+                            <a href="" class="btn-link text-semibold">{{activity.user.username}}</a> followed <a href="{{activity.follow.user2.profile.get_absolute_url}}"> {{activity.follow.user2.username}}.</a>
                         </div>
     			    </div>
                     {% endif %}
