@@ -671,3 +671,6 @@ def check_genres(movie, genre):
     if movie.genres.find(genre)!=-1:
         return True
     return False
+
+
+# like movie dosent have 

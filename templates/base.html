@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {% load static %}
     <link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" id="bootstrap-css">
-{#    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">#}
     <link href="{% static "css/navbar.css" %}" rel="stylesheet">
     <script src="{% static "js/jquery-1.10.2.min.js.download" %}"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -16,15 +15,20 @@
     <link href="{% static "css/bootstrap-social.css" %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/stars.css' %}"/>
+   
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
 
     <style type="text/css"></style>
 </head>
 
 {% load static %}
-<body style="background-color: #f0f0f5;">
+<body style="background-color: #f1f1f1;">
 <nav class="navbar navbar-default navbar-inverse" role="navigation" style="margin: 0">
     <div class="container-fluid">
         <div class="navbar-header" style=" align-items: center;
@@ -65,7 +69,7 @@
                 <input type="submit" class="btn btn-default" name="search" value="Search"/>
 
                 <div class="searchlistdiv"
-                     style="position:absolute;top:42px;left:430px;user-select:none;display:none;width: 430px;"
+                     style="position:absolute;top:42px;left:500px;user-select:none;display:none;width: 430px;"
                      aria-expanded="false">
                     <div class="search-movie"><b> Movie  </b> </div>
                     <div class="search-actor"><b> Actor </b>:</div>
@@ -74,20 +78,53 @@
 
             <ul class="nav navbar-nav navbar-right">
                 {% if user.is_authenticated %}
-                    <li>
-                        <p class="navbar-text" >
-                            <a style="color:#fff" class="notification">
-                                <span>Notification</span>
-                                <span style="color: red" class="badge">3</span>
-                            </a>
-                        </p>
-                        <p class="navbar-text" >
-                            <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
-                        </p>
-                        <p class="navbar-text" style="color:#fff9">
-                            Welcome, <a href="/user/detail/" > {{ user.username }} </a>
-                        </p>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link text-light" href="#" id="navbarDropdown" onclick = "seen_noti()" role="button" data-toggle="dropdown">
+                            {% if count_noti > 0 %}
+                                <i class="fa fa-bell"> <span id='count_noti' class="badge">{{count_noti}}</span></i>
+                            {% else %}
+                            <i class="fa fa-bell"> <span id='count_noti' class="badge"></span></i>
+                            {% endif %}
+
+
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="head text-light bg-dark" >
+                                <div class="row" >
+                                <div class="col-lg-12 col-sm-12 col-12">
+                                    <span> Notifications </span>
+                                </div>
+                            </li>
+                            {% for noti in notifications %}
+                                <li class="notification-box" >
+                                    <div class="row">
+                                    <div class="col-lg-3 col-sm-3 col-3 text-center">
+                                        <img src="{{noti.user2.profile.profile_picture.url}}" width =44 height =40 class="w-50 rounded-circle">
+                                    </div>   
+                                    <a href = {{noti.get_link}}> 
+                                        <div class="col-lg-8 col-sm-8 col-8">
+                                            <strong class="text-info">{{noti.user2.username}}</strong>
+                                            <div>
+                                                {{noti}}
+                                            </div>
+                                            <small class="text-warning">{{noti.get_date}}</small>
+                                        </div>   
+                                    </a> 
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        
+                            <li class="footer bg-dark text-center">
+                                <a href="" class="text-light">View All</a>
+                            </li>
+                        </ul>
                     </li>
+                    <p class="navbar-text" >
+                        <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
+                    </p>
+                    <p class="navbar-text" style="color:#fff9">
+                        Welcome, <a href="/user/detail/" > {{ user.username }} </a>
+                    </p>
                     <li style="align-items: center">
                         <form method="post" action="/user/logout/">
                         {% csrf_token %}
@@ -153,6 +190,8 @@
     </div><!-- /.container-fluid -->
 </nav>
 <script>
+
+    
 
     function getCookie(name) {
         var cookieValue = null;
@@ -326,10 +365,32 @@
       return arr;
     };
 
+   function seen_noti(){
+       // seen all notification 
+       $.ajax({
+            url : "{% url 'seen-noti' %}",
+            type: 'POST',
+            datatype: 'json',
+            processData: "application/json",
+            data: {
+                user_id: '{{request.user.id}}',
+                content: 'seen',
+                    }
+                }).done(function (data) {
+                    //alert('seen');
+                })
+
+        //clear count noti
+        $('#count_noti').text('');
+   }
+
+   
+
 </script>
 {% block mainbody %}
     {% load static %}
     {% load humanize  %}
+
     <div style=" margin-left: 1%;">
         <h3 class="title_text" style="color: #f5c518; line-height: 2.5rem; font-size: 2rem"><b>Popular Now </b></h3>
         {% for movie in popular %}
@@ -377,12 +438,27 @@
                 </a>
             {% endfor %}
         </div>
-        
+        <div role="alert" aria-live="assertive" aria-atomic="true" class="toast" data-autohide="false">
+            <div class="toast-header">
+                <svg class=" rounded mr-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="xMidYMid slice" focusable="false" role="img">
+                <rect fill="#007aff" width="100%" height="100%" /></svg>
+                <strong class="mr-auto">Bootstrap</strong>
+                <small>11 mins ago</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                Hello, world! This is a toast message.
+            </div>
+        </div>
 
 {% endblock %}
 <script>
         //const roomName = 'notification';
-        var roomName = '{{request.user.id}}';
+        var roomName = 'notification';
+        var roomName = '{{user.username}}';
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -393,21 +469,41 @@
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            console.log(data);
-        };
+            var mess = JSON.parse(data.message);
+            console.log(mess);
+            if($('#count_noti').text().length > 0){
+                var count_noti = parseInt($('#count_noti').text()) + 1;
+                $('#count_noti').text(count_noti);
+            }
+            else{
+                var count_noti = 1;
+                $('#count_noti').text(count_noti);
+            }
 
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
+            
+
+            $('.notification-box').prepend(
+                '<div class="row">'
+                +'<div class="col-lg-3 col-sm-3 col-3 text-center">'
+                + '<img src="' + mess.sender_image + '"width =44 height =40 class="w-50 rounded-circle">'
+                +'</div>'    
+                + '<a href ="' + mess.link  + '">'
+                +'<div class="col-lg-8 col-sm-8 col-8">'
+                +'<strong class="text-info">' + mess.sender + '</strong>'
+                + '<div>'
+                +    mess.noti
+                +    '</div>'
+                + '<small class="text-warning">' + mess.date + '</small>'
+                + '</div>'  
+                + '</a>'  
+                + '</div>'
+            );
+            
+
+            
+        }; 
 
         
-
-        document.querySelector('.notification').onclick = function(e) {
-            console.log('bat dau gui tin nhan');
-            chatSocket.send(JSON.stringify({
-                'message': 'hello world'
-            }));
-        };
   
 </script>
 </body>

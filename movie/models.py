@@ -5,7 +5,9 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 import humanize
 import datetime as dt
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import user.models 
 
 class Movie(models.Model):
     movieid = models.CharField(max_length=20, primary_key=True)
@@ -84,12 +86,7 @@ class User_Rate(models.Model):
     def __str__(self):
         return self.movie.movieid + '|' + str(self.user.username) + '|' + str(self.rate) + '|' + str(self.review)
 
-    # def save(self, *args, **kwargs):
-    #     created = not self.pk
-    #     super().save(*args,**kwargs)
-    #     if created:
-    #         Activity.objects.create(review=self, user = self.user, type = 3)
-
+   
     def total_likes(self):
 
         return self.likes.count()
@@ -103,6 +100,9 @@ class User_Rate(models.Model):
         replys = ReplyToReview.objects.filter(review = self).order_by('-date_posted')
 
         return replys
+    
+    def get_absolute_url(self):
+        return "/movie/movie_detail/{}".format(self.movie.movieid)
 
 
 class ReplyToReview(models.Model):
@@ -118,6 +118,13 @@ class ReplyToReview(models.Model):
 
     def __str__(self):
         return self.user.username + '|' + str(self.review) + '|' + str(self.content)
+
+
+# create notification if follow created
+@receiver(post_save, sender=ReplyToReview)
+def create_notification4(sender, instance, created, **kwargs):
+    if created:
+        user.models.Notification.objects.create(reply_to_review = instance, user = instance.review.user, user2=instance.user ,type=4)
 
 
 class MovieTags(models.Model):

@@ -20,7 +20,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
-from .models import Profile, PostToUser, CommentToPost, Follow, Activity
+from .models import Profile, PostToUser, CommentToPost, Follow, Activity, Notification, UserSeenNotifycation
 
 # add date time and time ago - humaize
 import datetime
@@ -263,6 +263,9 @@ def like_post(request):
                     return JsonResponse({'count_likes': count_likes, 'type':'dislike'})
                 else:
                     post.likes.add(request.user)
+                    # add notification
+                    if request.user.id != post.author.id:
+                        Notification.objects.create(user=post.author, user2= request.user, post = post, type = 7)
                     count_likes = post.likes.count()
                     return JsonResponse({'count_likes': count_likes, 'type':'like'})
     return JsonResponse({'count_likes': 0, 'type': -1})
@@ -288,7 +291,18 @@ def report_post(request):
 
     return JsonResponse({'type': -1})
 
+@csrf_exempt
+@login_required
+def seen_noti(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            all_noti = UserSeenNotifycation.objects.filter(user = request.user)
+            for noti in all_noti:
+                noti.is_seen = True
+                noti.save()            
 
+            return JsonResponse({'mess': 'sucess'})
+    return JsonResponse({'mess': 'error'})
 
 
 

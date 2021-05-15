@@ -6,6 +6,7 @@ import random
 from movie.initializer import search_index
 from movie.views import top_movie, favourite_movie, get_recommend_by_jaccard, get_recommend_by_cosine, action_movie, comedy_movie
 from django.http import HttpResponse, JsonResponse
+from user.models import Notification, UserSeenNotifycation
 
 @csrf_protect
 def index(request):
@@ -13,6 +14,11 @@ def index(request):
     movie_dict = search_index.data_in_memory['movie_dict']
     if request.user.is_authenticated:
         data = {'username': request.user.get_username()}
+        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+        data['notifications'] = notifications
+        # not seen 
+        count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
+        data['count_noti'] = count_noti
     popular_movies = Popularity.objects.all().order_by('-weight')
     popular = []
     for movie in popular_movies[:11]:

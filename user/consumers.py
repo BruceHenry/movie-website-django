@@ -7,7 +7,10 @@ from asgiref.sync import async_to_sync
 
 class NotificationConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_group_name = 'group1'
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = 'noti_%s' % self.room_name
+        print(self.room_name)
+        print(self.room_group_name)
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -24,20 +27,22 @@ class NotificationConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-    # Receive message from WebSocket
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        print('nhan tin nhan tu websocket 1')
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message
-            }
-        )
-        print('chuyen tin nhan len kenh ')
+    # turn off receive message from websocket
+
+    # # Receive message from WebSocket
+    # def receive(self, text_data):
+    #     text_data_json = json.loads(text_data)
+    #     message = text_data_json['message']
+    #     print('nhan tin nhan tu websocket 1')
+    #     # Send message to room group
+    #     async_to_sync(self.channel_layer.group_send)(
+    #         self.room_group_name,
+    #         {
+    #             'message': message,
+    #             'type': 'chat_message',
+    #         }
+    #     )
+    #     print('chuyen tin nhan len kenh ')
 
     # Receive message from room group
     def chat_message(self, event):
@@ -46,5 +51,6 @@ class NotificationConsumer(WebsocketConsumer):
         # Send message to WebSocket
         self.send(text_data=json.dumps({
             'message': message,
+            'type': 'chat_message',
         }))
         print('chuyen nguoc lai len websocket')

@@ -47,9 +47,15 @@
                                 <div class="timeline-time">{{activity.get_date}}</div>
                             </div>
                             <div class="timeline-label">
-                                <p class="mar-no pad-btm"><a href="{{activity.user.profile.get_absolute_url}}" class="btn-link text-semibold">{{activity.user.username}}</a> posted on <a href="#">{{activity.post.to_user.username}}</a>
-                                </p>
-                                <blockquote class="bq-sm bq-open">{{activity.post.content}}</blockquote>
+                                {% if activity.user.id !=  activity.post.to_user.id %}
+                                    <p class="mar-no pad-btm"><a href="{{activity.user.profile.get_absolute_url}}" class="btn-link text-semibold">{{activity.user.username}}</a> posted on <a href="{{activity.post.to_user.profile.get_absolute_url}}">{{activity.post.to_user.username}}</a>
+                                    </p>
+                                    <blockquote class="bq-sm bq-open">{{activity.post.content}}</blockquote>
+                                {% else %}
+                                    <p class="mar-no pad-btm"><a href="{{activity.user.profile.get_absolute_url}}" class="btn-link text-semibold">{{activity.user.username}}</a> posted on his wall
+                                    </p>
+                                    <blockquote class="bq-sm bq-open">{{activity.post.content}}</blockquote>
+                                {% endif %}
                             </div>
     			        </div>
                     {% endif %}

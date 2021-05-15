@@ -23,7 +23,7 @@ import humanize
 import datetime as dt
 
 # user's activity 
-from movie.models import User_Rate, ReplyToReview
+# from movie.models import User_Rate, ReplyToReview
 
 # human time 
 from django.contrib.humanize.templatetags import humanize
@@ -69,14 +69,12 @@ class PostToUser(models.Model):
     def __str__(self):
         return self.content
     
+    
     def save(self, *args,**kwargs):
         created = not self.pk
         super().save(*args,**kwargs)
         if created:
             Activity.objects.create(post=self, user = self.author, type = 2)
-
-    #def get_absolute_url(self):
-    #    return reverse('beets:beets-detail', kwargs={'pk': self.pk})
 
     def total_likes(self):
 
@@ -107,6 +105,19 @@ class CommentToPost(models.Model):
     def get_date(self):
         return humanize.naturaltime(self.date_posted)
 
+# create notification if post created
+@receiver(post_save, sender=PostToUser)
+def create_notification(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(post = instance, user = instance.to_user, user2=instance.author ,type=2)
+
+
+
+# create notification if post created
+@receiver(post_save, sender=CommentToPost)
+def create_notification2(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(reply_to_post = instance ,user = instance.post.author, user2=instance.author ,type=3)
 
 
 class Follow(models.Model):
@@ -125,9 +136,16 @@ class Follow(models.Model):
         if created:
             Activity.objects.create(follow=self, user = self.user1, type = 1)
 
+# create notification if follow created
+@receiver(post_save, sender=Follow)
+def create_notification3(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(follow = instance, user = instance.user2, user2=instance.user1 ,type=1)
+
+
 class Activity(models.Model):
     follow = models.ForeignKey(Follow, on_delete = models.CASCADE, blank=True, null=True)
-    review = models.ForeignKey(User_Rate, on_delete = models.CASCADE, blank=True, null=True)
+    review = models.ForeignKey("movie.User_Rate", on_delete = models.CASCADE, blank=True, null=True)
     post = models.ForeignKey(PostToUser, on_delete = models.CASCADE, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.IntegerField() # 1 follow, 2 post , 3 review
@@ -141,34 +159,103 @@ class Activity(models.Model):
 
 # add notigications
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    follow = models.ForeignKey(Follow, on_delete = models.CASCADE, blank=True, null=True)
-    post = models.ForeignKey(PostToUser, on_delete = models.CASCADE, blank=True, null=True)
-    reply_to_post = models.ForeignKey(CommentToPost, on_delete = models.CASCADE, blank=True, null=True)
-    reply_to_review = models.ForeignKey(ReplyToReview, on_delete = models.CASCADE, blank=True, null=True)
+    #to user 
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    #from_user
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user', blank=True, null=True)
     NOTIFICATION_TYPES = ((1,'follow'), (2,'post'), (3, 'reply post'), (4, 'reply review'), (5, 'report'), (6, 'like review'), (7, 'like post'))
     date_posted = models.DateTimeField(default=timezone.now)
     is_seen = models.BooleanField(default=False)
     type = models.IntegerField(choices=NOTIFICATION_TYPES)
-    link = models.CharField(max_length=140, null=True)
+    follow = models.ForeignKey(Follow, on_delete=models.CASCADE, blank=True, null=True)
+    post = models.ForeignKey(PostToUser, on_delete=models.CASCADE, blank=True, null=True)
+    reply_to_review = models.ForeignKey("movie.ReplyToReview", on_delete=models.CASCADE, blank=True, null=True)
+    reply_to_post = models.ForeignKey(CommentToPost, on_delete=models.CASCADE, blank=True, null=True)
+    review = models.ForeignKey("movie.User_Rate", on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
         if self.type == 1:
-            return str(self.user) + ' follow you' 
+            return str(self.user2) + ' follow you' 
         if self.type == 2:
-            return str(self.user) + ' just posted on your wall' 
+            return str(self.user2) + ' just posted on your wall' 
         if self.type == 4:
-            return str(self.user) + ' just replied to the review about {}'.format(self.reply_to_review.review.movie.title) 
+            return str(self.user2) + ' just replied to the review about {} movie'.format(self.reply_to_review.review.movie.title) 
         if self.type == 3:
-            return str(self.user) + ' just replied to your post'
-        if self.type == 5:
-            return str(self.user) + ' just reported to {}"s post'.format(self.post.author.username)
+            return str(self.user2) + ' just replied to your post'
         if self.type == 6:
-            return str(self.user) + ' liked your review'
+            return str(self.user2) + ' liked your review  about {}'.format(self.review.movie.title)
         if self.type == 7:
-            return str(self.user) + ' liked your post'
+            return str(self.user2) + ' liked your post'
+    
+    def get_date(self):
+        return humanize.naturaltime(self.date_posted)
+    
+    def get_link(self):
+        if self.type == 1:
+            return self.user2.profile.get_absolute_url()
+        if self.type == 2:
+            return self.user.profile.get_absolute_url()
+        if self.type == 4:
+            return self.reply_to_review.review.get_absolute_url()
+        if self.type == 3:
+            return self.reply_to_post.post.to_user.profile.get_absolute_url()
+        if self.type == 6:
+            return self.review.get_absolute_url()
+        if self.type == 7:
+            return self.post.to_user.profile.get_absolute_url()
 
+
+class UserSeenNotifycation(models.Model):
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, blank=True, null=True, related_name='noti')
+    # to user ( user get this notification)
+    user =  models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True,related_name= 'user_get_that_noti')
+    is_seen = models.BooleanField(default=False)
+
+    def get_all_noti_not_seen(self):
+        return UserSeenNotifycation.objects.filter(user = self.user, is_seen = False)
+    
+    def count_not_seen(self):
+        return UserSeenNotifycation.objects.filter(user = self.user, is_seen = False).count()
+
+    def __str__(self):
+        return str(self.user.username) + '|' + str(self.notification)
 
             
+# create user_seen after notification create
+@receiver(post_save, sender=Notification)
+def create_notification_seen(sender, instance, created, **kwargs):
+    if created:
+        UserSeenNotifycation.objects.create(user = instance.user, notification = instance)
 
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+import json
+
+def create_new_folow_notifications(sender, **kwargs):
+    
+	notify = kwargs['instance']
+	print(notify.user.username)
+	channel_layer = get_channel_layer()
+	room_name = 'noti_' + str(notify.user.username)
+	my_dictionary = {
+		'sender': notify.user2.username,
+		'to_user': notify.user.username,
+		'date': str(notify.get_date()),
+		'is_seen': notify.is_seen,
+        'noti': str(notify),
+        'sender_image': notify.user2.profile.profile_picture.url,
+        'link': notify.get_link()
+	}
+
+	# print(my_dictionary)
+	message = json.dumps(my_dictionary, default=str)
+	
+	async_to_sync(channel_layer.group_send)(
+		room_name, {
+            'type': 'chat_message',
+            'message': message
+		}
+	)
+
+post_save.connect(create_new_folow_notifications, sender=Notification)
