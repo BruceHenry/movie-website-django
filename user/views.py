@@ -323,3 +323,5 @@ def follow(request):
                 new_record.save()
                 return JsonResponse({'mess': 'follow'})
     return JsonResponse({'mess':'error'})
+
+

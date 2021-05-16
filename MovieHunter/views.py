@@ -6,7 +6,9 @@ import random
 from movie.initializer import search_index
 from movie.views import top_movie, favourite_movie, get_recommend_by_jaccard, get_recommend_by_cosine, action_movie, comedy_movie
 from django.http import HttpResponse, JsonResponse
-from user.models import Notification, UserSeenNotifycation
+from user.models import *
+from django.contrib.auth.models import User
+from movie.models import *
 
 @csrf_protect
 def index(request):
@@ -85,3 +87,30 @@ def get_recommendation(request, popular_movie_list):
 
                     return [result[i] for i in random.sample(range(len(result)), 11)]
     return result
+
+
+
+
+def get_dict_context():
+    dict_context = {}
+    # lay tong so user dang nhap theo thang 
+    register_month = [0,0,0,0,0,0,0,0,0,0,0,0]
+    register_month[0] = User.objects.filter(date_joined__month = 1).count()
+    register_month[1] = User.objects.filter(date_joined__month = 2).count()
+    register_month[2] = User.objects.filter(date_joined__month = 3).count()
+    register_month[3] = User.objects.filter(date_joined__month = 4).count()
+    register_month[4] = User.objects.filter(date_joined__month = 5).count()
+    register_month[5] = User.objects.filter(date_joined__month = 6).count()
+    register_month[6] = User.objects.filter(date_joined__month = 7).count()
+    register_month[7] = User.objects.filter(date_joined__month = 8).count()
+    register_month[8] = User.objects.filter(date_joined__month = 9).count()
+    register_month[9] = User.objects.filter(date_joined__month = 10).count()
+    register_month[10] = User.objects.filter(date_joined__month = 11).count()
+    register_month[11] = User.objects.filter(date_joined__month = 12).count()
+    dict_context['register_user'] = register_month
+
+    return dict_context
+
+
+    
+

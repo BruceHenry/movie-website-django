@@ -33,6 +33,7 @@ urlpatterns = [
     path('follow/', views.follow, name='follow'),
 
     path('seen-noti/', views.seen_noti, name='seen-noti'),
+
     #test image upload
 
     # path('image', views.hotel_image_view, name='upload'),
