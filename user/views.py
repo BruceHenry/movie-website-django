@@ -325,3 +325,8 @@ def follow(request):
     return JsonResponse({'mess':'error'})
 
 
+@csrf_exempt
+@login_required
+def get_data_chart1(request):
+    
+    return JsonResponse({'data': [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]})

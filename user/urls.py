@@ -36,7 +36,7 @@ urlpatterns = [
 
     #test image upload
 
-    # path('image', views.hotel_image_view, name='upload'),
+    path('getdatachart1/', views.get_data_chart1, name='get_data'),
     # path('success', views.success, name='display'),
 
 
