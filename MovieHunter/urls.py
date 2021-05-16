@@ -32,6 +32,8 @@ urlpatterns = [
     # error here 
     # url(r'.*', lambda request: render(request, '404.html'), name='404'),
     #path('dict_context/', views.get_dict_context, name='get-dict-context'),
+    path('fuck-chart/', views.population_chart, name='fuck-chart'),
+
     path('verification/', include('verify_email.urls')),] 
 
 
