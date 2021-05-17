@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import user.models 
 
+
+
 class Movie(models.Model):
     movieid = models.CharField(max_length=20, primary_key=True)
     title = models.CharField(max_length=30)

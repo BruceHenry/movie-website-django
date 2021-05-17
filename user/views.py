@@ -21,7 +21,7 @@ from django.contrib.auth.tokens import default_token_generator
 
 from django.urls import reverse
 from .models import Profile, PostToUser, CommentToPost, Follow, Activity, Notification, UserSeenNotifycation
-
+from user.models import *
 # add date time and time ago - humaize
 import datetime
 import humanize
@@ -258,7 +258,7 @@ def like_post(request):
 
                 if request_user in post.likes.all():
                     #dislike
-                    post.likes.remove(request_user)
+                    post.likes.removie.modelse(request_user)
                     count_likes = post.likes.count()
                     return JsonResponse({'count_likes': count_likes, 'type':'dislike'})
                 else:
@@ -328,5 +328,90 @@ def follow(request):
 @csrf_exempt
 @login_required
 def get_data_chart1(request):
-    
-    return JsonResponse({'data': [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 630]})
+    if request.is_ajax():
+        type = request.GET.get('type')
+        if type == 'chart1':
+            register_list = []
+            register_list.append(User.objects.filter(date_joined__month = 1).count())
+            register_list.append(User.objects.filter(date_joined__month = 2).count())
+            register_list.append(User.objects.filter(date_joined__month = 3).count())
+            register_list.append(User.objects.filter(date_joined__month = 4).count())
+            register_list.append(User.objects.filter(date_joined__month = 5).count())
+            register_list.append(User.objects.filter(date_joined__month = 6).count())
+            register_list.append(User.objects.filter(date_joined__month = 7).count())
+            register_list.append(User.objects.filter(date_joined__month = 8).count())
+            register_list.append(User.objects.filter(date_joined__month = 9).count())
+            register_list.append(User.objects.filter(date_joined__month = 10).count())
+            register_list.append(User.objects.filter(date_joined__month = 11).count())
+            register_list.append(User.objects.filter(date_joined__month = 12).count())
+            return JsonResponse({'data': register_list, 'mess': 'sucess', 'label':'Total User Register'})
+        if type == 'chart2':
+            register_list = []
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 1).count())     
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 2).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 3).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 4).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 5).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 6).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 7).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 8).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 9).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 10).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 11).count())
+            register_list.append(Activity.objects.filter(type=3, date_posted__month = 12).count())
+            return JsonResponse({'data': register_list, 'mess': 'sucess','label':'Total Rates'})
+        if type == 'chart3':
+            register_list = []
+            register_list.append(PostToUser.objects.filter(date_posted__month = 1).count())     
+            register_list.append(PostToUser.objects.filter(date_posted__month = 2).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 3).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 4).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 5).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 6).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 7).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 8).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 9).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 10).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 11).count())
+            register_list.append(PostToUser.objects.filter(date_posted__month = 12).count())
+            return JsonResponse({'data': register_list, 'mess': 'sucess', 'label':'Total Posts'})
+        
+    return JsonResponse({'mess':'error'})
+
+
+@csrf_exempt
+@login_required
+def get_data_chart2(request):
+    if request.is_ajax():
+        # get top 6 user hoat dong nhieu nhat 
+        all_user = User.objects.all()
+        lables = []
+        data = []
+        for user in all_user:
+            lables.append(user.username)
+            data.append(check_activity(user))
+        total_acivitys = Activity.objects.all().count()
+        return JsonResponse({'mess':'success', 'labels':lables, 'data':data, 'total': total_acivitys})
+    return JsonResponse({'mess':'error'})
+
+def check_activity(user):
+    return Activity.objects.filter(user=user).count()
+
+@csrf_exempt
+@login_required
+def get_chart_post(request):
+    if request.is_ajax():
+        # Top cac bai post nhieu report nhat 
+        total_likes =0 
+        total_comments =0
+        total_reports = 0
+        data = []
+        for post in PostToUser.objects.all():
+            total_likes += post.total_likes()
+            total_comments +=  post.total_comments()
+            total_reports += post.total_reports()
+        data = [total_likes, total_comments, total_reports]
+        total_post = PostToUser.objects.all().count()
+        print(data)
+        return JsonResponse({'mess':'success', 'data' : data, 'total': total_post})
+    return JsonResponse({'mess':'error'})

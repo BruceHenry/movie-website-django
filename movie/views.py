@@ -674,3 +674,22 @@ def check_genres(movie, genre):
 
 
 # like movie dosent have 
+
+
+@login_required
+@csrf_exempt
+def get_data_chart3(request):
+    if request.is_ajax():
+        all_movies = Movie.objects.all()
+        top_movie = sorted(all_movies, key= lambda t: get_all_rates(t))[-10:]
+        labels = []
+        data = []
+        for movie in top_movie:
+            labels.append(movie.title)
+            data.append(get_all_rates(movie))
+        total_rates = User_Rate.objects.all().count()
+        return JsonResponse({'mess':'success', 'labels': labels, 'data': data, 'total_rates':total_rates})
+    return JsonResponse({'mess':'error'})
+
+def get_all_rates(movie):
+    return User_Rate.objects.filter(movie=movie).count()

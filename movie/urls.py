@@ -35,4 +35,6 @@ urlpatterns = [
     path('get_search_value/', views.get_search_value, name='get-search-value'),
 
     # path('comunity_tags/', views.)
+    path('get_chart_movie_rate/', views.get_data_chart3, name='get_chart_movie'),
+
 ]
