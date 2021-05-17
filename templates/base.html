@@ -23,18 +23,19 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">  
+    {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> {% endcomment %}
 
     <style type="text/css"></style>
 </head>
 
 {% load static %}
-<body style="background-color: #f1f1f1;">
-<nav class="navbar navbar-default navbar-inverse" role="navigation" style="margin: 0">
+{% comment %} <body style="background-color: #f1f1f1;"> {% endcomment %}
+<body style="background-color: black;">
+
+<nav class="navbar navbar-dark bg-dark" role="navigation" style="margin: 0">
     <div class="container-fluid">
-        <div class="navbar-header" style=" align-items: center;
-        display: flex;
-        min-height: 100%;
-        width: 112px;">
+        <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                     data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
@@ -42,17 +43,17 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/"><span class=" 	glyphicon glyphicon-home"></span> Home</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+                <li><a class="navbar-brand" href="/"><span class=" 	glyphicon glyphicon-home"></span> Home</a> </li>
                 <li><a href="/movie/movie_all/1"><span class="glyphicon glyphicon-film"></span> Movies</a></li>
                 <li><a href="/movie/actor_all/1"><span class="glyphicon glyphicon-user"></span> Actors</a></li>
                 <li class="dropdown">
                         <a  href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                           data-toggle="dropdown">My Movies<span class="caret"></span></a>
+                           data-toggle="dropdown">My Movies </a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="/movie/seen/">Seen List </a></li>
                             <li class="divider"></li>
@@ -63,16 +64,15 @@
             <form class="navbar-form navbar-left" id="search--form" onsubmit="searchSubmit()">
                 {% csrf_token %}
 
-                <input type="text" name="title" id="search-input" class="form-control"
+                <input type="text"  name="title" id="search-input" class="form-control"
                        placeholder="Search Movies or Actors"
                        onkeyup="start_timer()" size="55" autocomplete="off" required/>
-                <input type="submit" class="btn btn-default" name="search" value="Search"/>
-
+                <input type="submit" class="btn btn-info waves-effect waves-light m-b-5" name="search" value="Search"/>
                 <div class="searchlistdiv"
-                     style="position:absolute;top:42px;left:500px;user-select:none;display:none;width: 430px;"
+                     style="position:absolute;top:50px;left:380px;user-select:none;display:none;width: 430px;"
                      aria-expanded="false">
-                    <div class="search-movie"><b> Movie  </b> </div>
-                    <div class="search-actor"><b> Actor </b>:</div>
+                    <div class="search-movie"><h4><b> Movie </b> </h4> </div>
+                    <div class="search-actor"><h4><b> Actor </b> </h4> </div>
                 </div>
             </form>
 
@@ -122,9 +122,10 @@
                         </ul>
                     </li>
                     <p class="navbar-text" >
-                        <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a>
+                        {% comment %} <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a> {% endcomment %}
+                        <a href="{% url 'comunity' %}">Comunity</a>
                     </p>
-                    <p class="navbar-text" style="color:#fff9">
+                    <p class="navbar-text">
                         Welcome, <a href="/user/detail/" > {{ user.username }} </a>
                     </p>
                     <li style="align-items: center">
@@ -135,13 +136,13 @@
                     </li>
                 {% else %}
                     {% if message %}
-                        <li><p class="navbar-text" style="color:red;">{{ message }}</p></li>
+                        <li><p class="navbar-text">{{ message }}</p></li>
                     {% endif %}
-                    <li><p class="navbar-text" style ="color: #fff;" >Already have an account?</p></li>
+                    <li><p class="navbar-text">Already have an account?</p></li>
                     <li class="dropdown">
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
-                        <ul id="login-dp" class="dropdown-menu">
+                        <ul id="login-dp" class="dropdown-menu"  >
                             <li>
                                 <div class="row">
                                     <div class="col-md-12">
