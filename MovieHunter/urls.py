@@ -25,14 +25,12 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls, {'extra_context': views.get_dict_context()}),
+    url(r'^admin/', admin.site.urls),
     url(r'^movie/', include('movie.urls')),
     url(r'^user/', include('user.urls')),
     url(r'^$', views.index, name='index'),
     # error here 
     # url(r'.*', lambda request: render(request, '404.html'), name='404'),
-    #path('dict_context/', views.get_dict_context, name='get-dict-context'),
-    path('fuck-chart/', views.population_chart, name='fuck-chart'),
 
     path('verification/', include('verify_email.urls')),] 
 

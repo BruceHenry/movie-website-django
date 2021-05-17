@@ -360,7 +360,6 @@
                 event.preventDefault();
                 var postID  = $(this).find("input[name='likePostID']").val();
                 var likeID = '#count-likes' + postID
-                alert(postID);
 
                 $.ajax({
                     url : "{% url 'like-post'%}",
@@ -390,9 +389,6 @@
 
                 });
          });
-
-
-
 
 
           $(document).on('click', '#reportButton', function (event) {
@@ -430,23 +426,7 @@
                 });
           });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
     </script>
+
+            
 {% endblock mainbody %}

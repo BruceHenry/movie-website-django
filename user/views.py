@@ -152,7 +152,14 @@ def user_detail_edit_profile(request):
 @login_required
 def comunity(request):
     activitys = Activity.objects.order_by('-date_posted')
-    return render(request, 'comunity.html', {'activitys': activitys})
+    # add notification ...
+    data = {}
+    notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+    count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
+    data['activitys'] = activitys
+    data['notifications'] = notifications
+    data['count_noti'] = count_noti
+    return render(request, 'comunity.html',  data)
 
 # get profile by id ...
 
@@ -161,6 +168,8 @@ def comunity(request):
 def detail_user(request, profile_id):
     profile = get_object_or_404(Profile, pk=profile_id)
     post_comments = PostToUser.objects.filter(to_user=profile.user).order_by('-date_posted')
+    notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+    count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
     print('vao day 1')
     # check request user , profile's user
     follow_flag = -1
@@ -235,7 +244,7 @@ def detail_user(request, profile_id):
                     }
 
                     return JsonResponse(data)
-    return render(request, 'user_profile.html', {'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag, 'follow_flag': follow_flag, 'followers': followers, 'following': following})
+    return render(request, 'user_profile.html', {'notifications':notifications,'count_noti':count_noti,'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag, 'follow_flag': follow_flag, 'followers': followers, 'following': following})
 
 #profile request user
 def user_detail(request, format=None):
