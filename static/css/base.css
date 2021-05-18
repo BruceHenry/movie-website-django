@@ -206,4 +206,14 @@ h3{
 
 
 
- 
+ /* IMAGE  */
+ .bookDetailLeftSide {
+  text-align: center;
+}
+.bookDetailLeftSide .bookImage {
+  max-width: 200px;
+}
+
+.bookImage {
+  max-height: 300px;
+}

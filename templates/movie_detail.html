@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
 {% block mainbody %}
-    <div class="Layer" id="layer"></div>
+
+<div class="Layer" id="layer"></div>
     <div id="container">
         {% if object %}
 
@@ -256,7 +257,7 @@
             </div>
 
             <div id="main-pic">
-                <img border="0" src="{{ object.poster }}" alt="Cannot load photo, sorry!" width="300" height="500">
+                <img border="0" src="{{ object.poster }}" alt="Cannot load photo, sorry!" style = "position: absolute;left: 250px; top: 150px" width="300" height="500">
             </div>
 
         {% endif %}
@@ -320,17 +321,15 @@
 
 
 
-    {% if form_flag != -1 %}
-        <div class="comment-block">
+        {% comment %} <div class="comment-block">
                     <div id="form-comment" class="form-group">
                         <textarea class="form-control" id="review-textarea" rows="2" placeholder="Reviews   {{object.title}}..."></textarea>
                         <div class="media-feed-control clearfix">
                             <button onclick="review()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
                         </div>
                     </div>
-        </div>
+        </div> {% endcomment %}
 
-    {% endif %}
 
     <script>
     function review(){
@@ -458,7 +457,7 @@
                 </div>
             </div>
         </li>
-    </ul>
+    </ul> 
 
 
 
