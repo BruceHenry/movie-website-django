@@ -117,7 +117,8 @@ def create_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=CommentToPost)
 def create_notification2(sender, instance, created, **kwargs):
     if created:
-        Notification.objects.create(reply_to_post = instance ,user = instance.post.author, user2=instance.author ,type=3)
+        if instance.post.author != instance.author:
+            Notification.objects.create(reply_to_post = instance ,user = instance.post.author, user2=instance.author ,type=3)
 
 
 class Follow(models.Model):

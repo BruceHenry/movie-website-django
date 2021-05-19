@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from movie.models import *
 from django.http import HttpResponse, JsonResponse
@@ -10,7 +10,7 @@ from movie.initializer import search_cache, search_index
 import operator
 from django.contrib.auth.decorators import login_required
 
-from user.models import Activity
+from user.models import Activity, Notification
 
 def add_seen(request, movie_id):
     print('oke')
@@ -85,9 +85,7 @@ def rate_movie(request):
 
 @csrf_exempt
 def review_movie(request):
-    print('review movie here')
     if request.method == 'POST':
-        print('rate movie here 2')
         if request.is_ajax():
             movie_id = request.POST.get('movieid')
             username = request.POST.get('username')
@@ -119,29 +117,27 @@ def review_movie(request):
 
 @csrf_exempt
 def reply_review(request):
-    print('reply review here')
     if request.method == 'POST':
-        print('reply review here 2')
         if request.is_ajax():
             data = {}
-            review_id = request.POST.get('review_id')
-            username = request.POST.get('username')
+            review_id = request.POST.get('postID')
             content = request.POST.get('content')
             type = request.POST.get('type')
+            print(review_id)
+            print(content)
 
             if type == 'reply':
                 try:
                     rate_movie = User_Rate.objects.get(id=int(review_id))
-                    user = User.objects.get(username=username)
-                    reply = ReplyToReview(user=user, review=rate_movie, content=content)
+                    reply = ReplyToReview(user=request.user, review=rate_movie, content=content)
                     reply.save()
                     data['mess'] = 'succsess'
-                    data['username'] = username
+                    data['send_user'] = request.user.username
                     data['content'] = content
                     data['review_id'] = review_id
 
-                    data['send_user_url'] = user.profile.get_absolute_url()
-                    data['send_user_avatar']= user.profile.profile_picture.url
+                    data['send_user_url'] = request.user.profile.get_absolute_url()
+                    data['send_user_avatar']= request.user.profile.profile_picture.url
                     data['date_posted']  = 'just now'
 
 
@@ -244,25 +240,27 @@ def movie_detail(request, model, id):
 
 
             # get tags from movie
-            dict_tags ={}
+            users_tags = []
+            comunity_tags = []
             try:
-                list_tags = MovieTags.objects.filter(movie=object)
-                for tag in list_tags:
-                    if tag.tags in dict_tags.keys():
-                        dict_tags[tag.tags] +=1
-                    else:
-                        dict_tags[tag.tags] =1
+                users_tags = MovieTags.objects.filter(movie=object, user = request.user)
+                for tag in  MovieTags.objects.filter(movie=object):
+                    if tag  not in users_tags:
+                        comunity_tags.append(tag)
+
+                
 
 
             except:
-                print('empty')
-                dict_tags = {}
-
+                users_tags = []
+                comunity_tags = []
+                print('ko co tag nao cao ')
     except:
         return render(request, '404.html')
 
     # print(review_form_flag)
-    return render(request, 'movie_detail.html', {'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+    return render(request, 'movie_detail.html', {'users_tags': users_tags, 'comunity_tags':comunity_tags,
+    'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 @csrf_exempt
 def actor_detail(request, model, id):
@@ -419,6 +417,30 @@ def expect(request, movie_id):
         movies.append(Movie.objects.get(movieid=movie_id))
     return render(request, 'expect.html', {'items': movies, 'number': len(movies)})
 
+
+@csrf_exempt
+def like_review(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            postID = request.POST.get('postID')
+            type = request.POST.get('type')
+            if type == 'like':
+                post = get_object_or_404(User_Rate, pk=int(postID))
+                request_user = request.user
+                if request_user in post.likes.all():
+                    #dislike
+                    post.likes.remove(request_user)
+                    count_likes = post.likes.count()
+                    return JsonResponse({'count_likes': count_likes, 'type':'dislike'})
+                else:
+                    post.likes.add(request.user)
+                    # add notification
+                    if request.user.id != post.user.id:
+                        if post.user != request.user:
+                            Notification.objects.create(user=post.user, user2=request.user, review = post, type = 6)
+                    count_likes = post.likes.count()
+                    return JsonResponse({'count_likes': count_likes, 'type':'like'})
+    return JsonResponse({'count_likes': 0, 'type': -1})
 
 def top_movie(request):
     top_movie = Movie.objects.order_by('-rate')[:30]

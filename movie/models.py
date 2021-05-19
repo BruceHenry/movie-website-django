@@ -3,11 +3,12 @@ from django.contrib.auth.models import User
 
 #add timezones
 from django.utils import timezone
-import humanize
 import datetime as dt
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import user.models 
+
+from django.contrib.humanize.templatetags import humanize
 
 
 
@@ -106,6 +107,9 @@ class User_Rate(models.Model):
     def get_absolute_url(self):
         return "/movie/movie_detail/{}".format(self.movie.movieid)
 
+    def get_date(self):
+        return humanize.naturaltime(self.date_posted)
+
 
 class ReplyToReview(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -121,12 +125,17 @@ class ReplyToReview(models.Model):
     def __str__(self):
         return self.user.username + '|' + str(self.review) + '|' + str(self.content)
 
+    def get_date(self):
+        return humanize.naturaltime(self.date_posted)
+    
+
 
 # create notification if follow created
 @receiver(post_save, sender=ReplyToReview)
 def create_notification4(sender, instance, created, **kwargs):
     if created:
-        user.models.Notification.objects.create(reply_to_review = instance, user = instance.review.user, user2=instance.user ,type=4)
+        if instance.user != instance.review.user:
+            user.models.Notification.objects.create(reply_to_review = instance, user = instance.review.user, user2=instance.user ,type=4)
 
 
 class MovieTags(models.Model):

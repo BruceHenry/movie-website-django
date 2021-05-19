@@ -19,11 +19,11 @@
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+    {% comment %} <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script> {% endcomment %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">  
+    {% comment %} <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script> {% endcomment %}
+    {% comment %} <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script> {% endcomment %}
+    {% comment %} <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">   {% endcomment %}
     {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> {% endcomment %}
 
     <style type="text/css"></style>
@@ -68,7 +68,7 @@
                        onkeyup="start_timer()" size="55" autocomplete="off" required/>
                 <input type="submit" class="btn btn-info waves-effect waves-light m-b-5" name="search" value="Search"/>
                 <div class="searchlistdiv"
-                     style="position:absolute;top:50px;left:380px;user-select:none;display:none;width: 430px;"
+                     style="position:absolute;top:45px;left:400px;user-select:none;display:none;width: 430px;"
                      aria-expanded="false">
                     <div class="search-movie"><h4><b> Movie </b> </h4> </div>
                     <div class="search-actor"><h4><b> Actor </b> </h4> </div>
@@ -138,7 +138,7 @@
                         <li><p class="navbar-text">{{ message }}</p></li>
                     {% endif %}
                     <li><p class="navbar-text">Already have an account?</p></li>
-                    <li class="dropdown">
+                    <li class="dropdown" >
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
                         <ul id="login-dp" class="dropdown-menu"  >
@@ -493,7 +493,6 @@
        
 
 {% endblock %}
-
 </body>
 </html>
 

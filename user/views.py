@@ -148,11 +148,20 @@ def user_detail_edit_profile(request):
             # return HttpResponse('hello world')
     return render(request, 'edit_detail_profile.html', {'user': request.user})
 
+def check_follow(user1, user2):
+    if len(Follow.objects.filter(user1 = user1, user2 = user2)) >0:
+        return True
+    return False
 
 @login_required
 def comunity(request):
-    activitys = Activity.objects.order_by('-date_posted')
-    # add notification ...
+    # show activity for user follow 
+    activitys = []
+    for acti in Activity.objects.order_by('-date_posted'):
+        if check_follow(request.user, acti.user):
+            activitys.append(acti)
+
+    # add notification to show user...
     data = {}
     notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
     count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
@@ -267,7 +276,7 @@ def like_post(request):
 
                 if request_user in post.likes.all():
                     #dislike
-                    post.likes.removie.modelse(request_user)
+                    post.likes.remove(request_user)
                     count_likes = post.likes.count()
                     return JsonResponse({'count_likes': count_likes, 'type':'dislike'})
                 else:

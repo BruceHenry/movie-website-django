@@ -24,6 +24,7 @@ urlpatterns = [
 
     # path('detail/<str:movie_id>/', views.movie_detail, name='movie-detail'),
     #ajax send data
+    path('like_review/', views.like_review, name='like-review'),
     path('review_movie/', views.review_movie, name='review-movie'),
     path('reply_review/', views.reply_review, name='reply-review'),
     path('rate_movie/', views.rate_movie, name='rate-movie'),
