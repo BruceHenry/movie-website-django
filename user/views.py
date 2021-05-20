@@ -116,37 +116,87 @@ def facebook(request):
         login(request, user)
     return HttpResponse()
 
+@csrf_exempt
+@login_required
+def upload_image(request):
+    
+    if request.method == "POST":
+        if request.is_ajax():
+            print('oke')
+            profile_picture = request.FILES.get('avatar-image')
+            print('image',profile_picture)
 
+            return JsonResponse({'profile_picture': profile_picture})
+    return JsonResponse({'profile_picture': 'profile_picture'})
+
+
+
+@csrf_exempt
 @login_required
 def user_detail_edit_profile(request):
     response_data = {}
     if request.method == "POST":
-        # get data
+        print('1')
         if request.is_ajax():
-            print('oke')
-            location = request.POST.get('location')
-            gender = request.POST.get('gender')
-            birthday =  request.POST.get('birthday')
-            bio = request.POST.get('bio')
-            profile_picture = request.FILES.get('profile_picture')
-            print('image',profile_picture)
+            print('2')
+            type = request.POST.get('type')
+            if type == 'general':
+                print('3')
+                location = request.POST.get('country')
+                gender = request.POST.get('gender')
+                print('gender', gender)
+                birthday =  request.POST.get('birthday')
+                bio = request.POST.get('bio')
+                profile_picture = request.FILES.get('profile_picture')
+                full_name = request.POST.get('full_name')
+                if len(Profile.objects.filter(user=request.user).order_by('-id'))==1:
+                    print('here')
+                    user_profile = Profile.objects.filter(user=request.user).order_by('-id')[0]
+                    if len(location)>1:
+                        user_profile.location = location
+                    if gender is not None:
+                        print('here',gender)
+                        user_profile.gender = gender
+                    if len(birthday) >=1:
+                        user_profile.birthday = birthday
+                    if len(bio) >=1:
+                        user_profile.bio = bio
+                    if profile_picture is None:
+                        user_profile.profile_picture = request.user.profile.profile_picture
+                    if profile_picture is not None:
+                        user_profile.profile_picture = profile_picture
+                    if len(full_name) >1:
+                        user_profile.full_name = full_name
+                    user_profile.save()
 
-            user_profile = Profile.objects.filter(user=request.user).order_by('-id')[0].delete()
-            user_profile = Profile.objects.create(user=request.user, location=location, bio=bio, birthday=birthday, profile_picture=profile_picture)
-            user_profile.save()
+                # return data
+                response_data['location'] = location
+                response_data['gender'] = gender
+                response_data['birthday'] = birthday
+                response_data['full_name'] = full_name
+                response_data['bio'] = bio
+                response_data['profile_picture'] = user_profile.profile_picture.url
+                return JsonResponse({'mess':'success', 'data': response_data})
 
+                # return JsonResponse(response_data)
+            
+            if type == 'change-password':
+                password = request.POST.get('old_password')
+                new_password = request.POST.get('new_password')
+                user = authenticate(username =request.user.username, password=password)
+                if user is not None:
+                    user.set_password(new_password)
+                    return JsonResponse({'mess': 'ok', 'type':'change-password'})
+                else:
+                    return JsonResponse({'mess': 'error', 'type':'change-password'})
+            return JsonResponse({'mess': 'error'})
 
-            # return data
-            response_data['location'] = location
-            response_data['gender'] = gender
-            response_data['birthday'] = birthday
-            response_data['bio'] = bio
-            response_data['profile_picture'] = user_profile.profile_picture.url
-
-
-            return JsonResponse(response_data)
-            # return HttpResponse('hello world')
-    return render(request, 'edit_detail_profile.html', {'user': request.user})
+                    
+    if request.user.profile.birthday is not None:
+        birthday = str(request.user.profile.birthday.year)+'-' +'{:02d}'.format(request.user.profile.birthday.month) +'-' + '{:02d}'.format(request.user.profile.birthday.day)
+        return render(request, 'edit_detail_profile.html', {'user': request.user, 'birthday':birthday})
+    return render(request, 'edit_detail_profile.html', {'user': request.user, 'birthday':''})
+    
 
 def check_follow(user1, user2):
     if len(Follow.objects.filter(user1 = user1, user2 = user2)) >0:

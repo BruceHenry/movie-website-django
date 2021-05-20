@@ -41,6 +41,7 @@ class Profile(models.Model):
     birthday = models.DateField(verbose_name=("Birthday"), null=True)
     # slug = AutoSlugField(populate_from='user')
     bio = models.CharField(max_length=255, blank=True)
+    full_name = models.CharField(max_length=140, null=True)
 
     # def slug(self):
     #     return slugify(self.id)

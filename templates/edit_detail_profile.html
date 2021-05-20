@@ -1,60 +1,411 @@
-{% extends "base.html" %}
-{% block mainbody %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--  This file has been downloaded from bootdey.com    @bootdey on twitter -->
+    <!--  All snippets are MIT license http://bootdey.com/license -->
+    <title>Account settings</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+    	body{
+    background: #f5f5f5;
+    margin-top:20px;
+}
 
-<div class="container rounded bg-white mt-5 mb-5">
-    <div class="profile-page-left">
-        <div class="row">
-            <div class="ccol-md-12">
-                <div class="profile-picture profile-picture-lg bg-gradient bg-primary mb-4">
-                    {% if user.profile.profile_picture %}
-                        <img id="avatar" src="{{ user.profile.profile_picture.url }}" alt="User Photo">
-                    {% else %}
-                        <img src="/media/image/avatar.png" alt="User Photo">
-                    {% endif %}
+.ui-w-80 {
+    width: 80px !important;
+    height: auto;
+}
 
-            </div>
+.btn-default {
+    border-color: rgba(24,28,33,0.1);
+    background: rgba(0,0,0,0);
+    color: #4E5155;
+}
+
+label.btn {
+    margin-bottom: 0;
+}
+
+.btn-outline-primary {
+    border-color: #26B4FF;
+    background: transparent;
+    color: #26B4FF;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+.text-light {
+    color: #babbbc !important;
+}
+
+.btn-facebook {
+    border-color: rgba(0,0,0,0);
+    background: #3B5998;
+    color: #fff;
+}
+
+.btn-instagram {
+    border-color: rgba(0,0,0,0);
+    background: #000;
+    color: #fff;
+}
+
+.card {
+    background-clip: padding-box;
+    box-shadow: 0 1px 4px rgba(24,28,33,0.012);
+}
+
+.row-bordered {
+    overflow: hidden;
+}
+
+.account-settings-fileinput {
+    position: absolute;
+    visibility: hidden;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+.account-settings-links .list-group-item.active {
+    font-weight: bold !important;
+}
+html:not(.dark-style) .account-settings-links .list-group-item.active {
+    background: transparent !important;
+}
+.account-settings-multiselect ~ .select2-container {
+    width: 100% !important;
+}
+.light-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24, 28, 33, 0.03) !important;
+}
+.light-style .account-settings-links .list-group-item.active {
+    color: #4e5155 !important;
+}
+.material-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24, 28, 33, 0.03) !important;
+}
+.material-style .account-settings-links .list-group-item.active {
+    color: #4e5155 !important;
+}
+.dark-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(255, 255, 255, 0.03) !important;
+}
+.dark-style .account-settings-links .list-group-item.active {
+    color: #fff !important;
+}
+.light-style .account-settings-links .list-group-item.active {
+    color: #4E5155 !important;
+}
+.light-style .account-settings-links .list-group-item {
+    padding: 0.85rem 1.5rem;
+    border-color: rgba(24,28,33,0.03) !important;
+}
+
+
+
+    </style>
+</head>
+<body>
+<div class="container light-style flex-grow-1 container-p-y">
+
+    <h4 class="font-weight-bold py-3 mb-4">
+      Account settings
+    </h4>
+
+    <div class="card overflow-hidden">
+      <div class="row no-gutters row-bordered row-border-light">
+        <div class="col-md-3 pt-0">
+          <div class="list-group list-group-flush account-settings-links">
+            <a class="list-group-item list-group-item-action active" data-toggle="list" href="#account-general">General</a>
+            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-change-password">Change password</a>
+            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-social-links">Social links</a>
+            <a class="list-group-item list-group-item-action" data-toggle="list" href="#account-notifications">Notifications</a>
+          </div>
         </div>
-    <div>
+        <div class="col-md-9">
+          <div class="tab-content">
+            <div class="tab-pane fade active show" id="account-general">
+            <!--SLOVE: https://stackoverflow.com/questions/56493419/how-to-display-uploaded-image-on-the-screen-using-django-and-ajax -->
+              <div class="card-body media align-items-center">
+                <img src="{{request.user.profile.profile_picture.url}}" id="avatar" alt="" class="d-block ui-w-80">
+                <form class="media-body ml-4">
+                  <label class="btn btn-outline-primary">
+                    Upload new photo
+                    <input id="uploadImage" type="file" onchange="PreviewImage()" class="account-settings-fileinput">
+                  </label> &nbsp;
+                  <button type="button" class="btn btn-default md-btn-flat" onclick="resetUpload()">Reset</button>
 
-        <div class="col-md-5 border-right">
-            <div class="p-3 py-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <form id="profile" method="POST" enctype="multipart/form-data">
-                        <div class="row mt-3">
-                            {% csrf_token %}
-                                <div class="col-md-12"><label class="labels">Location</label><input type="text" id='location' name="location" class="form-control" placeholder="enter location..." value="{{user.profile.location}}"></div>
-                                <br>
-                                <div class="col-md-12"><label class="labels">Gender</label></div>
-                                <br>
-                                <div class="col-md-12"><input type="radio" name="gender" value="M"> Male<br> </div>
-                                <div class="col-md-12"><input type="radio" name="gender" value="F"> Female<br> </div>
-                                <br>
-                                <div class="col-md-12"><label class="labels">Birthday</label><input type="date" id='birthday' name="birthday" class="form-control" placeholder="enter Bio" value="{{user.profile.birthday|date:'Y-m-d'}}"></div>
-                                <br>
-                                <div class="col-md-12"><label class="labels">Bio</label><input type="text" id='bio' name="bio" class="form-control" placeholder="enter" value="{{user.profile.bio}}"></div>
-                                <br>
-                                <div class="col-md-12"><label class="labels">Avatar</label><input id='profile_picture' name="profile_picture" type="file" value="{{user.profile.profile_picture}}"> </div>
-                        </div>
-                        <br>
-                        <button class="btn btn-success" type="submit" > Submit </button>
-                    </form>
+                  <div class="text-light small mt-1">Allowed JPG, GIF or PNG. Max size of 800K</div>
+                </form>
+              </div>
+              <hr class="border-light m-0">
+
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input id = "full_name" type="text" class="form-control" value = "{{user.profile.full_name}}" >
                 </div>
+                
+                <div id ="genre" class="form-group">
+                  <label class="form-label">Sex</label>
+                  <select id="sex" class="custom-select">
+                    <option>Male</option>
+                    <option>Female</option>
+
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bio</label>
+                  <textarea id="bio" class="form-control" rows="5">{{request.user.profile.bio}}</textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Birthday</label>
+                  <input id="birthday" type="date" class="form-control" min="1900-01-01" max="2018-12-31">
+                </div>
+                <div id="location" class="form-group">
+                  <label class="form-label">Country</label>
+                  <select id="country" class="custom-select">
+                    <option>USA</option>
+                    <option>Viet Nam</option>
+                    <option>UK</option>
+                    <option>Germany</option>
+                    <option>France</option>
+                    <option value="{{user.profile.location}}" selected>{{user.profile.location}}</option>
+                  </select>
+                </div>
+                
+              </div>
+
             </div>
+            <div class="tab-pane fade" id="account-change-password">
+              <div class="card-body pb-2">
+
+                <div class="form-group">
+                  <label class="form-label">Current password</label>
+                  <input id='old_password' type="password" class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">New password</label>
+                  <input id='old_password1' type="password" class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Repeat new password</label>
+                  <input id='old_password2' type="password" class="form-control">
+                </div>
+
+              </div>
+            </div>
+            
+            <div class="tab-pane fade" id="account-social-links">
+              <div class="card-body pb-2">
+
+                <div class="form-group">
+                  <label class="form-label">Twitter</label>
+                  <input type="text" class="form-control" value="https://twitter.com/user">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Facebook</label>
+                  <input type="text" class="form-control" value="https://www.facebook.com/user">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Google+</label>
+                  <input type="text" class="form-control" value="">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">LinkedIn</label>
+                  <input type="text" class="form-control" value="">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Instagram</label>
+                  <input type="text" class="form-control" value="https://www.instagram.com/user">
+                </div>
+
+              </div>
+            </div>
+            <div class="tab-pane fade" id="account-connections">
+              <div class="card-body">
+                <button type="button" class="btn btn-twitter">Connect to <strong>Twitter</strong></button>
+              </div>
+              <hr class="border-light m-0">
+              <div class="card-body">
+                <h5 class="mb-2">
+                  <a href="javascript:void(0)" class="float-right text-muted text-tiny"><i class="ion ion-md-close"></i> Remove</a>
+                  <i class="ion ion-logo-google text-google"></i>
+                  You are connected to Google:
+                </h5>
+                nmaxwell@mail.com
+              </div>
+              <hr class="border-light m-0">
+              <div class="card-body">
+                <button type="button" class="btn btn-facebook">Connect to <strong>Facebook</strong></button>
+              </div>
+              <hr class="border-light m-0">
+              <div class="card-body">
+                <button type="button" class="btn btn-instagram">Connect to <strong>Instagram</strong></button>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="account-notifications">
+              <div class="card-body pb-2">
+
+                <h6 class="mb-4">Activity</h6>
+
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input" checked="">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">Email me when someone comments on my article</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input" checked="">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">Email me when someone answers on my forum thread</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">Email me when someone follows me</span>
+                  </label>
+                </div>
+              </div>
+              <hr class="border-light m-0">
+              <div class="card-body pb-2">
+
+                <h6 class="mb-4">Application</h6>
+
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input" checked="">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">News and announcements</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">Weekly product updates</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label class="switcher">
+                    <input type="checkbox" class="switcher-input" checked="">
+                    <span class="switcher-indicator">
+                      <span class="switcher-yes"></span>
+                      <span class="switcher-no"></span>
+                    </span>
+                    <span class="switcher-label">Weekly blog digest</span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
-<script>
-    $(document).ready(function (){
-        $("form").submit(function (event) {
-            console.log($('#profile_picture').val());
-        var formdata =  new FormData($('#profile').get(0));
-        console.log(formdata);
+    <div class="text-right mt-3">
+      <button type="button" onclick ="save_change()" class="btn btn-primary">Save changes</button>&nbsp;
+      <a type="button" href="{% url 'detail' %}" class="btn btn-default">Cancel</a>
+    </div>
+
+  </div>
+<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://netdna.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script type="text/javascript"></script>
+	<script>
+    if('{{user.profile.gender}}'=='F'){
+      $("#sex").val("Female");
+    }
+    if('{{user.profile.gender}}'=='M'){
+      $("#sex").val("Male");
+    }
+  $("#country").val("{{user.profile.location}}");
+  if('{{birthday}}'!=''){
+     $("#birthday").val("{{birthday}}");
+  }
+
+
+
+    function PreviewImage() {
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(document.getElementById("uploadImage").files[0]);
+
+        oFReader.onload = function (oFREvent) {
+            document.getElementById("avatar").src = oFREvent.target.result;
+        };
+    };
+
+     function save_change(){
+
+        var myFormData = new FormData();
+        var media = document.getElementById("uploadImage").files[0];
+        console.log(media);
+        var full_name = $('#full_name').val()
+        console.log(full_name);
+        var bio = $('#bio').val()
+        console.log(bio);
+        var birthday = $('#birthday').val()
+        if(birthday.lenth<1){
+          birthday = '';
+        }
+        var country = $('#country').val()
+        console.log(country);
+        var sex = $('#sex').val()
+        console.log(sex);
+        //apend to formData
+        var gender = '';
+        if(sex=='Male'){
+          gender = 'M';
+          
+        }
+        if(sex=='Female'){
+          gender = 'F';
+        }
+        console.log(gender);
+        myFormData.append('birthday', birthday);
+        myFormData.append('gender', gender);
+        myFormData.append('profile_picture', media);
+        myFormData.append('full_name', full_name);
+        myFormData.append('bio', bio);
+        myFormData.append('country', country);
+        myFormData.append('type', 'general');
         $.ajax({
           type: "POST",
-          url: "{% url 'detail-edit-profile'%}",
-          data: formdata,
-        processData: false,
-        contentType: false,
+          url: "{% url 'detail-edit-profile' %}",
+          data: myFormData,
+          processData: false,
+          contentType: false,
         }).done(function (data) {
           console.log(data);
             $('#avatar').attr("src", data.profile_picture);
@@ -64,8 +415,16 @@
             'success'
             );
         });
-        event.preventDefault();
-    });
-    });
+    }; 
+
+    function resetUpload(){
+      $('#avatar').attr("src","");
+    } 
+    function change_password(){
+
+    }
+    
+    
 </script>
-{% endblock mainbody %}
+</body>
+</html>

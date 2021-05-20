@@ -34,6 +34,7 @@ urlpatterns = [
 
     path('seen-noti/', views.seen_noti, name='seen-noti'),
 
+    path('upload_image/', views.upload_image, name='upload-image'),
     #test image upload
 
     path('getdatachart1/', views.get_data_chart1, name='get_data'),
