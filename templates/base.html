@@ -18,7 +18,9 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/stars.css' %}"/>
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style type="text/css"></style>
     {% comment %} {% endblock %} {% endcomment %}
     {% comment %} <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script> {% endcomment %}
 
@@ -28,12 +30,16 @@
     {% comment %} <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> {% endcomment %}
 
     {% comment %} <style type="text/css"></style> {% endcomment %}
+    {% comment %} <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/> {% endcomment %}
+    {% comment %} <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"> {% endcomment %}
+
+
 </head>
 
 {% load static %}
 <body style="background-color: #f1f1f1;">
 
-<nav class="navbar navbar-light" role="navigation" style="margin: 0">
+<nav class="navbar navbar-light" style="background-color:#e0e0eb" role="navigation" style="margin: 0">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
@@ -43,23 +49,25 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+             <a class="navbar-brand" href="/"><span class=" 	glyphicon glyphicon-home"></span> Home</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a class="navbar-brand" href="/"><span class=" 	glyphicon glyphicon-home"></span> Home</a> </li>
                 <li><a href="/movie/movie_all/1"><span class="glyphicon glyphicon-film"></span> Movies</a></li>
                 <li><a href="/movie/actor_all/1"><span class="glyphicon glyphicon-user"></span> Actors</a></li>
-                <li class="dropdown">
-                        <a  href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                           data-toggle="dropdown">My Movies </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="/movie/seen/">Seen List </a></li>
-                            <li class="divider"></li>
-                            <li><a href="/movie/expect/">Expect List</a></li>
-                        </ul>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                            <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
+                            data-toggle="dropdown">My Movie<span class="caret"></span></a>
+                           <ul class="dropdown-menu" >
+                               <li> <a href="/movie/seen/">Seen List</a> </li>
+                               <li> <a href="/movie/expect/">Expect List</a> </li>
+                            </ul>
+                    </li>
+                {% endif %}
+
             </ul>
             <form class="navbar-form navbar-left" id="search--form" onsubmit="searchSubmit()">
                 {% csrf_token %}
@@ -121,13 +129,17 @@
                             </li>
                         </ul>
                     </li>
+                    <li>
                     <p class="navbar-text" >
                         {% comment %} <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a> {% endcomment %}
                         <a href="{% url 'comunity' %}">Comunity</a>
                     </p>
+                    </li>
+                    <li>
                     <p class="navbar-text">
                         Welcome, <a href="/user/detail/" > {{ user.username }} </a>
                     </p>
+                    </li>
                     <li style="align-items: center">
                         <form method="post" action="/user/logout/">
                         {% csrf_token %}

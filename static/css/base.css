@@ -153,11 +153,12 @@ h3{
   .nav-pills .nav-link.active, .nav-pills .show > .nav-link{
     background-color: #17A2B8;
   }
+  
   .dropdown-menu{
     top: 60px;
     right: 0px;
     left: unset;
-    width: 460px;
+    width: 120px;
     box-shadow: 0px 5px 7px -1px #c1c1c1;
     padding-bottom: 0px;
     padding: 0px;
@@ -204,7 +205,10 @@ h3{
       }
   }
 
+.container-fluid{
+  margin-top: 0px;
 
+}
 
  /* IMAGE  */
  .bookDetailLeftSide {
@@ -217,3 +221,5 @@ h3{
 .bookImage {
   max-height: 300px;
 }
+
+#bs-example-navbar-collapse-1

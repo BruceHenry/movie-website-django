@@ -139,7 +139,7 @@ def reply_review(request):
                     data['send_user_url'] = request.user.profile.get_absolute_url()
                     data['send_user_avatar']= request.user.profile.profile_picture.url
                     data['date_posted']  = 'just now'
-
+                    print('data here', data)
 
                     return JsonResponse(data)
                 except:
