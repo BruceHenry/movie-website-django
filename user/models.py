@@ -42,6 +42,14 @@ class Profile(models.Model):
     # slug = AutoSlugField(populate_from='user')
     bio = models.CharField(max_length=255, blank=True)
     full_name = models.CharField(max_length=140, null=True)
+    # social network
+    twitter_link = models.CharField(max_length=140, null=True)
+    facebook_link = models.CharField(max_length=140, null=True)
+    google_link = models.CharField(max_length=140, null=True)
+    linkedln_link = models.CharField(max_length=140, null=True)
+    instagram = models.CharField(max_length=140, null=True)
+
+
 
     # def slug(self):
     #     return slugify(self.id)

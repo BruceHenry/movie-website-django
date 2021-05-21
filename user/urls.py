@@ -15,10 +15,15 @@ urlpatterns = [
     path('password_reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset_confirm.html') ,name='password_reset_confirm'),
     path('password_reset/reset/complete', auth_views.PasswordResetCompleteView.as_view(template_name= "templates/password_reset_complete.html") ,name='password_reset_complete'),
     
+     #change password
+     path('change_password', views.change_password, name='change-password'),
+
     #detail and profile
     path('detail/', views.user_detail, name='detail'),
     path('detail/edit_profile', views.user_detail_edit_profile, name='detail-edit-profile'),
+    path('connect_social/', views.connect_social, name='connect_social'),
     #add comunity page
+
 
     path('comunity/', views.comunity, name='comunity'),
 
@@ -34,7 +39,6 @@ urlpatterns = [
 
     path('seen-noti/', views.seen_noti, name='seen-noti'),
 
-    path('upload_image/', views.upload_image, name='upload-image'),
     #test image upload
 
     path('getdatachart1/', views.get_data_chart1, name='get_data'),

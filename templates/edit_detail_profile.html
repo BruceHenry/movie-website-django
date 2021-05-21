@@ -182,56 +182,70 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
                 </div>
                 
               </div>
+               <div class="text-right mt-3">
+                <button type="button" onclick ="save_change()" class="btn btn-primary">Save changes</button>&nbsp;
+                <a type="button" href="{% url 'detail' %}" class="btn btn-default">Cancel</a>
+              </div>
 
             </div>
-            <div class="tab-pane fade" id="account-change-password">
+            
+
+            <form class="tab-pane fade" id="account-change-password">
               <div class="card-body pb-2">
 
                 <div class="form-group">
                   <label class="form-label">Current password</label>
-                  <input id='old_password' type="password" class="form-control">
-                </div>
-
-                <div class="form-group">
-                  <label class="form-label">New password</label>
                   <input id='old_password1' type="password" class="form-control">
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label">Repeat new password</label>
+                  <label class="form-label">Repeat current password</label>
                   <input id='old_password2' type="password" class="form-control">
                 </div>
 
+                <div class="form-group">
+                  <label class="form-label">New password</label>
+                  <input id='new_password' type="password" class="form-control">
+                </div>
+                <div class="text-right mt-3">
+                  <button type="button" onclick ="change_password()" class="btn btn-primary">Save changes</button>&nbsp;
+                  <a type="button" href="{% url 'detail' %}" class="btn btn-default">Cancel</a>
+                </div>
+
               </div>
-            </div>
+            </form>
             
             <div class="tab-pane fade" id="account-social-links">
               <div class="card-body pb-2">
 
                 <div class="form-group">
                   <label class="form-label">Twitter</label>
-                  <input type="text" class="form-control" value="https://twitter.com/user">
+                  <input id="twitter" type="text" class="form-control" value="https://twitter.com/user">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Facebook</label>
-                  <input type="text" class="form-control" value="https://www.facebook.com/user">
+                  <input id="facebook" type="text" class="form-control" value="https://www.facebook.com/user">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Google+</label>
-                  <input type="text" class="form-control" value="">
+                  <input id="google" type="text" class="form-control" value="">
                 </div>
                 <div class="form-group">
                   <label class="form-label">LinkedIn</label>
-                  <input type="text" class="form-control" value="">
+                  <input id="linked" type="text" class="form-control" value="">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Instagram</label>
-                  <input type="text" class="form-control" value="https://www.instagram.com/user">
+                  <input id="instagram" type="text" class="form-control" value="https://www.instagram.com/user">
+                </div>
+                <div class="text-right mt-3">
+                  <button type="button" onclick ="save_social()" class="btn btn-primary">Save changes</button>&nbsp;
+                  <a type="button" href="{% url 'detail' %}" class="btn btn-default">Cancel</a>
                 </div>
 
               </div>
             </div>
-            <div class="tab-pane fade" id="account-connections">
+            <!--div class="tab-pane fade" id="account-connections">
               <div class="card-body">
                 <button type="button" class="btn btn-twitter">Connect to <strong>Twitter</strong></button>
               </div>
@@ -252,7 +266,7 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
               <div class="card-body">
                 <button type="button" class="btn btn-instagram">Connect to <strong>Instagram</strong></button>
               </div>
-            </div>
+            </div-->
             <div class="tab-pane fade" id="account-notifications">
               <div class="card-body pb-2">
 
@@ -332,10 +346,6 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
       </div>
     </div>
 
-    <div class="text-right mt-3">
-      <button type="button" onclick ="save_change()" class="btn btn-primary">Save changes</button>&nbsp;
-      <a type="button" href="{% url 'detail' %}" class="btn btn-default">Cancel</a>
-    </div>
 
   </div>
 <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -353,7 +363,40 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
   $("#country").val("{{user.profile.location}}");
   if('{{birthday}}'!=''){
      $("#birthday").val("{{birthday}}");
-  }
+  };
+
+
+  function save_social(){
+    var facebook = $('#facebook').val();
+    var google = $('#google').val();
+    var linked = $('#linked').val();
+    var instagram = $('#instagram').val();
+    var instagram = $('#twitter').val();
+
+    $.ajax({
+          type: "POST",
+          url: "{% url 'connect_social' %}",
+          data : {'facebook':'oke'},
+          {% comment %} data: {'facebook':facebook, 'google':google, 'linked':linked, 'twitter': twitter , 'instagram':instagram}, {% endcomment %}
+          datatype: 'json',
+          processData: "application/json",        
+        }).done(function (data) {
+          if(data.mess=='ok'){
+             Swal.fire({
+              position: 'top-end',
+              icon: 'success',
+              title: 'Your work has been saved',
+              showConfirmButton: false,
+              timer: 1500
+            })
+          }
+           
+        });
+
+
+
+    
+  };
 
 
 
@@ -421,6 +464,54 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
       $('#avatar').attr("src","");
     } 
     function change_password(){
+      console.log('hello world');
+      var old_password1 = $('#old_password1').val();
+      var old_password2 = $('#old_password2').val();
+      var new_password = $('#new_password').val(); 
+      console.log(new_password);
+      if (old_password1 != old_password2){
+          Swal.fire(
+          "The two password fields didn't match "
+        )
+      }
+      else{
+        if(new_password.length <8){
+           Swal.fire(
+          "The password minimum 8 characters"
+          );
+        }
+        else{
+           $.ajax({
+          type: "POST",
+          url: "{% url 'change-password' %}",
+          datatype: 'json',
+          processData: "application/json",
+          data: {
+            'old_password':old_password1, 
+            'new_password':new_password, 
+            'type':'change-password',
+          },
+        }).done(function (data) {
+          console.log(data);
+          if (data.mess == 'ok'){
+            Swal.fire(
+            'Succsess !',
+            'You must login with new password !',
+            'success'
+            ).then(function(){
+              window.location = "{% url 'index'  %}";
+            })
+          }
+          else{
+            Swal.fire(
+          "Password incorrect"
+          );
+
+          }
+        });
+
+        }
+      }
 
     }
     

@@ -35,7 +35,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 @csrf_protect
 def user_login(request):
-    if request.POST:
+    if request.method == 'POST':
         user_name = request.POST.get('username')
         pass_word = request.POST.get('password')
         user = authenticate(username=user_name, password=pass_word)
@@ -49,6 +49,57 @@ def user_login(request):
             return render(request, 'base.html', {'message': 'Username or Password wrong!'})
     else:
         return render(request, '404.html')
+
+@csrf_exempt
+@login_required
+def change_password(request):
+    if request.method =='POST':
+        if request.is_ajax():
+            print('nguyen minh dan')
+            type = request.POST.get('type')
+            password = request.POST.get('old_password')
+            new_password = request.POST.get('new_password')
+
+            if type == 'change-password':
+                username = request.user.username
+                print(password)
+                print(new_password)
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    user.set_password(new_password)
+                    user.save()
+                    return JsonResponse({'mess': 'ok', 'type':'change-password'})
+                else:
+                    print('here')
+                    return JsonResponse({'mess': 'error', 'type':'change-password'})
+    return JsonResponse({'mess': 'error', 'type':'change-password'})
+
+@csrf_exempt
+def connect_social(request):
+    if request.method =='POST':
+        if request.is_ajax():
+            facebook = request.POST.get('facebook')
+            linked = request.POST.get('linked')
+            google = request.POST.get('google')
+            instagram = request.POST.get('instagram')
+            twitter = request.POST.get('twitter')
+
+            profile = request.user.profile
+            profile.facebook = facebook
+            profile.linked = linked
+            profile.google = google
+            profile.instagram = instagram
+            profile.twitter = twitter
+
+            profile.save()
+            return JsonResponse({'mess':'ok'})
+    return JsonResponse({'mess':'error'})
+    
+        
+
+
+
+
 
 @csrf_protect
 def user_logout(request):
@@ -180,15 +231,7 @@ def user_detail_edit_profile(request):
 
                 # return JsonResponse(response_data)
             
-            if type == 'change-password':
-                password = request.POST.get('old_password')
-                new_password = request.POST.get('new_password')
-                user = authenticate(username =request.user.username, password=password)
-                if user is not None:
-                    user.set_password(new_password)
-                    return JsonResponse({'mess': 'ok', 'type':'change-password'})
-                else:
-                    return JsonResponse({'mess': 'error', 'type':'change-password'})
+            
             return JsonResponse({'mess': 'error'})
 
                     
