@@ -220,23 +220,46 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
 
                 <div class="form-group">
                   <label class="form-label">Twitter</label>
-                  <input id="twitter" type="text" class="form-control" value="https://twitter.com/user">
+                  {% if request.user.profile.twitter_link is not None %}
+                    <input id="twitter" type="text" class="form-control" value="{{request.user.profile.twitter_link}}">
+                  {% else %}
+                    <input id="twitter" type="text" class="form-control" value="">
+                  {% endif %}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Facebook</label>
-                  <input id="facebook" type="text" class="form-control" value="https://www.facebook.com/user">
+                  {% if request.user.profile.facebook_link is not None %}
+                    <input id="facebook" type="text" class="form-control" value="{{request.user.profile.facebook_link}}">
+                  {% else %}
+                    <input id="facebook" type="text" class="form-control" value="">
+                  {% endif %}
                 </div>
                 <div class="form-group">
                   <label class="form-label">Google+</label>
-                  <input id="google" type="text" class="form-control" value="">
+                  {% if request.user.profile.google_link is not None %}
+                    <input id="google" type="text" class="form-control" value="{{request.user.profile.google_link}}">
+                  {% else %}
+                    <input id="google" type="text" class="form-control" value="">
+                  {% endif %}
                 </div>
                 <div class="form-group">
                   <label class="form-label">LinkedIn</label>
-                  <input id="linked" type="text" class="form-control" value="">
+                  {% if request.user.profile.linkedln_link is not None %}
+                    <input id="linked" type="text" class="form-control" value="{{request.user.profile.linkedln_link}}">
+                  {% else %}
+                    <input id="linked" type="text" class="form-control" value="">
+                  {% endif %}
+
                 </div>
                 <div class="form-group">
                   <label class="form-label">Instagram</label>
-                  <input id="instagram" type="text" class="form-control" value="https://www.instagram.com/user">
+                  {% if request.user.profile.instagram is not None %}
+                    <input id="instagram" type="text" class="form-control" value="{{request.user.profile.instagram}}">
+                  {% else %}
+                    <input id="instagram" type="text" class="form-control" value="">
+                  {% endif %}
+
+
                 </div>
                 <div class="text-right mt-3">
                   <button type="button" onclick ="save_social()" class="btn btn-primary">Save changes</button>&nbsp;
@@ -279,7 +302,7 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
                       <span class="switcher-yes"></span>
                       <span class="switcher-no"></span>
                     </span>
-                    <span class="switcher-label">Email me when someone comments on my article</span>
+                    <span class="switcher-label">Email me when someone comments on my review</span>
                   </label>
                 </div>
                 <div class="form-group">
@@ -289,7 +312,7 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
                       <span class="switcher-yes"></span>
                       <span class="switcher-no"></span>
                     </span>
-                    <span class="switcher-label">Email me when someone answers on my forum thread</span>
+                    <span class="switcher-label">Email me when someone answers on my wall</span>
                   </label>
                 </div>
                 <div class="form-group">
@@ -371,31 +394,37 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
     var google = $('#google').val();
     var linked = $('#linked').val();
     var instagram = $('#instagram').val();
-    var instagram = $('#twitter').val();
+    var twitter = $('#twitter').val();
+    console.log(facebook);
+   var  data = {
+        'facebook':facebook,
+        'google':google,
+        'linked':linked,
+        'instagram':instagram,
+        'twitter':twitter
+      }
+    console.log(data);
+
+
 
     $.ajax({
-          type: "POST",
-          url: "{% url 'connect_social' %}",
-          data : {'facebook':'oke'},
-          {% comment %} data: {'facebook':facebook, 'google':google, 'linked':linked, 'twitter': twitter , 'instagram':instagram}, {% endcomment %}
-          datatype: 'json',
-          processData: "application/json",        
-        }).done(function (data) {
-          if(data.mess=='ok'){
-             Swal.fire({
-              position: 'top-end',
-              icon: 'success',
-              title: 'Your work has been saved',
-              showConfirmButton: false,
-              timer: 1500
-            })
-          }
-           
-        });
+      type:"POST",
+      url:"{% url 'connect_social' %}",
+      data : data,
+      processData: "application/json",
+      datatype: "json",
+    }).done(function(data){
+        console.log(data);
 
+      if(data.mess=='ok'){
+          Swal.fire(
+            'Succsess !',
+            'Your change has been saved !',
+            'success'
+            );
+      }
+    })
 
-
-    
   };
 
 

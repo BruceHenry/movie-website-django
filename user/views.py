@@ -83,14 +83,14 @@ def connect_social(request):
             google = request.POST.get('google')
             instagram = request.POST.get('instagram')
             twitter = request.POST.get('twitter')
-
-            profile = request.user.profile
-            profile.facebook = facebook
-            profile.linked = linked
-            profile.google = google
+            print(facebook)
+            
+            profile = Profile.objects.filter(user= request.user)[0]
+            profile.facebook_link = facebook
+            profile.linkedln_link = linked
+            profile.google_link = google
             profile.instagram = instagram
-            profile.twitter = twitter
-
+            profile.twitter_link = twitter
             profile.save()
             return JsonResponse({'mess':'ok'})
     return JsonResponse({'mess':'error'})

@@ -21,7 +21,7 @@ urlpatterns = [
     #detail and profile
     path('detail/', views.user_detail, name='detail'),
     path('detail/edit_profile', views.user_detail_edit_profile, name='detail-edit-profile'),
-    path('connect_social/', views.connect_social, name='connect_social'),
+    path('social/', views.connect_social, name='connect_social'),
     #add comunity page
 
 
