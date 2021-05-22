@@ -60,7 +60,7 @@
                 {% if user.is_authenticated %}
                     <li class="dropdown mymovie">
                             <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
-                            data-toggle="dropdown">My Movie<span class="caret"></span></a>
+                            data-toggle="dropdown">My Movie</a>
                            <ul class="dropdown-menu" >
                                <li> <a href="/movie/seen/">Seen List</a> </li>
                                <li> <a href="/movie/expect/">Expect List</a> </li>
@@ -130,12 +130,7 @@
                             </div>
                         </ul>
                     </li>
-                    <li>
-                    <p class="navbar-text" >
-                        {% comment %} <a style="color:#fff" href="{% url 'comunity' %}" > Comunity </a> {% endcomment %}
-                        <a href="{% url 'comunity' %}">Comunity</a>
-                    </p>
-                    </li>
+                    <li><a href="{% url 'comunity' %}"> Community</a></li>
                     <li>
                     <p class="navbar-text">
                         Welcome, <a href="/user/detail/" > {{ user.username }} </a>
