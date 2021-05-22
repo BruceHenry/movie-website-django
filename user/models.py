@@ -118,7 +118,8 @@ class CommentToPost(models.Model):
 @receiver(post_save, sender=PostToUser)
 def create_notification(sender, instance, created, **kwargs):
     if created:
-        Notification.objects.create(post = instance, user = instance.to_user, user2=instance.author ,type=2)
+        if instance.to_user != instance.author:
+            Notification.objects.create(post = instance, user = instance.to_user, user2=instance.author ,type=2)
 
 
 

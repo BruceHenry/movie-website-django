@@ -274,11 +274,11 @@
                                         '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' '+ '</span>' +
                                     '</a>' +
                                     '<a href="" id="reportButton">' +
-                                                '<input type="hidden" name="reportPostID" value="{{ post.id }}">' +
+                                                '<input type="hidden" name="reportPostID" value="{{'+ data.post_id + '}}">' +
                                                 '{% if request.user in post.reports.all %}' +
-                                                    '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>' +
+                                                    '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{' + data.post_id +'}}"> Report </span>' +
                                                 '{% else %}'+
-                                                    '<i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>' +
+                                                    '<i class="batch-icon batch-icon-flag"></i><span id="reports{{'+ data.post_id + '}}"> Report </span>' +
                                                 '{% endif %}'+
 
                                     '</a>'+

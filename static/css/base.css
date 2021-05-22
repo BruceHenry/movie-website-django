@@ -129,11 +129,7 @@ span.stars span {
     background-position: 0 0;
 }
 
-h3{
-    color: #f5c518;
-    line-height: 2.5rem;
-    font-size: 2rem;
-}
+
 
 /* add hover poster website */
 
@@ -148,22 +144,10 @@ h3{
 
 
   /* notification  */
-
-
   .nav-pills .nav-link.active, .nav-pills .show > .nav-link{
     background-color: #17A2B8;
   }
-  
-  .dropdown-menu-mymovie{
-    top: 60px;
-    right: 0px;
-    left: unset;
-    width: 50px;
-    box-shadow: 0px 5px 7px -1px #c1c1c1;
-    padding-bottom: 0px;
-    padding: 0px;
-  }
-  .dropdown-menu-notibox{
+.notibox{
     top: 60px;
     right: 0px;
     left: unset;
@@ -172,63 +156,37 @@ h3{
     padding-bottom: 0px;
     padding: 0px;
   }
-  .dropdown-menu:before{
-    content: "";
-    position: absolute;
-    top: -20px;
-    right: 12px;
-    border:10px solid #343A40;
-    border-color: transparent transparent #343A40 transparent;
-  }
-  .head{
-    padding:5px 15px;
-    border-radius: 3px 3px 0px 0px;
-  }
-  .footer{
-    padding:5px 15px;
-    border-radius: 0px 0px 3px 3px; 
-  }
+ 
   .notification-box{
     padding: 10px 0px; 
-  }
-  .notification-box :hover{
-    background-color: #DCDCDC;
   }
   .bg-gray{
     background-color: #eee;
   }
-  @media (max-width: 40px) {
-      .dropdown-menu{
-        top: 50px;
-        left: -16px;  
-        width: 30px;
-      } 
-      .nav{
-        display: block;
-      }
-      .nav .nav-item,.nav .nav-item a{
-        padding-left: 0px;
-      }
-      .message{
-        font-size: 13px;
-      }
+  .content :hover{
+    background-color: #eee;
   }
+
+    
+  @media (max-width: 640px) {
+    .dropdown-menu{
+      top: 50px;
+      left: -16px;  
+      width: 290px;
+    } 
+    .nav{
+      display: block;
+    }
+    .nav .nav-item,.nav .nav-item a{
+      padding-left: 0px;
+    }
+    .message{
+      font-size: 13px;
+    }
+}
 
 .container-fluid{
   margin-top: 0px;
 
 }
 
- /* IMAGE  */
- .bookDetailLeftSide {
-  text-align: center;
-}
-.bookDetailLeftSide .bookImage {
-  max-width: 200px;
-}
-
-.bookImage {
-  max-height: 300px;
-}
-
-#bs-example-navbar-collapse-1

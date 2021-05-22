@@ -91,42 +91,43 @@
                             {% if count_noti > 0 %}
                                 <i class="fa fa-bell"> <span id='count_noti' class="badge">{{count_noti}}</span></i>
                             {% else %}
-                            <i class="fa fa-bell"> <span id='count_noti' class="badge"></span></i>
+                                <i class="fa fa-bell"> <span id='count_noti' class="badge"></span></i>
                             {% endif %}
 
 
                         </a>
                         <ul class="dropdown-menu">
-                            <li class="head text-light bg-dark" >
-                                <div class="row" >
-                                <div class="col-lg-12 col-sm-12 col-12">
-                                    <span> Notifications </span>
-                                </div>
-                            </li>
-                            <div id = "new_noti_prepend">
-                            {% for noti in notifications %}
-                                <li class="notification-box" >
-                                    <div class="row">
-                                    <div class="col-lg-3 col-sm-3 col-3 text-center">
-                                        <img src="{{noti.user2.profile.profile_picture.url}}" width =44 height =40 class="w-50 rounded-circle">
-                                    </div>   
-                                    <a href = {{noti.get_link}}> 
-                                        <div class="col-lg-8 col-sm-8 col-8">
-                                            <strong class="text-info">{{noti.user2.username}}</strong>
-                                            <div>
-                                                {{noti}}
-                                            </div>
-                                            <small class="text-warning">{{noti.get_date}}</small>
-                                        </div>   
-                                    </a> 
+                            <div class = "notibox">
+                                <li class="head">
+                                    <div class="row" >
+                                    <div class="col-lg-12 col-sm-12 col-12">
+                                        <span> <b style="font-size: 16px"> Notifications </b>  </span>
+                                        <hr>
                                     </div>
                                 </li>
-                            {% endfor %}
+                                <div id = "new_noti_prepend" style="height:400px; width:400px; overflow:scroll;>
+                                {% for noti in notifications %}
+                                    <li class= "notification-box" >
+                                        <div class="row">
+                                        <div class="col-lg-3 col-sm-3 col-3 text-center">
+                                            <img src="{{noti.user2.profile.profile_picture.url}}" width =44 height =40 class="w-50 rounded-circle">
+                                        </div>   
+                                        <a href = {{noti.get_link}}> 
+                                            <div>
+                                                <strong class="text-info" style="font-size: 14px;" >{{noti.user2.username}}</strong>
+                                                <p style="font-size: 14px; color: black">{{noti}} </p>
+                                                <small style="font-size: 12px; color: black" >{{noti.get_date}}</small>
+                                            </div>   
+                                        </a> 
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                                </div>
+                                <hr>
+                                <li class="footer text-center">
+                                    <span style="font-size: 16px" href=""> <b> View All </b> </span>
+                                </li>
                             </div>
-                        
-                            <li class="footer bg-dark text-center">
-                                <a href="" class="text-light">View All</a>
-                            </li>
                         </ul>
                     </li>
                     <li>
@@ -154,7 +155,7 @@
                     <li class="dropdown" >
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
-                        <ul id="login-dp" class="dropdown-menu notibox" >
+                        <ul id="login-dp" class="dropdown-menu" >
                             <li>
                                 <div class="row">
                                     <div class="col-md-12">
@@ -435,12 +436,12 @@
                 + '<img src="' + mess.sender_image + '"width =44 height =40 class="w-50 rounded-circle">'
                 +'</div>'    
                 + '<a href ="' + mess.link  + '">'
-                +'<div class="col-lg-8 col-sm-8 col-8">'
-                +'<strong class="text-info">' + mess.sender + '</strong>'
-                + '<div>'
+                +'<div>'
+                +'<strong style="font-size: 14px; class="text-info">' + mess.sender + '</strong>'
+                + '<p style="font-size: 14px; color: black">'
                 +    mess.noti
-                +    '</div>'
-                + '<small class="text-warning">' + mess.date + '</small>'
+                +    '</p>'
+                + '<small style="font-size: 12px; color: black"' + mess.date + '</small>'
                 + '</div>'  
                 + '</a>'  
                 + '</div>'
