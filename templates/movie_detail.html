@@ -4,15 +4,74 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
 
 {% block mainbody %}
+<style>
+    .edtCmt {
+        border-radius: 4px;
+        border: 1px solid #dadada;
+    }
 
+    .edtCmt textarea {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #dadada;
+        border-radius: 4px 4px 0 0;
+        padding: 10px;
+        box-sizing: border-box;
+        line-height: 20px;
+    }
+
+    .wrap_comment .boxemotion {
+        overflow: visible;
+        position: relative;
+    }
+
+    .wrap_comment .motionsend {
+        display: block;
+        overflow: hidden;
+        padding: 5px;
+    }
+
+    .wrap_comment .cmt_right {
+        float: right;
+    }
+
+    .wrap_comment .motionsend a.btnSend {
+        padding: 5px 25px;
+        height: 30px;
+        font-size: 14px;
+        color: #fff;
+        text-transform: uppercase;
+        border: 1px solid #288ad6;
+        border-radius: 4px;
+        background: #288ad6;
+        margin: 0;
+    }
+
+    .wrap_comment .motionsend a {
+        padding: 0 12px 0 5px;
+        height: 20px;
+        color: #4a90e2;
+        font-size: 14px;
+        border-right: 1px solid #dadada;
+        display: inline-block;
+        line-height: 20px;
+    }
+</style>
 <div class="Layer" id="layer"></div>
-    <div class="container" id='movie_info'>
+    <div class="container" id='container'>
         {% if object %}
-            
-            <div id="detail-infro">
-                <h1>{{ object.title }}</h1>
-
-                 <div class="rating">
+            <div>
+                <div class="col-md-4">
+                    <div style="padding: 20px;">
+                        <img style="width: 100%;"
+                            src="{{object.poster}}"
+                            alt="Cannot load photo, sorry!">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div style="padding: 20px;">
+                        <h1>{{object.title}}</h1>
+                        <div class="rating">
                             <input type="radio" name="rating" value="5" id="5">
                             <label for="5">☆</label>
                             <input type="radio" name="rating" value="4" id="4">
@@ -23,328 +82,489 @@
                             <label for="2">☆</label>
                             <input type="radio" name="rating" value="1" id="1">
                             <label for="1">☆</label>
-                     <script>
-                         var rated = {{ object.rate }} ;
-                         var movieid = '{{object.movieid}}';
-                         console.log(movieid);
-                         var username = '{{ user.username }}';
-                         console.log(username);
-                         user_rate_movie = {{ rate_score }};
-                         if(user_rate_movie==0){
-                             var stars = Math.floor(rated/2);
-                             input_value = '#' + stars.toString();
-                             console.log(input_value);
-                             $(input_value).attr('checked', 'checked');
-                         }
-                         else{
-                             input_value = '#' + user_rate_movie.toString();
-                             console.log(input_value);
-                             $(input_value).attr('checked', 'checked');
-                         }
-
-                         $("input[name='rating']").click(function() {
-                             var radioValue = $("input[name='rating']:checked").val();
-                             console.log(radioValue);
-                             if (radioValue) {
-                                 console.log('send mess !');
-                                 $.ajax({
-                                   url : "{% url 'rate-movie' %}",
-                                   type: 'POST',
-                                   datatype: 'json',
-                                   processData: "application/json",
-                                   data: {
-                                   movieid: movieid,
-                                   type: 'rate',
-                                   username : username,
-                                   rate_score : radioValue,
-                                    },
-                                     //beforeSend:function (xhr,settings) {
-                                    //console.log("{{ csrf_token }}");
-                                    //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
-                                    //},
-                                    }).done(function (data) {
-                                     if (data.type == 'error') {
-                                         alert('erorr !');
-                                         Swal.fire('Any fool can use a computer')
-                                         Swal.fire({
-                                             icon: 'error',
-                                             title: 'Oops...',
-                                             text: 'Something went wrong!',
-                                             footer: '<a href>Why do I have this issue?</a>'
-                                         })
-                                     } else {
-                                         Swal.fire(
-                                             'Good job!',
-                                             'You rated this movie!',
-                                             'success'
-                                         );
-                                         console.log(data);
-                                     }
-                                 });
-                             }
-                         });
-
-                     </script>
-
-                </div>
-
-                {% if  user.is_authenticated %}
-                    <button class="add_button" id="seen">Have seen</button>
-                    <button class="add_button" id="expect">Want to see</button>
-                    <b style="color: #f44336" id="message"></b>
-                    {% if  object.flag == 1 %}
-                        <script>
-                            $("#seen").css({"background-color": "#f44336", "color": "white"});
-                        </script>
-                    {% endif %}
-                    {% if  object.flag == 2 %}
-                        <script>
-                            $("#expect").css({"background-color": "#f44336", "color": "white"});
-                        </script>
-                    {% endif %}
-                {% endif %}
-
-                <script>
-                    $(document).ready(function () {
-                        $("#seen").click(function () {
-                            $.get("/movie/add_seen/{{ object.movieid }}", function (msg) {
-                                if (msg == "1") {
-                                    $("#seen").css({"background-color": "#f44336", "color": "white"});
-                                    $("#expect").css({"background-color": "white", "color": "black"});
-                                    $("#message").html("Added to Seen list!").fadeIn("fast").fadeOut("slow");
+                            <!-- rating function js --->
+                            <script>
+                                var rated = {{ object.rate }} ;
+                                var movieid = '{{object.movieid}}';
+                                console.log(movieid);
+                                var username = '{{ user.username }}';
+                                console.log(username);
+                                user_rate_movie = {{ rate_score }};
+                                if(user_rate_movie==0){
+                                    var stars = Math.floor(rated/2);
+                                    input_value = '#' + stars.toString();
+                                    console.log(input_value);
+                                    $(input_value).attr('checked', 'checked');
                                 }
-                                if (msg == "0") {
-                                    $("#seen").css({"background-color": "white", "color": "black"});
-                                    $("#message").html("Deleted from Seen list!").fadeIn("fast").fadeOut("slow");
+                                else{
+                                    input_value = '#' + user_rate_movie.toString();
+                                    console.log(input_value);
+                                    $(input_value).attr('checked', 'checked');
                                 }
-                            });
-                        });
 
-
-                    });
-                </script>
-                <script>
-                    $(document).ready(function () {
-                        $("#expect").click(function () {
-                            $.get("/movie/add_expect/{{ object.movieid }}", function (msg) {
-                                if (msg == "2") {
-                                    $("#expect").css({"background-color": "#f44336", "color": "white"});
-                                    $("#seen").css({"background-color": "white", "color": "black"});
-                                    $("#message").html("Added to Wish list!").fadeIn("fast").fadeOut("slow");
-                                }
-                                if (msg == "0") {
-                                    $("#expect").css({"background-color": "white", "color": "black"});
-                                    $("#message").html("Deleted from Wish list!").fadeIn("fast").fadeOut("slow");
-                                }
-                            });
-                        });
-                    });
-                </script>
-
-                <div class="movie-detail box">
-
-                    <p><b>Year:</b> {{ object.year }}</p>
-                    <p><b>Genres:</b> {{ object.genres }}</p>
-                    <p><b>Movie Length:</b> {{ object.length }} min</p>
-                    <p><b>IMDB:</b> {{ object.rate }}</p>
-                    <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
-                            class="glyphicon glyphicon-new-window"></span></a></p>
-                    <span class="click_Show"> <button class="button_trailer">
-                    <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
-                    </span>
-
-                    <div id="TrailerWindow" style="position: fixed;">
-                        <div id="title">{{ object.title }}
-                            <button type="button" class="close" aria-label="Close">
-                                <span aria-hidden="true">x</span>
-                            </button>
-                        </div>
-                        <div id="videoControl">
-                            <iframe width="560" height="500" src="https://www.youtube.com/embed/{{ object.youtubeid }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        </div>
-                    </div>
-
-                    <p id="summary"><b>Plot Summary: </b>"{{ object.plot }}"</p>
-
-                    <p><b>Main actors : </b></p>
-
-                    {% for item in items %}
-                        <a href="/movie/actor_detail/{{ item.actorid }}" target="_self">{{ item.name }}</a>
-                    {% endfor %}
-                    <br>
-                    <br>
-                    <p><b>Add tag for {{object.title}}</b></p> 
-                    <div class="input-group mb-3" id="addTagClass">
-                      <input type="text" id="nameTag"  placeholder="Add your tags..." style="width: 100px" aria-label="Recipient's username" aria-describedby="basic-addon2">
-                      <div class="input-group-btn">
-                        <button class="btn btn-secondary" onclick="addTag()" type="button">+</button>
-                      </div>
-                    </div>
-
-                    <p><b>Your Tags : </b></p>
-                    {% for tag in users_tags %}
-                        <a type="text" class="w-25 p-3"> {{tag.tags}} </a>
-                    {% endfor %}
-
-
-
-
-
-                    <script>
-                        function addTag(){
-
-                            var movieid = '{{object.movieid}}';
-                            var username = '{{ user.username }}';
-                            {#console.log(username);#}
-                            {#console.log(movieid);#}
-                            var nameTag = $('#nameTag').val();
-                            {#console.log(nameTag);#}
-
-                            //send ajax
-                            $.ajax({
-                                   url : "{% url 'add-tag' %}",
-                                   type: 'POST',
-                                   datatype: 'json',
-                                   processData: "application/json",
-                                   data: {
-                                   movieid: movieid,
-                                   type: 'add-tag',
-                                   username : username,
-                                   tag : nameTag
+                                $("input[name='rating']").click(function() {
+                                    var radioValue = $("input[name='rating']:checked").val();
+                                    console.log(radioValue);
+                                    if (radioValue) {
+                                        console.log('send mess !');
+                                        $.ajax({
+                                        url : "{% url 'rate-movie' %}",
+                                        type: 'POST',
+                                        datatype: 'json',
+                                        processData: "application/json",
+                                        data: {
+                                        movieid: movieid,
+                                        type: 'rate',
+                                        username : username,
+                                        rate_score : radioValue,
+                                            },
+                                            //beforeSend:function (xhr,settings) {
+                                            //console.log("{{ csrf_token }}");
+                                            //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                                            //},
+                                            }).done(function (data) {
+                                            if (data.type == 'error') {
+                                                alert('erorr !');
+                                                Swal.fire('Any fool can use a computer')
+                                                Swal.fire({
+                                                    icon: 'error',
+                                                    title: 'Oops...',
+                                                    text: 'Something went wrong!',
+                                                    footer: '<a href>Why do I have this issue?</a>'
+                                                })
+                                            } else {
+                                                Swal.fire(
+                                                    'Good job!',
+                                                    'You rated this movie!',
+                                                    'success'
+                                                );
+                                                console.log(data);
+                                            }
+                                        });
                                     }
-                                    }).done(function (data) {
-                                if (data.mess == 'error') {
-                                    Swal.fire('You have tagged this movie already')
-                                } else {
-                                    Swal.fire(
-                                      'Good job!',
-                                      'You clicked the button!',
-                                      'success'
-                                    )
-                                    $('#nameTag').val('');
-                                    console.log(data);
+                                });
 
-                                    $('#addTagClass').append(
-                                                            '<div class="input-group ">' +
-                                                            '<div class="input-group-prepend">'+
-                                                            '<button class="btn btn-outline-secondary" >' + 'x'+ data.count +
-                                                            '</button>' +
-                                                            '</div>' +
-                                                            '<button class="w-10 p-2"  aria-describedby="basic-addon2">' +data.tags + '</button>' +
-                                                            '<div class="input-group-append">' +
-                                                            '<button class="btn btn-outline-secondary" type="button">' + '+' + '</button>'+
-                                                            '</div>'+
-                                                            '</div>');
-
-                                }
-                            })
-                        }
-                    </script>
-
-                    <p><b>Tags Comunity : </b></p>
-                    {% if dict_tags %}
-                        <div class="input-group ">
-                                {% for tag,count in dict_tags.items %}
-                                    {% if count > 10 %}
-                                        <div class="input-group-prepend">
-                                        <button class="btn btn-outline-secondary" >{{ count }}</button>
-                                        </div>
-                                        <button class="w-5 p-1"  aria-describedby="basic-addon2">{{ tag }} </button>
-
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button">+</button>
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
+                            </script>
                         </div>
-                    {% endif %}
+                        <!-- add seen , andd expect --->
+                        {% if  user.is_authenticated %}
+                            <button class="btn btn-warning" id="seen">Have seen</button>
+                            <button class="btn btn-danger" id="expect">Want to see</button>
+                            <b style="color: #f44336" id="message"></b>
+                            {% if  object.flag == 1 %}
+                            <script>
+                                $("#seen").css({"background-color": "#f44336", "color": "white"});
+                            </script>
+                            {% endif %}
+                            {% if  object.flag == 2 %}
+                                <script>
+                                    $("#expect").css({"background-color": "#f44336", "color": "white"});
+                                </script>
+                            {% endif %}
+                        {% endif %}
+                         <!-- function for add to my list --->
+                        <script>
+                                $(document).ready(function () {
+                                    $("#seen").click(function () {
+                                        $.get("/movie/add_seen/tt1255953", function (msg) {
+                                            if (msg == "1") {
+                                                $("#seen").css({"background-color": "#f44336", "color": "white"});
+                                                $("#expect").css({"background-color": "white", "color": "black"});
+                                                $("#message").html("Added to Seen list!").fadeIn("fast").fadeOut("slow");
+                                            }
+                                            if (msg == "0") {
+                                                $("#seen").css({"background-color": "white", "color": "black"});
+                                                $("#message").html("Deleted from Seen list!").fadeIn("fast").fadeOut("slow");
+                                            }
+                                        });
+                                    });
 
-                </div>
-            </div>
 
-            <div id="main-pic">
-                <img border="0" src="{{ object.poster }}" alt="Cannot load photo, sorry!" style = "position: absolute;left: 240px; top: 150px" width="300" height="500">
-            </div>
+                                });
+                        </script>
+                
+                        <script>
+                            $(document).ready(function () {
+                                $("#expect").click(function () {
+                                    $.get("/movie/add_expect/{{ object.movieid }}", function (msg) {
+                                        if (msg == "2") {
+                                            $("#expect").css({"background-color": "#f44336", "color": "white"});
+                                            $("#seen").css({"background-color": "white", "color": "black"});
+                                            $("#message").html("Added to Wish list!").fadeIn("fast").fadeOut("slow");
+                                        }
+                                        if (msg == "0") {
+                                            $("#expect").css({"background-color": "white", "color": "black"});
+                                            $("#message").html("Deleted from Wish list!").fadeIn("fast").fadeOut("slow");
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                    
+                        <!-- Detail movie box  --->       
+                        <div class="movie-detail box">
+                        <br>
+                        <p><b>Year:</b> {{ object.year }}</p>
+                        <p><b>Genres:</b> {{ object.genres }}</p>
+                        <p><b>Movie Length:</b> {{ object.length }} min</p>
+                        <p><b>IMDB:</b> {{ object.rate }}</p>
+                        <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
+                                class="glyphicon glyphicon-new-window"></span></a></p>
+                        <span class="click_Show"> <button class="button_trailer">
+                        <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
+                        </span>
 
-        {% endif %}
-        </div>
-    {% if user.is_authenticated %}
-    <div class="container" name = "reviews">
-    <div class="card-user-profile">
-        <div class="profile-page-center">
-            <h3 class="card-user-profile-name"> COMMUNITY REVIEWS</h3>
-                <div class="comment-block">
-                            <div id="form-comment" class="form-group">
-                                <textarea class="form-control" id="review-textarea" rows="2" placeholder="Say something for {{profile.user}}..."></textarea>
-                                <div class="media-feed-control clearfix">
-                                    <button onclick="review()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
+                        <div id="TrailerWindow" style="position: fixed;">
+                            <div id="title">{{ object.title }}
+                                <button type="button" class="close" aria-label="Close">
+                                    <span aria-hidden="true">x</span>
+                                </button>
+                            </div>
+                            <div id="videoControl">
+                                <iframe width="560" height="500" src="https://www.youtube.com/embed/{{ object.youtubeid }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+
+                        <p id="summary"><b>Plot Summary: </b>"{{ object.plot }}"</p>
+
+                        <p><b>Main actors : </b></p>
+                        <style>
+                            .actor-image {
+                                height: 128px;
+                                width: 100%;
+                                background-size: cover;
+                                background-repeat: no-repeat;
+                            }
+
+                            #list_actor_carousel li {
+                                display: inline-block !important;
+                                float: none !important;
+                            }
+
+                            #list_actor_carousel .actor-profile-item {
+                                width: 92px;
+                                height: 165px;
+                                margin-left: 0px;
+                                margin-right: 15px;
+                                display: inline-block;
+                                cursor: pointer;
+                            }
+
+                            .actor-name-a {
+                                display: block;
+                                font-size: 12px;
+                                padding: 5px 0 0;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                width: 100%;
+                            }
+
+                            .character {
+                                font-size: 12px;
+                                color: #999;
+                            }
+                        </style>
+                        <ul id="list_actor_carousel">
+                            {% for item in items %}
+                                <li><a href="/movie/actor_detail/{{ item.actorid }}" class="actor-profile-item">
+                                    <div class="actor-image"
+                                        style="background-image:url('{{item.photo}}')"></div>
+                                    <div class="actor-name"><span  class="character">{{ item.name }}</span></div>
+                                </a></li>
+                            {% endfor %}
+                        </ul>
+                        <br>
+                        <br>
+                        <!-- add tag movie here -->
+                        <div class="form-group has-success has-feedback">
+                            <label class="control-label" for="inputGroupSuccess1">Your Tags :</label>
+                            <div class="input-group">
+                                <label for="inputGroupSuccess1"></label>
+                                <input type="text" class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">
+                                <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
+                            </div>
+                        </div>
+                        <!-- function add tag here -->
+
+                        <script>
+                            function addTag(){
+
+                                var movieid = '{{object.movieid}}';
+                                var username = '{{ user.username }}';
+                                {#console.log(username);#}
+                                {#console.log(movieid);#}
+                                var nameTag = $('#nameTag').val();
+                                {#console.log(nameTag);#}
+
+                                //send ajax
+                                $.ajax({
+                                    url : "{% url 'add-tag' %}",
+                                    type: 'POST',
+                                    datatype: 'json',
+                                    processData: "application/json",
+                                    data: {
+                                    movieid: movieid,
+                                    type: 'add-tag',
+                                    username : username,
+                                    tag : nameTag
+                                        }
+                                        }).done(function (data) {
+                                    if (data.mess == 'error') {
+                                        Swal.fire('You have tagged this movie already')
+                                    } else {
+                                        Swal.fire(
+                                        'Good job!',
+                                        'You clicked the button!',
+                                        'success'
+                                        )
+                                        $('#nameTag').val('');
+                                        console.log(data);
+
+                                        $('#addTagClass').append(
+                                                                '<div class="input-group ">' +
+                                                                '<div class="input-group-prepend">'+
+                                                                '<button class="btn btn-outline-secondary" >' + 'x'+ data.count +
+                                                                '</button>' +
+                                                                '</div>' +
+                                                                '<button class="w-10 p-2"  aria-describedby="basic-addon2">' +data.tags + '</button>' +
+                                                                '<div class="input-group-append">' +
+                                                                '<button class="btn btn-outline-secondary" type="button">' + '+' + '</button>'+
+                                                                '</div>'+
+                                                                '</div>');
+
+                                    }
+                                })
+                            }
+                        </script>
+
+
+                        {% comment %} <p><b>Your Tags : </b></p>
+                        {% for tag in users_tags %}
+                            <a type="text" class="w-25 p-3"> {{tag.tags}} </a>
+                        {% endfor %} {% endcomment %}
+                        <p><b>Tags Comunity : </b></p>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="wrap_comment">
+                                    <div class="edtCmt">
+                            <textarea class="dropfirst textarea" id="content" name="content"
+                                style="overflow-y: visible;"></textarea> <input type="hidden" name="dataContent"
+                                                                    value=""> <input type="hidden"
+                                                                                    name="objectid"
+                                                                                    value="218355">
+                                        <input type="hidden" name="parentid" value="0"> <input type="hidden" name="objecttype" value="2"> <input
+                                            type="hidden" name="objecttitle" value=""> <input type="hidden" name="objecturl"
+                                                                                            value="https://www.thegioididong.com/dtdd/samsung-galaxy-note-20?fbclid=IwAR0213SktOHFLh_U_fDpZ7WM2Fpy42LCRlY-pV0DxmWdlBZBRYyp-1MSVM8">
+                                        <input type="hidden" name="siteID" value="1"> <input type="hidden" name="cmtLast" value=""> <input type="hidden"
+                                                                                                                                        name="iDevice"
+                                                                                                                                        value="2">
+                                        <input type="hidden" name="iVersion" value="1"> <input type="hidden" name="loginemail"> <input type="hidden"
+                                                                                                                                    name="loginpass">
+                                        <input type="hidden" name="sendwithemail"> <input type="hidden" name="sendwithphone"> <input type="hidden"
+                                                                                                                                    name="sendwithname">
+                                        <input type="hidden" name="chatusername"> <input type="hidden" name="sendwithIfoSocial"> <input type="hidden"
+                                                                                                                                        name="chatcookie"
+                                                                                                                                        value="p9WIaSaKRIM-FKaiB2fs">
+                                        <input type="hidden" name="gender" value="0"> <input type="hidden" name="hdfCmtImg" class="hdfCmtImg">
+                                        <div class="boxemotion" style="padding-bottom: 5px;">
+                                            <div class="motionsend"><input id="hdFileCmtUpload" type="file" class="hide"
+                                                                        accept="image/x-png, image/gif, image/jpeg"> <a href="javascript:void(0)"
+                                                                                                                        class="loadpic btnCmtUpload"><i
+                                                    class="iconcom-pict"></i><span>Gửi ảnh</span></a> <a
+                                                    href="https://www.thegioididong.com/huong-dan-dang-binh-luan" target="_blank" class="qd">Quy định
+                                                đăng bình luận</a>
+                                                <div class="cmt_right"><a class="btnSend" href="javascript:void(0)" id="btnSendCmt"
+                                                                        onclick="cmtSend();">Gửi</a> <span class="loading hide">Đang xử lý...</span>
+                                                    <div class="captchacmt hide"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                </div>
-                <hr>
-                <ul class="list-unstyled mt-5">
-                        {% for review in reviews %}
-                            <li class="media">
-                                <div class="profile-picture">
-                                    <img src="{{review.user.profile.profile_picture.url}}" width="44" height="44">
+                        </div>
+                        <br>
+                        <div class="">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="rating-block">
+                                        <h4>Average user rating</h4>
+                                        <h2 class="bold padding-bottom-7">4.3 <small>/ 5</small></h2>
+                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="media-body">
-                                    <div class="media-title mt-0 mb-1">
-                                        <a href="{{review.user.profile.get_absolute_url}}">{{ review.user.username }}</a> <small> {{ review.get_date }}</small>
+                                <div class="col-md-6">
+                                    <h4>Rating breakdown</h4>
+                                    <div class="pull-left">
+                                        <div class="pull-left" style="width:35px; line-height:1;">
+                                            <div style="height:9px; margin:5px 0;">5 <span class="glyphicon glyphicon-star"></span></div>
+                                        </div>
+                                        <div class="pull-left" style="width:180px;">
+                                            <div class="progress" style="height:9px; margin:8px 0;">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="5"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 1000%">
+                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pull-right" style="margin-left:10px;">1</div>
                                     </div>
-                                    {{ review.review }}
-                                    <div class="media-feed-control">
-                                        <a href="" id="likeButton">
-                                            <input type="hidden" name="likePostID" value="{{ review.id }}">
-                                            {% if review.total_likes > 0 %}
-                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"> {{review.total_likes}} </span>
-                                            {% else %}
-                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
-
-                                            {% endif %}
-                                        </a>
-                                        <a href="#">
-                                            {% if review.total_reply > 0 %}
-                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> {{review.total_reply}} </span>
-                                            {% else %}
-                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
-                                            {% endif %}
-
-                                        </a>
+                                    <div class="pull-left">
+                                        <div class="pull-left" style="width:35px; line-height:1;">
+                                            <div style="height:9px; margin:5px 0;">4 <span class="glyphicon glyphicon-star"></span></div>
+                                        </div>
+                                        <div class="pull-left" style="width:180px;">
+                                            <div class="progress" style="height:9px; margin:8px 0;">
+                                                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="4"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 80%">
+                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pull-right" style="margin-left:10px;">1</div>
                                     </div>
-                                    <div class="media-body-reply-block">
-                                        <ul class="list-unstyled">
-                                            {% for reply  in review.get_all_reply %}
-                                                <li class="media mt-4">
-                                                    <div class="profile-picture bg-gradient bg-primary mb-4">
-                                                        <img src="{{reply.user.profile.profile_picture.url}}" width="44" height="44">
-                                                    </div>
-                                                    <div class="media-body">
-                                                        <div class="media-title mt-0 mb-1">
-                                                            <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> {{ reply.get_date }}</small>
-                                                        </div>
-                                                        {{reply.content}}
-                                                    </div>
-                                                <li>
-                                            {% endfor %}
-                                            <li class="comment-reply-block mt-4">
-                                                <form method="POST" class="form-reply" enctype="multipart/form-data">
-                                                    <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
-                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="reply review here..."> </textarea>
-                                                    <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
-                                                </form>
-                                            </li>
-                                        </ul>
+                                    <div class="pull-left">
+                                        <div class="pull-left" style="width:35px; line-height:1;">
+                                            <div style="height:9px; margin:5px 0;">3 <span class="glyphicon glyphicon-star"></span></div>
+                                        </div>
+                                        <div class="pull-left" style="width:180px;">
+                                            <div class="progress" style="height:9px; margin:8px 0;">
+                                                <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="3"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 60%">
+                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pull-right" style="margin-left:10px;">0</div>
                                     </div>
-                                </div>          
-                            </li>
-                        {% endfor %}
-                    </ul>
-        </div>
-    </div> 
-    </div> 
-    {% endif %} 
+                                    <div class="pull-left">
+                                        <div class="pull-left" style="width:35px; line-height:1;">
+                                            <div style="height:9px; margin:5px 0;">2 <span class="glyphicon glyphicon-star"></span></div>
+                                        </div>
+                                        <div class="pull-left" style="width:180px;">
+                                            <div class="progress" style="height:9px; margin:8px 0;">
+                                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="2"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 40%">
+                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pull-right" style="margin-left:10px;">0</div>
+                                    </div>
+                                    <div class="pull-left">
+                                        <div class="pull-left" style="width:35px; line-height:1;">
+                                            <div style="height:9px; margin:5px 0;">1 <span class="glyphicon glyphicon-star"></span></div>
+                                        </div>
+                                        <div class="pull-left" style="width:180px;">
+                                            <div class="progress" style="height:9px; margin:8px 0;">
+                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="1"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 20%">
+                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pull-right" style="margin-left:10px;">0</div>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <hr/>
+                                    <div class="review-block">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <img src="http://dummyimage.com/60x60/666/ffffff&text=No+Image" class="img-rounded">
+                                                <div class="review-block-name"><a href="#">nktailor</a></div>
+                                                <div class="review-block-date">January 29, 2016<br/>1 day ago</div>
+                                            </div>
+                                            <div class="col-md-9">
+                                                <div class="review-block-rate">
+                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                    </button>
+                                                </div>
+                                                <div class="review-block-title">this was nice in buy</div>
+                                                <div class="review-block-description">this was nice in buy. this was nice in buy. this was nice
+                                                    in buy. this was nice in buy this was nice in buy this was nice in buy this was nice in buy
+                                                    this was nice in buy
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                function layersize() {
+                    document.getElementById("layer").style.width = document.documentElement.scrollWidth + "px";
+                    document.getElementById("layer").style.height = document.documentElement.scrollHeight + "px";
+                }
+
+                $(".click_Show").click(function () {
+                    layersize();
+                    $(".Layer").show();//show layer
+                    $("#TrailerWindow").show();//show videoWindow
+                    tm();
+                });
+
+                $(window).resize(function () {
+                    layersize();
+                    tm();
+                });
+
+                function tm() {
+                    var _left = (document.documentElement.clientWidth - $("#TrailerWindow").width()) / 2;//Get distance of left
+                    var _top = (document.documentElement.clientHeight) * 0.15;//Get distance of top
+                    $("#TrailerWindow").css({left: _left, top: _top});
+                }
+
+                $("button.close").click(function () {
+                    $('video').trigger('pause');
+                    $("#TrailerWindow").hide();//hide
+                    $(".Layer").hide();//hide
+                });
+            </script>
+        {% endif %}
+    </div>
+
+
+                
+
+       
 
     
 <script>

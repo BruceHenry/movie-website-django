@@ -1,0 +1,76 @@
+    {% if user.is_authenticated %}
+    <div class="container" name = "reviews">
+    <div class="card-user-profile">
+        <div class="profile-page-center">
+            <h3 class="card-user-profile-name"> COMMUNITY REVIEWS</h3>
+                <div class="comment-block">
+                            <div id="form-comment" class="form-group">
+                                <textarea class="form-control" id="review-textarea" rows="2" placeholder="Say something for {{profile.user}}..."></textarea>
+                                <div class="media-feed-control clearfix">
+                                    <button onclick="review()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
+                                </div>
+                            </div>
+                </div>
+                <hr>
+                <ul class="list-unstyled mt-5">
+                        {% for review in reviews %}
+                            <li class="media">
+                                <div class="profile-picture">
+                                    <img src="{{review.user.profile.profile_picture.url}}" width="44" height="44">
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-title mt-0 mb-1">
+                                        <a href="{{review.user.profile.get_absolute_url}}">{{ review.user.username }}</a> <small> {{ review.get_date }}</small>
+                                    </div>
+                                    {{ review.review }}
+                                    <div class="media-feed-control">
+                                        <a href="" id="likeButton">
+                                            <input type="hidden" name="likePostID" value="{{ review.id }}">
+                                            {% if review.total_likes > 0 %}
+                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"> {{review.total_likes}} </span>
+                                            {% else %}
+                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
+
+                                            {% endif %}
+                                        </a>
+                                        <a href="#">
+                                            {% if review.total_reply > 0 %}
+                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> {{review.total_reply}} </span>
+                                            {% else %}
+                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
+                                            {% endif %}
+
+                                        </a>
+                                    </div>
+                                    <div class="media-body-reply-block">
+                                        <ul class="list-unstyled">
+                                            {% for reply  in review.get_all_reply %}
+                                                <li class="media mt-4">
+                                                    <div class="profile-picture bg-gradient bg-primary mb-4">
+                                                        <img src="{{reply.user.profile.profile_picture.url}}" width="44" height="44">
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <div class="media-title mt-0 mb-1">
+                                                            <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> {{ reply.get_date }}</small>
+                                                        </div>
+                                                        {{reply.content}}
+                                                    </div>
+                                                <li>
+                                            {% endfor %}
+                                            <li class="comment-reply-block mt-4">
+                                                <form method="POST" class="form-reply" enctype="multipart/form-data">
+                                                    <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
+                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="reply review here..."> </textarea>
+                                                    <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>          
+                            </li>
+                        {% endfor %}
+                    </ul>
+        </div>
+    </div> 
+    </div> 
+    {% endif %} 
