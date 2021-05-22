@@ -154,11 +154,20 @@ h3{
     background-color: #17A2B8;
   }
   
-  .dropdown-menu{
+  .dropdown-menu-mymovie{
     top: 60px;
     right: 0px;
     left: unset;
-    width: 120px;
+    width: 50px;
+    box-shadow: 0px 5px 7px -1px #c1c1c1;
+    padding-bottom: 0px;
+    padding: 0px;
+  }
+  .dropdown-menu-notibox{
+    top: 60px;
+    right: 0px;
+    left: unset;
+    width: 400px;
     box-shadow: 0px 5px 7px -1px #c1c1c1;
     padding-bottom: 0px;
     padding: 0px;

@@ -3,7 +3,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
 {% load static %}
-
+<link href="{% static "css/test.min.css" %}" rel="stylesheet" id="test-css">
 <link rel="stylesheet" type="text/css" href="{% static 'css/user-profile.css' %}"/>
 
 <main class="container bootdey">
@@ -108,12 +108,17 @@
                         <hr>
                     </div>
                     <div  class="profile-page-center">
-                        <h3 class="card-user-profile-name" style="color : black "> News Feeds </h3>
-
+                        {% if user.profile.full_name is not None  %}
+                            <h3 class="card-user-profile-name" style="color : black ">{{request.user.profile.full_name}} </h3>
+                        {% endif %}
 
                         <div class="comment-block">
                             <div id="form-comment" class="form-group">
-                                <textarea class="form-control" id="comment-textarea" rows="2" placeholder="Say something for {{profile.user}}..."></textarea>
+                                {% if profile_flag > 0 %}
+                                    <textarea class="form-control" id="comment-textarea" rows="2" placeholder="How are you today ..."></textarea>
+                                {% else %}
+                                    <textarea class="form-control" id="comment-textarea" rows="2" placeholder="Say something for {{profile.user}}..."></textarea>
+                                {% endif %}
                                 <div class="media-feed-control clearfix">
                                     <button onclick="comment()" type="button" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light">Post</button>
                                 </div>
@@ -123,22 +128,31 @@
 
                         <ul class="list-unstyled mt-5">
                         {% for post in posts %}
-                            <li class="media">
-                                <div class="profile-picture bg-gradient bg-primary mb-4">
-                                    <img src="{{post.author.profile.profile_picture.url}}" width="44" height="44">
-                                </div>
+                            <li class="media mt-4">
+                                    <div class="profile-picture bg-gradient bg-primary mb-4">
+                                        <img src="{{post.author.profile.profile_picture.url}}" width="44" height="44">
+                                    </div>
                                 <div class="media-body">
                                     <div class="media-title mt-0 mb-1">
-                                        <a href="{{post.author.profile.get_absolute_url}}"></a>{{ post.author.username }} <small> {{ post.get_date }}</small>
+                                        <a href="{{post.author.profile.get_absolute_url}}">{{ post.author.username }}</a><small> {{ post.get_date }}</small>
                                     </div>
                                     {{ post.content }}
                                     <div class="media-feed-control">
                                         <a href="" id="likeButton">
                                             <input type="hidden" name="likePostID" value="{{ post.id }}">
-                                            <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{post.total_likes}}) </span>
+                                            {% if  post.total_likes > 0 %}
+                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"> ({{post.total_likes}}) </span>
+                                            {% else %}
+                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ post.id }}"></span>
+                                            {% endif %}
                                         </a>
-                                        <a href="#">
-                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_comments}}) </span>
+                                        <a onclick="show_block_reply({{post.id}})" href="#">
+                                            {% if post.total_comments > 0  %}
+                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> ({{post.total_comments}}) </span>
+                                            {% else %}
+                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ post.id }}"> </span>
+                                            {% endif %}
+
                                         </a>
                                         <a href="" id="reportButton">
                                             <input type="hidden" name="reportPostID" value="{{ post.id }}">
@@ -147,12 +161,10 @@
                                             {% else %}
                                                 <i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>
                                             {% endif %}
-
                                         </a>
                                     </div>
                                     <div class="media-body-reply-block">
                                         <ul class="list-unstyled">
-                                            {% comment %} <li class="comment-reply" id="comment-reply"> {% endcomment %}
                                             {% for reply  in post.get_all_reply %}
                                                 <li class="media mt-4">
                                                     <div class="profile-picture bg-gradient bg-primary mb-4">
@@ -164,13 +176,13 @@
                                                         </div>
                                                         {{reply.content}}
                                                     </div>
-                                                <li>
+                                                </li>
                                             {% endfor %}
-                                            <li class="comment-reply-block mt-4">
+                                            <li hidden class="comment-reply-block mt-4" id="block-reply-{{post.id}}" >
                                                 <form method="POST" class="form-reply" enctype="multipart/form-data">
                                                     {% csrf_token %}
                                                     <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
-                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="123-45-678"> </textarea>
+                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="How are you today ..."> </textarea>
                                                     <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
                                                 </form>
                                             </li>
@@ -187,8 +199,13 @@
         </div>
     </div>
 </main>
-</div>
+</main>
     <script>
+        function show_block_reply(post_id){
+            event.preventDefault();
+            var id = '#block-reply-' + post_id;
+            $(id).show();
+        }
         function follow(){
             var user2 = '{{profile.user.id}}';
             $.ajax({
@@ -237,48 +254,50 @@
                 console.log(data);
                 document.getElementById("comment-textarea").value = '' ;
 
-                 $(".media").prepend(
-                        '<div class="profile-picture bg-gradient bg-primary mb-4">' +
-                            '<img src="' + data.send_user_avatar +'"'  + 'width="44" height="44">' +
-                        '</div>' +
-                        '<div class="media-body">' +
-                            '<div class="media-title mt-0 mb-1">' +
-                                '<a href=' +'"'+ data.send_user_url + '"' +'>'  + data.send_user + '</a>' +  '<small>' + '   ' +    data.date_posted + '</small>'+
+                 $(".list-unstyled.mt-5").prepend(
+                      '<li class="media mt-4">'+
+                            '<div class="profile-picture bg-gradient bg-primary mb-4">' +
+                                '<img src="' + data.send_user_avatar +'"'  + 'width="44" height="44">' +
                             '</div>' +
-                            data.content +
-                            '<div class="media-feed-control">' +
-                                '<a href="#" id="likeButton">'+
-                                    '<input type="hidden" name="likePostID" value="' + data.post_id + '">' +
-                                    '<i class="batch-icon batch-icon-heart-full"></i>' +'Like' +
-                                     '<span id="count-likes' + data.post_id+ '">' + ' ({{post.total_likes}})' + '</span>' +
-                                '</a>'+
-                                '<a href="#">'+
-                                    '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' ({{post.total_comments}})'  + '</span>' +
-                                '</a>' +
-                                '<a href="" id="reportButton">' +
-                                            '<input type="hidden" name="reportPostID" value="{{ post.id }}">' +
-                                            '{% if request.user in post.reports.all %}' +
-                                                '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>' +
-                                            '{% else %}'+
-                                                '<i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>' +
-                                            '{% endif %}'+
+                            '<div class="media-body">' +
+                                '<div class="media-title mt-0 mb-1">' +
+                                    '<a href=' +'"'+ data.send_user_url + '"' +'>'  + data.send_user + '</a>' +  '<small>' + '   ' +    data.date_posted + '</small>'+
+                                '</div>' +
+                                data.content +
+                                '<div class="media-feed-control">' +
+                                    '<a href="#" id="likeButton">'+
+                                        '<input type="hidden" name="likePostID" value="' + data.post_id + '">' +
+                                        '<i class="batch-icon batch-icon-heart-full"></i>' +'Like' +
+                                        '<span id="count-likes' + data.post_id+ '">' +' '+  '</span>' +
+                                    '</a>'+
+                                    '<a onclick="show_block_reply('+ data.post_id+ ')" href="#">'+
+                                        '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' '+ '</span>' +
+                                    '</a>' +
+                                    '<a href="" id="reportButton">' +
+                                                '<input type="hidden" name="reportPostID" value="{{ post.id }}">' +
+                                                '{% if request.user in post.reports.all %}' +
+                                                    '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{post.id}}"> Report </span>' +
+                                                '{% else %}'+
+                                                    '<i class="batch-icon batch-icon-flag"></i><span id="reports{{post.id}}"> Report </span>' +
+                                                '{% endif %}'+
 
-                                '</a>'+
+                                    '</a>'+
+                                '</div>'+
+                                '<div class="media-body-reply-block">' +
+                                            '<ul class="list-unstyled">' +
+                                                '<li hidden class="comment-reply-block mt-4" id="block-reply-' +data.post_id + '" >'+
+                                                        '<form method="POST" class="form-reply" enctype="multipart/form-data">' +
+                                                            '<input type="hidden" class="postID" name="postID" value="' + data.post_id +  '">' +
+                                                            '<textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here .....">' + '</textarea>' +
+                                                            '<button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>'+
+                                                        '</form>' +
+                                                '</li>'+
+                                            '</ul>'+
+                                '</div>'+
                             '</div>'+
-                        '</div>'+
-                    '</li>' +
-                    '<li>' +
-                        '<form method="POST" class="form-reply" enctype="multipart/form-data">' +
-                            '<input type="hidden" class="postID" name="postID" value="' + data.post_id +  '">' +
-                            '<textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here .....">' + '</textarea>' +
-                            '<button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>'
-                        +'</form>' 
+                        '</li>'
                 );
-                Swal.fire(
-                    'Post success !',
-                    'You changed the profile !',
-                    'success'
-                );
+                
                 // location.reload();
 
 
@@ -323,22 +342,24 @@
             }).done(function (data){
                 $content.val('');
                 console.log(data);
-                $form.parent().prepend( '<div class="media-title mt-0 mb-1">' +
-                    '<a href="' + data.send_user_url + ' ">' + data.send_user  + '</a>' +  '<small>'  + data.date_posted + '</small>' +
-                    '</div>' + '<b>'+ data.content +  '</b>');
+                $form.parent().parent().prepend(
+                     '<li class="media mt-4">'+
+                    '<div class="profile-picture bg-gradient bg-primary mb-4">'+
+                    '<img src="' +data.send_user_avatar + '"width="44" height="44">'+
+                    '</div>'+
+                    '<div class="media-body">'+
+                    '<div class="media-title mt-0 mb-1">'+
+                    '<a href="' +data.send_user_url + '">' + data.send_user+ '</a>' + '<small>' + data.date_posted + '</small>'+
+                    '</div>'+ data.content + '</div>' + '</li>')
+                                                        
 
                 var countCommentID = '#count-comments' + data.to_post;
-                $(countCommentID).html(data.count_comments);
+                $(countCommentID).html(' (' +data.count_comments +')' );
 
 
 
                 {#location.reload();#}
 
-                Swal.fire(
-                    'Succsess !',
-                    'You just reply !',
-                    'success'
-                );
             });
             });
 
@@ -366,9 +387,14 @@
                         alert('erorr !');
                     }
                     else {
-                        // why with 1 id , count not run !!
+
                         console.log(data.count_likes);
-                        $(likeID).html(data.count_likes);
+                        if(data.count_likes > 0){
+                            $(likeID).html(' ('+data.count_likes + ')');
+                        }
+                        else{
+                            $(likeID).html('');
+                        }
 
                     }
 
@@ -381,7 +407,6 @@
                 event.preventDefault();
                 var postID  = $(this).find("input[name='reportPostID']").val();
                 var reportID = '#reports' + postID;
-                alert(reportID);
                 console.log(reportID);
                 $.ajax({
                     url : "{% url 'report-post'%}",

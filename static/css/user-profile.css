@@ -52,7 +52,7 @@
 
 .card .card-user-profile .profile-page-center .media-feed-control a:focus,
 .card .card-user-profile .profile-page-center .media-feed-control a:hover {
-    opacity: 1;
+    opacity: 2;
 }
 
 .card .card-user-profile .profile-page-center > .comment-block {
@@ -109,8 +109,9 @@
 }
 
 .card .card-user-profile .profile-page-center > ul > li.media .media-body {
-    margin-left: 0 !important;
+    margin-left: 10px !important;
 }
+
 
 .card .card-user-profile .profile-page-center > ul > li.media .media-body .media-title {
     font-weight: 500;
@@ -423,3 +424,5 @@
         padding-left: 5rem !important;
     }
 }
+
+
