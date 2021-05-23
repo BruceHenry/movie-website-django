@@ -398,9 +398,7 @@
 
 </script>
 <script>
-        //const roomName = 'notification';
-        var roomName = 'notification';
-        var roomName = '{{user.username}}';
+        var roomName = '{{user.id}}';
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host

@@ -248,7 +248,7 @@ def create_new_folow_notifications(sender, **kwargs):
 	notify = kwargs['instance']
 	print(notify.user.username)
 	channel_layer = get_channel_layer()
-	room_name = 'noti_' + str(notify.user.username)
+	room_name = 'noti_' + str(notify.user.id)
 	my_dictionary = {
 		'sender': notify.user2.username,
 		'to_user': notify.user.username,
