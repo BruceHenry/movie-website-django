@@ -34,6 +34,7 @@ urlpatterns = [
     #get comunity tags
     path('favourite_movie/', views.favourite_movie, name='favourite-movie'),
     path('get_search_value/', views.get_search_value, name='get-search-value'),
+    path('get_data_rate/', views.get_data_rate, name='get_data_rate'),
 
     # path('comunity_tags/', views.)
     path('get_chart_movie_rate/', views.get_data_chart3, name='get_chart_movie'),

@@ -391,45 +391,120 @@
 
 
                         <h4>Review for {{object.title}}</h4>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="wrap_comment">
-                                    <div class="edtCmt">
-                                        <textarea class="dropfirst textarea" id="review-textarea" name="content" style="overflow-y: visible;"></textarea>
-                                                <div class="boxemotion" style="padding-bottom: 5px;">
-                                                    <div class="motionsend"><input id="hdFileCmtUpload" type="file" class="hide"
-                                                                        accept="image/x-png, image/gif, image/jpeg"> 
-                                                        <div class="cmt_right"><a class="btnSend" href="#" id="btnSendCmt"
-                                                                        onclick="review();">Send</a>
+                        {% if review_form_flag == 1 %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="wrap_comment">
+                                        <div class="edtCmt">
+                                            <textarea class="dropfirst textarea" id="review-textarea" name="content" style="overflow-y: visible;"></textarea>
+                                                    <div class="boxemotion" style="padding-bottom: 5px;">
+                                                        <div class="motionsend"><input id="hdFileCmtUpload" type="file" class="hide"
+                                                                            accept="image/x-png, image/gif, image/jpeg"> 
+                                                            <div class="cmt_right"><a class="btnSend" href="#" id="btnSendCmt"
+                                                                            onclick="review();">Send</a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        {% endif %}
                         <br>
                         <div class="">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="rating-block">
                                         <h4>Average user rating</h4>
-                                        <h2 class="bold padding-bottom-7">4.3 <small>/ 5</small></h2>
-                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
-                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
-                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
-                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
-                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
-                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                        </button>
+                                        <!-- rating averange  movie user -->
+                                        <h2 class="bold padding-bottom-7" id="rate_all_for_movie">  <small>/ 5</small></h2>
+                                        {% if rate_average == 5  %}
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                        {% endif %}
+                                        {% if rate_average == 4  %}
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                           
+                                            <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                        {% endif %}
+                                        {% if rate_average == 3  %}
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            
+                                            <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                        {% endif %}
+                                        {% if rate_average == 2  %}
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                        {% endif %}
+                                        {% if rate_average == 1  %}
+                                            <button type="button" class="btn btn-warning btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                             <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default btn-grey btn-sm" aria-label="Left Align">
+                                                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -440,13 +515,13 @@
                                         </div>
                                         <div class="pull-left" style="width:180px;">
                                             <div class="progress" style="height:9px; margin:8px 0;">
-                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="5"
-                                                    aria-valuemin="0" aria-valuemax="5" style="width: 1000%">
-                                                    <span class="sr-only">80% Complete (danger)</span>
+                                                <div id="count_rate_sum_5" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="5"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 80%">
+                                                    <span class="sr-only">100%</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pull-right" style="margin-left:10px;">1</div>
+                                        <div id="count_5_star" class="pull-right" style="margin-left:10px;">1</div>
                                     </div>
                                     <div class="pull-left">
                                         <div class="pull-left" style="width:35px; line-height:1;">
@@ -454,13 +529,13 @@
                                         </div>
                                         <div class="pull-left" style="width:180px;">
                                             <div class="progress" style="height:9px; margin:8px 0;">
-                                                <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="4"
-                                                    aria-valuemin="0" aria-valuemax="5" style="width: 80%">
+                                                <div id="count_rate_sum_4" class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="4"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 0%">
                                                     <span class="sr-only">80% Complete (danger)</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pull-right" style="margin-left:10px;">1</div>
+                                        <div id="count_4_star" class="pull-right" style="margin-left:10px;">1</div>
                                     </div>
                                     <div class="pull-left">
                                         <div class="pull-left" style="width:35px; line-height:1;">
@@ -468,41 +543,43 @@
                                         </div>
                                         <div class="pull-left" style="width:180px;">
                                             <div class="progress" style="height:9px; margin:8px 0;">
-                                                <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="3"
+                                                <div id="count_rate_sum_3" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="3"
                                                     aria-valuemin="0" aria-valuemax="5" style="width: 60%">
                                                     <span class="sr-only">80% Complete (danger)</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pull-right" style="margin-left:10px;">0</div>
+                                        <div id="count_3_star" class="pull-right" style="margin-left:10px;">0</div>
                                     </div>
+                                    
                                     <div class="pull-left">
                                         <div class="pull-left" style="width:35px; line-height:1;">
                                             <div style="height:9px; margin:5px 0;">2 <span class="glyphicon glyphicon-star"></span></div>
                                         </div>
                                         <div class="pull-left" style="width:180px;">
                                             <div class="progress" style="height:9px; margin:8px 0;">
-                                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="2"
-                                                    aria-valuemin="0" aria-valuemax="5" style="width: 40%">
+                                                <div id="count_rate_sum_2" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="3"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 0%">
                                                     <span class="sr-only">80% Complete (danger)</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pull-right" style="margin-left:10px;">0</div>
+                                        <div id="count_2_star" class="pull-right" style="margin-left:10px;">0</div>
                                     </div>
+                                    
                                     <div class="pull-left">
                                         <div class="pull-left" style="width:35px; line-height:1;">
                                             <div style="height:9px; margin:5px 0;">1 <span class="glyphicon glyphicon-star"></span></div>
                                         </div>
                                         <div class="pull-left" style="width:180px;">
                                             <div class="progress" style="height:9px; margin:8px 0;">
-                                                <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="1"
-                                                    aria-valuemin="0" aria-valuemax="5" style="width: 20%">
+                                                <div id="count_rate_sum_1" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="3"
+                                                    aria-valuemin="0" aria-valuemax="5" style="width: 0%">
                                                     <span class="sr-only">80% Complete (danger)</span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="pull-right" style="margin-left:10px;">0</div>
+                                        <div id="count_1_star" class="pull-right" style="margin-left:10px;">0</div>
                                     </div>
                                 </div>
                             </div>
@@ -588,10 +665,23 @@
                                                         {% endif %}
                                                     {% endif %}
                                                 </div>
-                                                {% if review.review is not None %}
-                                                    <div class="review-block-title"><b>this was nice in buy</b></div>
+                                                    {% if review.rate == 5 %}
+                                                    <div class="review-block-title"><b>Excellent</b></div>
+                                                    {% endif %}
+                                                    {% if review.rate == 4 %}
+                                                    <div class="review-block-title"><b>Very good</b></div>
+                                                    {% endif %}
+                                                    {% if review.rate == 3 %}
+                                                    <div class="review-block-title"><b>Good</b></div>
+                                                    {% endif %}
+                                                    {% if review.rate == 2 %}
+                                                    <div class="review-block-title"><b>Bad</b></div>
+                                                    {% endif %}
+                                                    {% if review.rate == 1 %}
+                                                    <div class="review-block-title"><b>Very Bad</b></div>
+                                                    {% endif %}
+
                                                     <div class="review-block-description">{{review.review}}
-                                                {% endif %}
                                                 </div>
                                                 <div class="media-feed-control">
                                                     <a href="" id="likeButton" style="color:black">
@@ -602,9 +692,9 @@
                                                             <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
                                                         {% endif %}
                                                     </a>
-                                                    <a onclick="show_block_reply({{review.id}})" href="#">
+                                                    <a onclick="show_block_reply({{review.id}})"  style="color:black" href="#">
                                                         {% if review.total_reply > 0  %}
-                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}">({{review.total_reply}}) </span>
+                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}" >({{review.total_reply}}) </span>
                                                         {% else %}
                                                             <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
                                                         {% endif %}
@@ -613,7 +703,7 @@
                                                 <div hidden class="media-body-reply-block" id="block-reply-{{review.id}}" >
                                                     <div class="media mt-4" id="list_reply_review">
                                                         {% for reply in review.get_all_reply %}
-                                                            <div class="media-body" style="padding-left: 10px">
+                                                            <div class="media-body" style="padding-left: 10px ; border: 5px">
                                                                 <div class="media-title mt-0 mb-1">
                                                                     <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> just now</small>
                                                                 </div>
@@ -623,8 +713,8 @@
                                                             </div>
                                                         {% endfor %}
                                                     </div>
-                                                
-                                                
+                                                    
+                                                   
                                                     <div class="comment-reply-block mt-4">
                                                         <form method="POST" class="form-reply" enctype="multipart/form-data">
                                                             <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
@@ -633,6 +723,15 @@
                                                         </form>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div>
+                                            </div>
+                                            <div>
+                                                <p>  
+                                                <hr style="width:50%;text-align:left;margin-left:0">
+                                                <hr style="width:50%;text-align:left;margin-left:0">
+
+                                                </p>
                                             </div>
                                         {% endfor %}
                                         </div>
@@ -685,10 +784,66 @@
 
     
 <script>
+
+function get_breaking_rate(){
+    var movieid = '{{object.movieid}}';
+    console.log(movieid);
+    $.ajax({
+                url: "{% url 'get_data_rate' %}",
+                type: 'POST',
+                datatype: 'json',
+                processData: "application/json",
+                data: {
+                    movieid: movieid,
+                },
+                
+            }).done(function (data){
+                console.log(data);
+                $('#count_5_star').text(data.count_rate_5);
+                var count_rate_5_percent = data.count_rate_5_percent;
+                var count_rate_5_percent_width = count_rate_5_percent + '%';
+                console.log(count_rate_5_percent_width); 
+                $('#count_rate_sum_5').css("width", count_rate_5_percent_width);
+
+                $('#count_4_star').text(data.count_rate_4);
+                var count_rate_4_percent = data.count_rate_4_percent;
+                var count_rate_4_percent_width = count_rate_4_percent + '%';
+                console.log(count_rate_4_percent_width); 
+                $('#count_rate_sum_4').css("width", count_rate_4_percent_width);
+
+                $('#count_3_star').text(data.count_rate_3);
+                var count_rate_3_percent = data.count_rate_3_percent;
+                var count_rate_3_percent_width = count_rate_3_percent + '%';
+                console.log(count_rate_3_percent_width); 
+                $('#count_rate_sum_3').css("width", count_rate_3_percent_width);
+
+                $('#count_2_star').text(data.count_rate_2);
+                var count_rate_2_percent = data.count_rate_2_percent;
+                var count_rate_2_percent_width = count_rate_2_percent + '%';
+                console.log(count_rate_2_percent_width); 
+
+                $('#count_rate_sum_2').css("width", count_rate_2_percent_width);
+
+                $('#count_1_star').text(data.count_rate_1);
+                var count_rate_1_percent = data.count_rate_1_percent;
+                var count_rate_1_percent_width = count_rate_1_percent + '%';
+                console.log(count_rate_1_percent_width); 
+
+                $('#count_rate_sum_1').css("width", count_rate_1_percent_width);
+
+                $('#rate_all_for_movie').text(data.rate_all_for_movie +'/5');
+
+
+            });
+};
+
+get_breaking_rate();
+
+
 function show_block_reply(post_id){
             event.preventDefault();
             var id = '#block-reply-' + post_id;
-            $(id).show();
+            $(id).toggle();
         }
 
 $(document).on('submit', '.form-reply', function (event){
@@ -732,12 +887,8 @@ $(document).on('submit', '.form-reply', function (event){
                     data.content +
                     '</div>' +
                     '</div>')
-                    console.log(data.review_id);
                     var countCommentID = '#count-comments' + data.review_id;
-                    console.log(countCommentID);
-                    var count =  $(countCommentID).text();
-                    console.log()
-                    $(countCommentID).html(parseInt(count) +1);
+                    $(countCommentID).html('(' +data.count_reply +')');
 
                 });
             });

@@ -32,6 +32,14 @@ class Movie(models.Model):
     @staticmethod
     def get_name():
         return 'movie'
+    #add get_average for movie
+    def get_average(self):
+        sum = 0
+        count = 0
+        for rate in  User_Rate.objects.filter(movie = self):
+            sum += rate.rate
+            count +=1
+        return sum/count
 
 
 class Actor(models.Model):
@@ -47,7 +55,9 @@ class Actor(models.Model):
         return 'actor'
     
     def get_simple_name(self):
-        if len(self.name) > 14:
+        if len(self.name) > 12:
+            if len(self.name.split()[0]) < len(self.name.split()[1]):
+                return self.name.split()[1]
             return self.name.split()[0]
         else:
             return self.name
@@ -115,6 +125,7 @@ class User_Rate(models.Model):
 
     def get_date(self):
         return humanize.naturaltime(self.date_posted)
+
 
 
 class ReplyToReview(models.Model):

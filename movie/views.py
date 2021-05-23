@@ -12,6 +12,10 @@ from django.contrib.auth.decorators import login_required
 
 from user.models import Activity, Notification
 
+
+#add average for rate 
+from django.db.models import Avg
+
 def add_seen(request, movie_id):
     print('oke')
     if request.is_ajax():
@@ -139,6 +143,7 @@ def reply_review(request):
                     data['send_user_url'] = request.user.profile.get_absolute_url()
                     data['send_user_avatar']= request.user.profile.profile_picture.url
                     data['date_posted']  = 'just now'
+                    data['count_reply'] = rate_movie.total_reply() + 1
                     print('data here', data)
 
                     return JsonResponse(data)
@@ -185,8 +190,59 @@ def add_tag(request):
 
 
 
+@csrf_exempt
+def get_data_rate(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            data = {}
+            movieid = request.POST.get('movieid')
+            try:
+                # send data rating to client 
+                movie = Movie.objects.get(movieid=movieid)
+                count_all = User_Rate.objects.filter(movie=movie).count()
+                print(count_all)
+                count_rate_5 = User_Rate.objects.filter(movie=movie, rate =5).count()
+                count_rate_5_percent = int(count_rate_5/count_all*100)
+                count_rate_4 = User_Rate.objects.filter(movie=movie, rate =4).count()
+                count_rate_4_percent = int(count_rate_4/count_all*100)
+                count_rate_3 = User_Rate.objects.filter(movie=movie, rate =3).count()
+                count_rate_3_percent = int(count_rate_3/count_all*100)
+                count_rate_2 = User_Rate.objects.filter(movie=movie, rate =2).count()
+                count_rate_2_percent = int(count_rate_2/count_all*100)
+                count_rate_1 = User_Rate.objects.filter(movie=movie, rate =1).count()
+                count_rate_1_percent = int(count_rate_1/count_all*100)
+                data['count_rate_5'] = count_rate_5
+                data['count_rate_5_percent'] = count_rate_5_percent
+                data['count_rate_4'] = count_rate_4
+                data['count_rate_4_percent'] = count_rate_4_percent
+                data['count_rate_3'] = count_rate_3
+                data['count_rate_3_percent'] = count_rate_3_percent
+                data['count_rate_2'] = count_rate_2
+                data['count_rate_2_percent'] = count_rate_2_percent
+                data['count_rate_1'] = count_rate_1
+                data['count_rate_1_percent'] = count_rate_1_percent
+                print(data)
+                # rate averange
+                # sum_rate = 0 
+                # count_rate = 0
+                # rate_averange = 0
+                # for rate in User_Rate.objects.filter(movie=movie):
+                #     sum_rate += rate.rate
+                #     count +=1
+                # rate_averange = round(sum_rate/count, 2)
+
+                # data['type'] = 'oke'
+                avg =  User_Rate.objects.filter(movie=movie).aggregate(Avg('rate'))
+                data['rate_all_for_movie'] = round(avg['rate__avg'], 2)
+
+                return JsonResponse(data)
 
 
+            except:
+                return JsonResponse({'mess':'error'})
+    return JsonResponse({'mess':'error'})
+
+   
 
 
 
@@ -223,19 +279,20 @@ def movie_detail(request, model, id):
                 for actor in Actor.objects.filter(actorid=query.actorid_id):
                     print(actor)
                     items.append(actor)
-            # add rated movie for user
+            # add rated movie for user -  if form_flag =1 =>> user can review , -1 can not review
             review_form_flag = 1
+
             try:
                 rate_movie = User_Rate.objects.get(movie=object, user=request.user)
                 rate_score = rate_movie.rate
                 print(rate_score)
                 if rate_movie.review != None:
                     review_form_flag = -1
-                reviews = User_Rate.objects.filter(movie=object).order_by('-date_posted')
+                reviews = User_Rate.objects.filter(movie=object, review__isnull = False).order_by('-date_posted')
 
             except:
                 rate_score = 0
-                reviews = User_Rate.objects.filter(movie=object).order_by('-date_posted')
+                reviews = User_Rate.objects.filter(movie=object, review__isnull = False).order_by('-date_posted')
                 print(rate_score)
 
 
@@ -252,9 +309,8 @@ def movie_detail(request, model, id):
         return render(request, '404.html')
 
     # print(review_form_flag)
-    print(reviews)
     return render(request, 'movie_detail.html', {'users_tags': users_tags, 'comunity_tags':comunity_tags,
-    'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+    'items': items, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 @csrf_exempt
 def actor_detail(request, model, id):
