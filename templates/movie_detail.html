@@ -9,6 +9,45 @@
         border-radius: 4px;
         border: 1px solid #dadada;
     }
+    {% comment %} Media feed control - Like and comments in review here  {% endcomment %}
+    .media-feed-control .btn {
+    opacity: 0.5 !important;
+    margin-top: -6px;
+    
+    }
+    .comment-block textarea + .media-feed-control {
+    margin-top: 0;
+    padding-top: 15px;
+    }
+    .media-feed-control {
+    margin-top: 1rem;
+    padding: 10px 10px 4px;
+    background-color: #F7F7FA;
+    }
+    .media-feed-control a {
+    opacity: 0.5;
+    color: #7e7e7e;
+    -webkit-transition: opacity 0.225s ease-in-out;
+    -moz-transition: opacity 0.225s ease-in-out;
+    -o-transition: opacity 0.225s ease-in-out;
+    transition: opacity 0.225s ease-in-out;
+    }
+    .media-feed-control a:not(:last-child) {
+    margin-right: 15px;
+    }
+    {% comment %} end here  {% endcomment %}
+    {% comment %} reply here      {% endcomment %}
+    .rrSend {
+    padding: 4px 8px;
+    border: 1px solid #7e7e7e;
+    background: #fff;
+    font-size: 12px;
+    color: #7e7e7e;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    margin-top: 2px;
+    }
 
     .edtCmt textarea {
         width: 100%;
@@ -154,11 +193,13 @@
                             {% if  object.flag == 1 %}
                             <script>
                                 $("#seen").css({"background-color": "#f44336", "color": "white"});
+                                $("#expect").css({"background-color": "white", "color": "black"});
                             </script>
                             {% endif %}
                             {% if  object.flag == 2 %}
                                 <script>
                                     $("#expect").css({"background-color": "#f44336", "color": "white"});
+                                    $("#seen").css({"background-color": "white", "color": "black"});
                                 </script>
                             {% endif %}
                         {% endif %}
@@ -166,7 +207,7 @@
                         <script>
                                 $(document).ready(function () {
                                     $("#seen").click(function () {
-                                        $.get("/movie/add_seen/tt1255953", function (msg) {
+                                        $.get("/movie/add_seen/{{object.movieid}}", function (msg) {
                                             if (msg == "1") {
                                                 $("#seen").css({"background-color": "#f44336", "color": "white"});
                                                 $("#expect").css({"background-color": "white", "color": "black"});
@@ -178,8 +219,6 @@
                                             }
                                         });
                                     });
-
-
                                 });
                         </script>
                 
@@ -226,7 +265,7 @@
                         </div>
 
                         <p id="summary"><b>Plot Summary: </b>"{{ object.plot }}"</p>
-
+                        <!-- detail actor here -->
                         <p><b>Main actors : </b></p>
                         <style>
                             .actor-image {
@@ -239,6 +278,7 @@
                             #list_actor_carousel li {
                                 display: inline-block !important;
                                 float: none !important;
+                                margin-left: 0px;
                             }
 
                             #list_actor_carousel .actor-profile-item {
@@ -265,38 +305,45 @@
                                 color: #999;
                             }
                         </style>
-                        <ul id="list_actor_carousel">
+
+                        <ul id="list_actor_carousel" style="padding-left: 0px;">
                             {% for item in items %}
                                 <li><a href="/movie/actor_detail/{{ item.actorid }}" class="actor-profile-item">
                                     <div class="actor-image"
                                         style="background-image:url('{{item.photo}}')"></div>
-                                    <div class="actor-name"><span  class="character">{{ item.name }}</span></div>
+                                    <div class="actor-name">{{item.get_simple_name}}</div>
                                 </a></li>
                             {% endfor %}
                         </ul>
                         <br>
                         <br>
+                        <!-- end  detail actor here -->
                         <!-- add tag movie here -->
                         <div class="form-group has-success has-feedback">
-                            <label class="control-label" for="inputGroupSuccess1">Your Tags :</label>
-                            <div class="input-group">
+                            <label class="control-label" style="color: black" >Your Tags :</label>
+                            <div class="input-group" style ="width:30% " >
                                 <label for="inputGroupSuccess1"></label>
-                                <input type="text" class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">
+                                <input id= "nameTag" type="text" class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">
                                 <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
                             </div>
                         </div>
                         <!-- function add tag here -->
-
+                            <div class="user_tag_here" id="list_actor_carousel" style="padding-left: 0px;">
+                            {% for user_tag in users_tags %}
+                                <li style ="width:30% "><div class="input-group" >
+                                    <span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x{{user_tag.count_tag}}</span>
+                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">{{user_tag.tags}}</button>
+                                    <span  style="cursor: pointer" class="input-group-addon">-</span>
+                                </div></li>
+                            {% endfor %}
+                            </div>
+                        <!-- function add tag by user here -->
                         <script>
                             function addTag(){
-
                                 var movieid = '{{object.movieid}}';
                                 var username = '{{ user.username }}';
-                                {#console.log(username);#}
-                                {#console.log(movieid);#}
                                 var nameTag = $('#nameTag').val();
-                                {#console.log(nameTag);#}
-
+                                console.log(nameTag);
                                 //send ajax
                                 $.ajax({
                                     url : "{% url 'add-tag' %}",
@@ -313,74 +360,50 @@
                                     if (data.mess == 'error') {
                                         Swal.fire('You have tagged this movie already')
                                     } else {
-                                        Swal.fire(
-                                        'Good job!',
-                                        'You clicked the button!',
-                                        'success'
-                                        )
                                         $('#nameTag').val('');
-                                        console.log(data);
-
-                                        $('#addTagClass').append(
-                                                                '<div class="input-group ">' +
-                                                                '<div class="input-group-prepend">'+
-                                                                '<button class="btn btn-outline-secondary" >' + 'x'+ data.count +
-                                                                '</button>' +
-                                                                '</div>' +
-                                                                '<button class="w-10 p-2"  aria-describedby="basic-addon2">' +data.tags + '</button>' +
-                                                                '<div class="input-group-append">' +
-                                                                '<button class="btn btn-outline-secondary" type="button">' + '+' + '</button>'+
-                                                                '</div>'+
-                                                                '</div>');
-
+                                        $('.user_tag_here').prepend(
+                                            '<li style ="width:30% "><div class="input-group" >' +
+                                    '<span  style="cursor: pointer" class="input-group-addon">x' +data.count + '</span>'+
+                                    '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
+                                    '<span  style="cursor: pointer" class="input-group-addon">...</span>'+
+                                    '</div></li>'
+                                        )
                                     }
                                 })
-                            }
+                            };
+
                         </script>
+                        <!-- end tag by user function -->
 
 
-                        {% comment %} <p><b>Your Tags : </b></p>
-                        {% for tag in users_tags %}
-                            <a type="text" class="w-25 p-3"> {{tag.tags}} </a>
-                        {% endfor %} {% endcomment %}
                         <p><b>Tags Comunity : </b></p>
+                        <div id="list_actor_carousel" style="padding-left: 0px;">
+                            {% for tag in comunity_tags %}
+                                <li style ="width:30%; height : 70% "><div class="input-group" >
+                                    <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{tag.count_tag}}</span>
+                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tag.tags}}</button>
+                                    <span style="cursor: pointer" class="input-group-addon">+</span>
+                                    
+                                </div></li>
+                            {% endfor %}
+                        </div>
+                        <br>
 
+
+                        <h4>Review for {{object.title}}</h4>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="wrap_comment">
                                     <div class="edtCmt">
-                            <textarea class="dropfirst textarea" id="content" name="content"
-                                style="overflow-y: visible;"></textarea> <input type="hidden" name="dataContent"
-                                                                    value=""> <input type="hidden"
-                                                                                    name="objectid"
-                                                                                    value="218355">
-                                        <input type="hidden" name="parentid" value="0"> <input type="hidden" name="objecttype" value="2"> <input
-                                            type="hidden" name="objecttitle" value=""> <input type="hidden" name="objecturl"
-                                                                                            value="https://www.thegioididong.com/dtdd/samsung-galaxy-note-20?fbclid=IwAR0213SktOHFLh_U_fDpZ7WM2Fpy42LCRlY-pV0DxmWdlBZBRYyp-1MSVM8">
-                                        <input type="hidden" name="siteID" value="1"> <input type="hidden" name="cmtLast" value=""> <input type="hidden"
-                                                                                                                                        name="iDevice"
-                                                                                                                                        value="2">
-                                        <input type="hidden" name="iVersion" value="1"> <input type="hidden" name="loginemail"> <input type="hidden"
-                                                                                                                                    name="loginpass">
-                                        <input type="hidden" name="sendwithemail"> <input type="hidden" name="sendwithphone"> <input type="hidden"
-                                                                                                                                    name="sendwithname">
-                                        <input type="hidden" name="chatusername"> <input type="hidden" name="sendwithIfoSocial"> <input type="hidden"
-                                                                                                                                        name="chatcookie"
-                                                                                                                                        value="p9WIaSaKRIM-FKaiB2fs">
-                                        <input type="hidden" name="gender" value="0"> <input type="hidden" name="hdfCmtImg" class="hdfCmtImg">
-                                        <div class="boxemotion" style="padding-bottom: 5px;">
-                                            <div class="motionsend"><input id="hdFileCmtUpload" type="file" class="hide"
-                                                                        accept="image/x-png, image/gif, image/jpeg"> <a href="javascript:void(0)"
-                                                                                                                        class="loadpic btnCmtUpload"><i
-                                                    class="iconcom-pict"></i><span>Gửi ảnh</span></a> <a
-                                                    href="https://www.thegioididong.com/huong-dan-dang-binh-luan" target="_blank" class="qd">Quy định
-                                                đăng bình luận</a>
-                                                <div class="cmt_right"><a class="btnSend" href="javascript:void(0)" id="btnSendCmt"
-                                                                        onclick="cmtSend();">Gửi</a> <span class="loading hide">Đang xử lý...</span>
-                                                    <div class="captchacmt hide"></div>
+                                        <textarea class="dropfirst textarea" id="review-textarea" name="content" style="overflow-y: visible;"></textarea>
+                                                <div class="boxemotion" style="padding-bottom: 5px;">
+                                                    <div class="motionsend"><input id="hdFileCmtUpload" type="file" class="hide"
+                                                                        accept="image/x-png, image/gif, image/jpeg"> 
+                                                        <div class="cmt_right"><a class="btnSend" href="#" id="btnSendCmt"
+                                                                        onclick="review();">Send</a>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -483,41 +506,135 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="row">
                                 <div class="col-md-12">
                                     <hr/>
                                     <div class="review-block">
                                         <div class="row">
+                                        {% for review in reviews %}
                                             <div class="col-md-3">
-                                                <img src="http://dummyimage.com/60x60/666/ffffff&text=No+Image" class="img-rounded">
-                                                <div class="review-block-name"><a href="#">nktailor</a></div>
-                                                <div class="review-block-date">January 29, 2016<br/>1 day ago</div>
+                                                <img src="{{review.user.profile.profile_picture.url}}" width ="60px" height ="60px" class="img-rounded">
+                                                <div class="review-block-name"><a href="#">{{review.user.username}}</a></div>
+                                                <div class="review-block-date">{{review.get_date}}</div>
                                             </div>
                                             <div class="col-md-9">
                                                 <div class="review-block-rate">
-                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
-                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
-                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
-                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
-                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                                    </button>
-                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
-                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-                                                    </button>
+                                                    {% if review.rate > 0 %}
+                                                        {% if review.rate > 4 %}
+                                                            {% for i in '01234'|make_list  %}
+                                                                <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                </button>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            {% if review.rate > 3 %}
+                                                                {% for i in '0123'|make_list %}
+                                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                    </button>
+                                                                {% endfor %}
+                                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                    </button>
+                                                            {% else %}
+                                                                {% if review.rate > 2 %}
+                                                                    {% for i in '012'|make_list %}
+                                                                    <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                    </button>
+                                                                    {% endfor %}
+                                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                    </button>
+                                                                    <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                        <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                    </button>
+                                                                {% else %}
+                                                                    {% if review.rate > 1 %}
+                                                                        <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                    {% else %}
+                                                                        <button type="button" class="btn btn-warning btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-default btn-grey btn-xs" aria-label="Left Align">
+                                                                            <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                                                                        </button>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endif %}
                                                 </div>
-                                                <div class="review-block-title">this was nice in buy</div>
-                                                <div class="review-block-description">this was nice in buy. this was nice in buy. this was nice
-                                                    in buy. this was nice in buy this was nice in buy this was nice in buy this was nice in buy
-                                                    this was nice in buy
+                                                {% if review.review is not None %}
+                                                    <div class="review-block-title"><b>this was nice in buy</b></div>
+                                                    <div class="review-block-description">{{review.review}}
+                                                {% endif %}
+                                                </div>
+                                                <div class="media-feed-control">
+                                                    <a href="" id="likeButton" style="color:black">
+                                                        <input type="hidden" name="likePostID" value="{{ review.id }}">
+                                                        {% if  review.total_likes > 0 %}
+                                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"> ({{review.total_likes}}) </span>
+                                                        {% else %}
+                                                            <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
+                                                        {% endif %}
+                                                    </a>
+                                                    <a onclick="show_block_reply({{review.id}})" href="#">
+                                                        {% if review.total_reply > 0  %}
+                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}">({{review.total_reply}}) </span>
+                                                        {% else %}
+                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
+                                                        {% endif %}
+                                                    </a>
+                                                </div>
+                                                <div hidden class="media-body-reply-block" id="block-reply-{{review.id}}" >
+                                                    <div class="media mt-4" id="list_reply_review">
+                                                        {% for reply in review.get_all_reply %}
+                                                            <div class="media-body" style="padding-left: 10px">
+                                                                <div class="media-title mt-0 mb-1">
+                                                                    <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> just now</small>
+                                                                </div>
+                                                                <div class ="reply-content" >
+                                                                    {{reply.content}}
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                
+                                                    <div class="comment-reply-block mt-4">
+                                                        <form method="POST" class="form-reply" enctype="multipart/form-data">
+                                                            <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
+                                                            <input style="height: 50%"  class="form-control comment-reply-textarea" name="reply-content" rows="2" placeholder="reply review here..."> </input>
+                                                            <button style="float: right;"  type="submit" class="rrSend"> Reply </button>
+                                                        </form>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        {% endfor %}
                                         </div>
                                         
                                     </div>
@@ -568,6 +685,11 @@
 
     
 <script>
+function show_block_reply(post_id){
+            event.preventDefault();
+            var id = '#block-reply-' + post_id;
+            $(id).show();
+        }
 
 $(document).on('submit', '.form-reply', function (event){
                 event.preventDefault();
@@ -575,11 +697,11 @@ $(document).on('submit', '.form-reply', function (event){
                 var $form = $(this);
 
                 // get dom by name
-                var $content = $form.find("textarea[name='content']");
+                var $content = $form.find("input[name='reply-content']");
                 // get dome by id
                 var $postID = $form.find(".postID");
 
-                var content =  $form.find("textarea[name='content']").val();
+                var content =  $form.find("input[name='reply-content']").val();
                 var postID =   $form.find("input[name='postID']").val();
 
                 console.log(content);
@@ -600,16 +722,24 @@ $(document).on('submit', '.form-reply', function (event){
             }).done(function (data){
                 $content.val('');
                 console.log(data);
-                $form.parent().prepend( '<div class="media-title mt-0 mb-1">' +
-                    '<a href="' + data.send_user_url + ' ">' + data.send_user  + '</a>' + ' ' +  '<small>'  + data.date_posted + '</small>' +
-                    '</div>' + data.content   );
+                $('#list_reply_review').prepend(
 
-                var countCommentID = '#count-comments' + data.review_id;
-                var count =  $(countCommentID).text();
-                $(countCommentID).html(parseInt(count) +1);
+                    '<div class="media-body" style="padding-left: 10px" >'+
+                    '<div class="media-title mt-0 mb-1">' +
+                    '<a href="' + data.send_user_url + '">'+ data.send_user + '</a> <small> just now</small>'+
+                    '</div>' +
+                    '<div class ="reply-content" >'+
+                    data.content +
+                    '</div>' +
+                    '</div>')
+                    console.log(data.review_id);
+                    var countCommentID = '#count-comments' + data.review_id;
+                    console.log(countCommentID);
+                    var count =  $(countCommentID).text();
+                    console.log()
+                    $(countCommentID).html(parseInt(count) +1);
 
-                {#location.reload();#}
-            });
+                });
             });
 
 function review(){
@@ -663,7 +793,7 @@ $(document).on('click', '#likeButton', function (event) {
                             $(likeID).text('');
                         }
                         else{
-                            $(likeID).text(data.count_likes);
+                            $(likeID).text('('+data.count_likes+')');
                         }
                     }
 

@@ -45,6 +45,12 @@ class Actor(models.Model):
     @staticmethod
     def get_name():
         return 'actor'
+    
+    def get_simple_name(self):
+        if len(self.name) > 14:
+            return self.name.split()[0]
+        else:
+            return self.name
 
 
 class Act(models.Model):
@@ -146,6 +152,8 @@ class MovieTags(models.Model):
 
     def __str__(self):
         return str(self.movie) + '|' + str(self.tags)
+    def count_tag(self):
+        return MovieTags.objects.filter(movie=self.movie, tags=self.tags).count()
 
 
 class User_Search(models.Model):

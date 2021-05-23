@@ -244,21 +244,15 @@ def movie_detail(request, model, id):
             comunity_tags = []
             try:
                 users_tags = MovieTags.objects.filter(movie=object, user = request.user)
-                for tag in  MovieTags.objects.filter(movie=object):
-                    if tag  not in users_tags:
-                        comunity_tags.append(tag)
-
-                
-
-
+                comunity_tags = MovieTags.objects.filter(movie=object)
             except:
                 users_tags = []
                 comunity_tags = []
-                print('ko co tag nao cao ')
     except:
         return render(request, '404.html')
 
     # print(review_form_flag)
+    print(reviews)
     return render(request, 'movie_detail.html', {'users_tags': users_tags, 'comunity_tags':comunity_tags,
     'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
