@@ -167,6 +167,7 @@ class MovieTags(models.Model):
         return MovieTags.objects.filter(movie=self.movie, tags=self.tags).count()
 
 
+
 class User_Search(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date_posted = models.DateTimeField(default=timezone.now)

@@ -250,9 +250,8 @@
                         <p><a href="http://www.imdb.com/title/{{ object.movieid }}" target="_blank">See in IMDB <span
                                 class="glyphicon glyphicon-new-window"></span></a></p>
                         <span class="click_Show"> <button class="button_trailer">
-                        <span class="glyphicon glyphicon-play-circle"></span> Trailer</button>
-                        </span>
-
+                        <span class="glyphicon glyphicon-play-circle"></span> Trailer</button></span>
+                        <br>
                         <div id="TrailerWindow" style="position: fixed;">
                             <div id="title">{{ object.title }}
                                 <button type="button" class="close" aria-label="Close">
@@ -317,13 +316,83 @@
                         </ul>
                         <br>
                         <br>
+                        <style>
+                            where-to-watch__header{text-transform:capitalize}
+                            .where-to-watch{margin-bottom:20px}
+                            @media(min-width:768px)
+                            {.where-to-watch__body{margin:25px 0 0;padding:0}}
+                            .panel-rt{border:none}
+                            .where-to-watch__body{margin:25px 0 0;padding:0}
+                            .affiliates__list{display:flex;overflow-x:scroll;padding:20px 0;clear:both}
+                            .affiliates__list::after{content:"";margin-right:6px;border:1px solid transparent}
+                            @media (min-width:768px)
+                            {#showMoreWhereToWatch{display:block}
+                            .affiliates__list{flex-wrap:nowrap;overflow:hidden;padding:5px 0}
+                            .affiliates__list.show-all{flex-wrap:wrap}}
+                            .affiliate__item{min-width:136px;margin:0 0 0 20px;border-radius:12px;box-shadow:0 2px 8px 0 rgba(42,44,50,.16);background-color:#fff;text-align:center}
+                            .affiliate__item:last-child{margin-right:20px}.affiliate__link{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:20px}
+                            .affiliate-icon{width:80px;height:40px}
+                            .affiliate__text{margin:32px 0 0;font-family:'Franklin Gothic FS Med','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.29;letter-spacing:.22px;color:#2a2c32}
+                            @media (min-width:768px)
+                            {.affiliate__item{min-width:calc(33.3% - 16px);margin:0 8px 16px}
+                            .affiliate__item:last-child{margin-right:8px}.affiliate__link{flex-direction:row;align-items:center}
+                            .affiliate__text{margin:0}}.affiliate__link--veneer{align-items:flex-start;padding:16px;height:100%}
+                            .affiliate__text--veneer{margin:20px 0 0;text-align:left}
+                            @media (min-width:768px){.affiliate__link--veneer{align-items:center}
+                            .affiliate__text--veneer{margin:0;max-width:96px;text-align:right}}
+                            .score-details-circle__icon{display:block;width:24px;height:24px}
+
+
+                            .affiliate-icon{width:80px;height:40px}
+                            .affiliate__text{margin:32px 0 0;font-family:'Franklin Gothic FS Med','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.29;letter-spacing:.22px;color:#2a2c32}
+                            @media (min-width:768px){.affiliate__item{min-width:calc(33.3% - 16px);margin:0 8px 16px}.affiliate__item:last-child{margin-right:8px}.affiliate__link{flex-direction:row;align-items:center}
+                            .affiliate__text{margin:0}}.affiliate__link--veneer{align-items:flex-start;padding:16px;height:100%}
+                            .affiliate__text--veneer{margin:20px 0 0;text-align:left}
+                            @media (min-width:768px){.affiliate__link--veneer{align-items:center}
+                            .affiliate__text--veneer{margin:0;max-width:96px;text-align:right}}
+                        </style>
+                        <section id="where-to-watch" class="where-to-watch panel-rt panel-box" data-qa="section:where-to-watch">
+                            <h4>Where to watch: </h4>
+                                <div class="where-to-watch__body">
+                                    <ul class="affiliates__list js-affiliates-list">
+        
+                                        <li class="affiliate__item" data-qa="affiliate-item" style ="list-style:none;">
+                                            <a class="affiliate__link affiliate__link--veneer js-affiliate-link" data-affiliate="fandango-now" target="blank" href="https://www.primevideo.com/" data-qa="affiliate-item-lnk">
+                                            <img style="width:80px;height:40px" src="https://www.rottentomatoes.com/assets/pizza-pie/images/affiliates/amazon_prime_video.aea370299cd.svg" name="fandango-now" alignicon="left center" role="image" style="--align-icon-x:left; --align-icon-y:center;">
+                                            <p class="affiliate__text affiliate__text--veneer no-price"><b>Rent/buy</b></p>
+                                            </a>
+                                        </li>
+        
+                                        <li class="affiliate__item" data-qa="affiliate-item" style ="list-style:none;">
+                                            <a class="affiliate__link affiliate__link--veneer js-affiliate-link" data-affiliate="vudu" target="blank" href="https://www.netflix.com/vn/" data-qa="affiliate-item-lnk">
+                                            <img style="width:80px;height:40px" src="https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/227_Netflix_logo-512.png" name="fandango-now" alignicon="left center" role="image" style="--align-icon-x:left; --align-icon-y:center;">
+                                            <p class="affiliate__text affiliate__text--veneer show-price hide">Rent/buy from $2.99</p>
+                                            <p class="affiliate__text affiliate__text--veneer no-price"> <b>Rent/buy</b></p>
+                                            </a>
+                                        </li>
+        
+                                        <li class="affiliate__item" data-qa="affiliate-item" style ="list-style:none;">
+                                            <a class="affiliate__link affiliate__link--veneer js-affiliate-link" data-affiliate="amazon-prime-video-us" target="blank" href="" data-qa="affiliate-item-lnk">
+                                            <img style="width:80px;height:40px" src="https://www.rottentomatoes.com/assets/pizza-pie/images/affiliates/apple_tv.da7a28db8f5.svg" name="fandango-now" alignicon="left center" role="image" style="--align-icon-x:left; --align-icon-y:center;">
+                                            <p class="affiliate__text affiliate__text--veneer show-price hide">Rent/buy from $2.99</p>
+                                            <p class="affiliate__text affiliate__text--veneer no-price"> <b>Rent/buy</b></p>
+                                            </a>
+                                        </li>
+        
+                                    </ul>
+                                </div>
+                        </section>
+                       
+                        
                         <!-- end  detail actor here -->
                         <!-- add tag movie here -->
+                        <h4>Your Tag: </h4>
                         <div class="form-group has-success has-feedback">
-                            <label class="control-label" style="color: black" >Your Tags :</label>
+                            <hr>
+                            <label class="control-label" style="color: black" ></label>
                             <div class="input-group" style ="width:30% " >
                                 <label for="inputGroupSuccess1"></label>
-                                <input id= "nameTag" type="text" class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">
+                                <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for {{object.title}}.." aria-describedby="inputGroupSuccess1Status">
                                 <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
                             </div>
                         </div>
@@ -363,7 +432,7 @@
                                         $('#nameTag').val('');
                                         $('.user_tag_here').prepend(
                                             '<li style ="width:30% "><div class="input-group" >' +
-                                    '<span  style="cursor: pointer" class="input-group-addon">x' +data.count + '</span>'+
+                                    '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' +data.count + '</span>'+
                                     '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
                                     '<span  style="cursor: pointer" class="input-group-addon">...</span>'+
                                     '</div></li>'
@@ -376,12 +445,12 @@
                         <!-- end tag by user function -->
 
 
-                        <p><b>Tags Comunity : </b></p>
+                        <h4>Tags Comunity : </h4>
                         <div id="list_actor_carousel" style="padding-left: 0px;">
-                            {% for tag in comunity_tags %}
+                            {% for tagname,count in dict_tag.items %}
                                 <li style ="width:30%; height : 70% "><div class="input-group" >
-                                    <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{tag.count_tag}}</span>
-                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tag.tags}}</button>
+                                    <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
+                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagname}}</button>
                                     <span style="cursor: pointer" class="input-group-addon">+</span>
                                     
                                 </div></li>

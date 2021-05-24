@@ -2,10 +2,9 @@
 
 {% block mainbody %}
     <div id="container">
-        {{ object }}
         {% if object %}
             <div id=detail-infro>
-                <h1>{{ object.name }}kkk</h1>
+                <h1>{{ object.name }}</h1>
                 <p><a href="http://www.imdb.com/name/{{ object.actorid }}" target="_self">See in IMDB</a></p>
             </div>
             <div id="main-pic">

@@ -12,7 +12,6 @@ from django.contrib.auth.decorators import login_required
 
 from user.models import Activity, Notification
 
-
 #add average for rate 
 from django.db.models import Avg
 
@@ -199,7 +198,7 @@ def get_data_rate(request):
             try:
                 # send data rating to client 
                 movie = Movie.objects.get(movieid=movieid)
-                count_all = User_Rate.objects.filter(movie=movie).count()
+                count_all = User_Rate.objects.filter(movie=movie, rate__gte = 1).count()
                 print(count_all)
                 count_rate_5 = User_Rate.objects.filter(movie=movie, rate =5).count()
                 count_rate_5_percent = int(count_rate_5/count_all*100)
@@ -232,7 +231,7 @@ def get_data_rate(request):
                 # rate_averange = round(sum_rate/count, 2)
 
                 # data['type'] = 'oke'
-                avg =  User_Rate.objects.filter(movie=movie).aggregate(Avg('rate'))
+                avg =  User_Rate.objects.filter(movie=movie, rate__gte=1).aggregate(Avg('rate'))
                 data['rate_all_for_movie'] = round(avg['rate__avg'], 2)
 
                 return JsonResponse(data)
@@ -299,17 +298,25 @@ def movie_detail(request, model, id):
             # get tags from movie
             users_tags = []
             comunity_tags = []
+            dict_tag = {}
             try:
                 users_tags = MovieTags.objects.filter(movie=object, user = request.user)
                 comunity_tags = MovieTags.objects.filter(movie=object)
+                for tag in comunity_tags:
+                    if tag.tags in dict_tag.keys():
+                        dict_tag[tag.tags] += 1
+                    else:
+                        dict_tag[tag.tags] = 1
+
             except:
                 users_tags = []
+                dict_tag = {}
                 comunity_tags = []
     except:
         return render(request, '404.html')
 
     # print(review_form_flag)
-    return render(request, 'movie_detail.html', {'users_tags': users_tags, 'comunity_tags':comunity_tags,
+    return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
     'items': items, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 @csrf_exempt
@@ -445,12 +452,27 @@ def seen(request, movie_id):
             d.delete()
         except:
             return render(request, '404.html')
+    movie_dict = search_index.data_in_memory['movie_dict']
     records = Seen.objects.filter(username=request.user.get_username())
     movies = []
+    popular_movies = Popularity.objects.all().order_by('-weight')
+    popular = []
+    for movie in popular_movies[:11]:
+        try:
+            popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
+        except:
+            continue
+    data = {}
+    data['popular'] = popular
+    data['top_movie'] = top_movie(request)
+    data['action_movie'] = action_movie(request)
+    data['comedy_movie'] = comedy_movie(request)
     for record in records:
         movie_id = str(record).split('|')[1]
         movies.append(Movie.objects.get(movieid=movie_id))
-    return render(request, 'seen.html', {'items': movies, 'number': len(movies)})
+    data['items'] = movies
+    data['number'] = len(movies)
+    return render(request, 'seen.html', data)
 
 @login_required
 def expect(request, movie_id):
@@ -465,7 +487,23 @@ def expect(request, movie_id):
     for record in records:
         movie_id = str(record).split('|')[1]
         movies.append(Movie.objects.get(movieid=movie_id))
-    return render(request, 'expect.html', {'items': movies, 'number': len(movies)})
+    ## add new infomation
+    movie_dict = search_index.data_in_memory['movie_dict']
+    popular_movies = Popularity.objects.all().order_by('-weight')
+    popular = []
+    for movie in popular_movies[:11]:
+        try:
+            popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
+        except:
+            continue
+    data = {}
+    data['popular'] = popular
+    data['top_movie'] = top_movie(request)
+    data['action_movie'] = action_movie(request)
+    data['comedy_movie'] = comedy_movie(request)
+    data['items'] = movies
+    data['number'] = len(movies)
+    return render(request, 'expect.html', data)
 
 
 @csrf_exempt
