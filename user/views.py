@@ -126,7 +126,7 @@ def user_register(request):
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(mail_subject, message, to=[to_email])
             email.send()
-            return HttpResponse('Please confirm your email address to complete the registration')
+            return render(request, template_name="confirm_email.html")
     else:
         form = UserCreateForm()
     return render(request, template_name="register.html", context={"register_form": form})
@@ -146,10 +146,11 @@ def activate(request, uidb64):
         user.save()
         # print(user.is_active)
         # print(user)
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account. \
-        Login <a href = "http://localhost:8000/"> Here </a> ')
+        return render(request,template_name="active_sucess.html" )
+        
     else:
-        return HttpResponse('Activation link is invalid!')
+        return render(request,template_name="active_sucess.html")
+
 
 #complete Facebook
 def facebook(request):
