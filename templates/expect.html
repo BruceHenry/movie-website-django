@@ -2,7 +2,7 @@
 
 {% block mainbody %}
         <div style=" margin-left: 1%;">
-            <h4 class="title_text"><a href="#">Expect list </a></h4>
+            <h4 class="title_text"><a href="#">My Expect list </a></h4>
             {% for movie in items %}
                 <a href="/movie/movie_detail/{{ movie.movieid }}">
                     <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
