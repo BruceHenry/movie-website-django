@@ -1,10 +1,20 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.contrib.auth.models import User
 from .models import Profile, PostToUser, CommentToPost
 from django.db import models
 
 #create your form here !
+
+class SetPasswordForm(SetPasswordForm):
+	def __init__(self, user, *args, **kwargs):
+		super(SetPasswordForm, self).__init__(*args, **kwargs)
+		for fieldname in ['new_password1', 'new_password2']:
+			self.fields[fieldname].help_text = None
+
+
+
+
 class UserCreateForm(UserCreationForm):
 	email = forms.EmailField(required=True)
 	

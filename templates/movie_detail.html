@@ -660,7 +660,7 @@
                                         {% for review in reviews %}
                                             <div class="col-md-3">
                                                 <img src="{{review.user.profile.profile_picture.url}}" width ="60px" height ="60px" class="img-rounded">
-                                                <div class="review-block-name"><a href="#">{{review.user.username}}</a></div>
+                                                <div class="review-block-name"><a href="{{review.user.profile.get_absolute_url}}">{{review.user.username}}</a></div>
                                                 <div class="review-block-date">{{review.get_date}}</div>
                                             </div>
                                             <div class="col-md-9">

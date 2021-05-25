@@ -33,6 +33,8 @@ from django.views.decorators.csrf import csrf_exempt
 # UserModel = get_user_model()
 
 # Create your views here.
+
+
 @csrf_protect
 def user_login(request):
     if request.method == 'POST':
