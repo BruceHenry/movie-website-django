@@ -53,6 +53,11 @@
                         <div class="timeline-header">
                             <div class="timeline-header-title bg-success">Now</div>
                         </div>
+
+                        
+                        <div id="first" class="timeline-entry">
+                        </div>
+                        
                         {% for activity in activitys %}
 
                             {% if activity.type == 1 %}
@@ -107,6 +112,7 @@
 
                         {% endfor %}
                         
+                        
             
                         <!-- Timeline header -->
                         <div class="timeline-header">
@@ -136,7 +142,7 @@
                     }).done(function (data) {
                         console.log(data);
                         if(data.mess=='oke'){
-                            $('.timeline').prepend(
+                            $('#first').prepend(
                                 '<div class="timeline-stat">'+
                                 '<div class="timeline-icon"><img src="{{request.user.profile.profile_picture.url}}" alt="Profile picture">'+
                                 '</div>'+
