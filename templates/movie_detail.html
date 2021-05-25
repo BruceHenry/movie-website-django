@@ -867,40 +867,62 @@ function get_breaking_rate(){
                 },
                 
             }).done(function (data){
-                console.log(data);
-                $('#count_5_star').text(data.count_rate_5);
-                var count_rate_5_percent = data.count_rate_5_percent;
-                var count_rate_5_percent_width = count_rate_5_percent + '%';
-                console.log(count_rate_5_percent_width); 
-                $('#count_rate_sum_5').css("width", count_rate_5_percent_width);
+                console.log(data.mess);
+                if(data.mess=='oke'){
+                    $('#count_5_star').text(data.count_rate_5);
+                    var count_rate_5_percent = data.count_rate_5_percent;
+                    var count_rate_5_percent_width = count_rate_5_percent + '%';
+                    console.log(count_rate_5_percent_width); 
+                    $('#count_rate_sum_5').css("width", count_rate_5_percent_width);
 
-                $('#count_4_star').text(data.count_rate_4);
-                var count_rate_4_percent = data.count_rate_4_percent;
-                var count_rate_4_percent_width = count_rate_4_percent + '%';
-                console.log(count_rate_4_percent_width); 
-                $('#count_rate_sum_4').css("width", count_rate_4_percent_width);
+                    $('#count_4_star').text(data.count_rate_4);
+                    var count_rate_4_percent = data.count_rate_4_percent;
+                    var count_rate_4_percent_width = count_rate_4_percent + '%';
+                    console.log(count_rate_4_percent_width); 
+                    $('#count_rate_sum_4').css("width", count_rate_4_percent_width);
 
-                $('#count_3_star').text(data.count_rate_3);
-                var count_rate_3_percent = data.count_rate_3_percent;
-                var count_rate_3_percent_width = count_rate_3_percent + '%';
-                console.log(count_rate_3_percent_width); 
-                $('#count_rate_sum_3').css("width", count_rate_3_percent_width);
+                    $('#count_3_star').text(data.count_rate_3);
+                    var count_rate_3_percent = data.count_rate_3_percent;
+                    var count_rate_3_percent_width = count_rate_3_percent + '%';
+                    console.log(count_rate_3_percent_width); 
+                    $('#count_rate_sum_3').css("width", count_rate_3_percent_width);
 
-                $('#count_2_star').text(data.count_rate_2);
-                var count_rate_2_percent = data.count_rate_2_percent;
-                var count_rate_2_percent_width = count_rate_2_percent + '%';
-                console.log(count_rate_2_percent_width); 
+                    $('#count_2_star').text(data.count_rate_2);
+                    var count_rate_2_percent = data.count_rate_2_percent;
+                    var count_rate_2_percent_width = count_rate_2_percent + '%';
+                    console.log(count_rate_2_percent_width); 
 
-                $('#count_rate_sum_2').css("width", count_rate_2_percent_width);
+                    $('#count_rate_sum_2').css("width", count_rate_2_percent_width);
 
-                $('#count_1_star').text(data.count_rate_1);
-                var count_rate_1_percent = data.count_rate_1_percent;
-                var count_rate_1_percent_width = count_rate_1_percent + '%';
-                console.log(count_rate_1_percent_width); 
+                    $('#count_1_star').text(data.count_rate_1);
+                    var count_rate_1_percent = data.count_rate_1_percent;
+                    var count_rate_1_percent_width = count_rate_1_percent + '%';
+                    console.log(count_rate_1_percent_width); 
 
-                $('#count_rate_sum_1').css("width", count_rate_1_percent_width);
+                    $('#count_rate_sum_1').css("width", count_rate_1_percent_width);
 
-                $('#rate_all_for_movie').text(data.rate_all_for_movie +'/5');
+                    $('#rate_all_for_movie').text(data.rate_all_for_movie +'/5');
+
+                }
+                else{
+                    console.log('heelo world');
+                    $('#count_1_star').text(0);
+                    $('#count_2_star').text(0);
+                    $('#count_3_star').text(0);
+                    $('#count_4_star').text(0);
+                    $('#count_5_star').text(0);
+
+                    $('#count_rate_sum_5').css("width", "0%");
+                    $('#count_rate_sum_4').css("width", "0%");
+                    $('#count_rate_sum_3').css("width", "0%");
+                    $('#count_rate_sum_2').css("width", "0%");
+                    $('#count_rate_sum_1').css("width", "0%");
+                    $('#rate_all_for_movie').text('0/0');
+
+                }
+                
+
+               
 
 
             });

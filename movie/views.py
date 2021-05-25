@@ -231,6 +231,7 @@ def get_data_rate(request):
                 # rate_averange = round(sum_rate/count, 2)
 
                 # data['type'] = 'oke'
+                data['mess'] = 'oke'
                 avg =  User_Rate.objects.filter(movie=movie, rate__gte=1).aggregate(Avg('rate'))
                 data['rate_all_for_movie'] = round(avg['rate__avg'], 2)
 

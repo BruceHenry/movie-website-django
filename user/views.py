@@ -256,6 +256,9 @@ def comunity(request):
     for acti in Activity.objects.order_by('-date_posted'):
         if check_follow(request.user, acti.user):
             activitys.append(acti)
+    # add activity by request.user
+    for acti in Activity.objects.filter(user= request.user):
+        activitys.append(acti)
 
     # add notification to show user...
     data = {}
@@ -491,6 +494,26 @@ def get_data_chart1(request):
             return JsonResponse({'data': register_list, 'mess': 'sucess', 'label':'Total Posts'})
         
     return JsonResponse({'mess':'error'})
+
+@csrf_exempt
+def post_now(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            content = request.POST.get('content')
+            user = request.user
+            PostToUser.objects.create(author = user, to_user = user, content = content)
+
+            data = {}
+            data['content']  = content
+            data['date_posted'] = 'just now'
+            data['mess'] = 'oke'
+
+            return JsonResponse(data)
+    return JsonResponse({'mess':'error'})
+    
+
+
+
 
 
 @csrf_exempt
