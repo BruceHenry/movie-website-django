@@ -317,11 +317,16 @@ def movie_detail(request, model, id):
         return render(request, '404.html')
 
     # print(review_form_flag)
-    notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
-    count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
-    # return
+
+    if request.user.is_authenticated :
+        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+        count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
+        return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
+        'items': items,'notifications' : notifications, 'count_noti':count_noti, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+
+
     return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
-    'items': items,'notifications' : notifications, 'count_noti':count_noti, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+    'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 @csrf_exempt
 def actor_detail(request, model, id):

@@ -267,6 +267,16 @@ def comunity(request):
     data['activitys'] = activitys
     data['notifications'] = notifications
     data['count_noti'] = count_noti
+    # recommend friend here 
+    recommend = []
+    for u1 in User.objects.all():
+        if check_follow(request.user, u1) is False:
+            recommend.append(u1)
+            
+    data['recommend'] = recommend[:5]
+
+    
+    
     return render(request, 'comunity.html',  data)
 
 # get profile by id ...

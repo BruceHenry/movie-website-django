@@ -122,68 +122,70 @@
                             <input type="radio" name="rating" value="1" id="1">
                             <label for="1">☆</label>
                             <!-- rating function js --->
-                            <script>
-                                var rated = {{ object.rate }} ;
-                                var movieid = '{{object.movieid}}';
-                                console.log(movieid);
-                                var username = '{{ user.username }}';
-                                console.log(username);
-                                user_rate_movie = {{ rate_score }};
-                                if(user_rate_movie==0){
-                                    var stars = Math.floor(rated/2);
-                                    input_value = '#' + stars.toString();
-                                    console.log(input_value);
-                                    $(input_value).attr('checked', 'checked');
-                                }
-                                else{
-                                    input_value = '#' + user_rate_movie.toString();
-                                    console.log(input_value);
-                                    $(input_value).attr('checked', 'checked');
-                                }
-
-                                $("input[name='rating']").click(function() {
-                                    var radioValue = $("input[name='rating']:checked").val();
-                                    console.log(radioValue);
-                                    if (radioValue) {
-                                        console.log('send mess !');
-                                        $.ajax({
-                                        url : "{% url 'rate-movie' %}",
-                                        type: 'POST',
-                                        datatype: 'json',
-                                        processData: "application/json",
-                                        data: {
-                                        movieid: movieid,
-                                        type: 'rate',
-                                        username : username,
-                                        rate_score : radioValue,
-                                            },
-                                            //beforeSend:function (xhr,settings) {
-                                            //console.log("{{ csrf_token }}");
-                                            //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
-                                            //},
-                                            }).done(function (data) {
-                                            if (data.type == 'error') {
-                                                alert('erorr !');
-                                                Swal.fire('Any fool can use a computer')
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Oops...',
-                                                    text: 'Something went wrong!',
-                                                    footer: '<a href>Why do I have this issue?</a>'
-                                                })
-                                            } else {
-                                                Swal.fire(
-                                                    'Good job!',
-                                                    'You rated this movie!',
-                                                    'success'
-                                                );
-                                                console.log(data);
-                                            }
-                                        });
+                            {% if request.user.is_authenticated %}
+                                <script>
+                                    var rated = {{ object.rate }} ;
+                                    var movieid = '{{object.movieid}}';
+                                    console.log(movieid);
+                                    var username = '{{ user.username }}';
+                                    console.log(username);
+                                    user_rate_movie = {{ rate_score }};
+                                    if(user_rate_movie==0){
+                                        var stars = Math.floor(rated/2);
+                                        input_value = '#' + stars.toString();
+                                        console.log(input_value);
+                                        $(input_value).attr('checked', 'checked');
                                     }
-                                });
+                                    else{
+                                        input_value = '#' + user_rate_movie.toString();
+                                        console.log(input_value);
+                                        $(input_value).attr('checked', 'checked');
+                                    }
 
-                            </script>
+                                    $("input[name='rating']").click(function() {
+                                        var radioValue = $("input[name='rating']:checked").val();
+                                        console.log(radioValue);
+                                        if (radioValue) {
+                                            console.log('send mess !');
+                                            $.ajax({
+                                            url : "{% url 'rate-movie' %}",
+                                            type: 'POST',
+                                            datatype: 'json',
+                                            processData: "application/json",
+                                            data: {
+                                            movieid: movieid,
+                                            type: 'rate',
+                                            username : username,
+                                            rate_score : radioValue,
+                                                },
+                                                //beforeSend:function (xhr,settings) {
+                                                //console.log("{{ csrf_token }}");
+                                                //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                                                //},
+                                                }).done(function (data) {
+                                                if (data.type == 'error') {
+                                                    alert('erorr !');
+                                                    Swal.fire('Any fool can use a computer')
+                                                    Swal.fire({
+                                                        icon: 'error',
+                                                        title: 'Oops...',
+                                                        text: 'Something went wrong!',
+                                                        footer: '<a href>Why do I have this issue?</a>'
+                                                    })
+                                                } else {
+                                                    Swal.fire(
+                                                        'Good job!',
+                                                        'You rated this movie!',
+                                                        'success'
+                                                    );
+                                                    console.log(data);
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                </script>
+                            {% endif %}
                         </div>
                         <!-- add seen , andd expect --->
                         {% if  user.is_authenticated %}
@@ -386,17 +388,18 @@
                         
                         <!-- end  detail actor here -->
                         <!-- add tag movie here -->
-                        <h4>Your Tag: </h4>
-                        <div class="form-group has-success has-feedback">
-                            <hr>
-                            <label class="control-label" style="color: black" ></label>
-                            <div class="input-group" style ="width:30% " >
-                                <label for="inputGroupSuccess1"></label>
-                                <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for {{object.title}}.." aria-describedby="inputGroupSuccess1Status">
-                                <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
+                        {% if request.user.is_authenticated %}
+                            <h4>Your Tag: </h4>
+                            <div class="form-group has-success has-feedback">
+                                <hr>
+                                <label class="control-label" style="color: black" ></label>
+                                <div class="input-group" style ="width:30% " >
+                                    <label for="inputGroupSuccess1"></label>
+                                    <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for {{object.title}}.." aria-describedby="inputGroupSuccess1Status">
+                                    <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
+                                </div>
                             </div>
-                        </div>
-                        <!-- function add tag here -->
+                            <!-- function add tag here -->
                             <div class="user_tag_here" id="list_actor_carousel" style="padding-left: 0px;">
                             {% for user_tag in users_tags %}
                                 <li style ="width:30% "><div class="input-group" >
@@ -406,57 +409,58 @@
                                 </div></li>
                             {% endfor %}
                             </div>
-                        <!-- function add tag by user here -->
-                        <script>
-                            function addTag(){
-                                var movieid = '{{object.movieid}}';
-                                var username = '{{ user.username }}';
-                                var nameTag = $('#nameTag').val();
-                                console.log(nameTag);
-                                //send ajax
-                                $.ajax({
-                                    url : "{% url 'add-tag' %}",
-                                    type: 'POST',
-                                    datatype: 'json',
-                                    processData: "application/json",
-                                    data: {
-                                    movieid: movieid,
-                                    type: 'add-tag',
-                                    username : username,
-                                    tag : nameTag
+                            <!-- function add tag by user here -->
+                            <script>
+                                function addTag(){
+                                    var movieid = '{{object.movieid}}';
+                                    var username = '{{ user.username }}';
+                                    var nameTag = $('#nameTag').val();
+                                    console.log(nameTag);
+                                    //send ajax
+                                    $.ajax({
+                                        url : "{% url 'add-tag' %}",
+                                        type: 'POST',
+                                        datatype: 'json',
+                                        processData: "application/json",
+                                        data: {
+                                        movieid: movieid,
+                                        type: 'add-tag',
+                                        username : username,
+                                        tag : nameTag
+                                            }
+                                            }).done(function (data) {
+                                        if (data.mess == 'error') {
+                                            Swal.fire('You have tagged this movie already')
+                                        } else {
+                                            $('#nameTag').val('');
+                                            $('.user_tag_here').prepend(
+                                                '<li style ="width:30% "><div class="input-group" >' +
+                                        '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' +data.count + '</span>'+
+                                        '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
+                                        '<span  style="cursor: pointer" class="input-group-addon">...</span>'+
+                                        '</div></li>'
+                                            )
                                         }
-                                        }).done(function (data) {
-                                    if (data.mess == 'error') {
-                                        Swal.fire('You have tagged this movie already')
-                                    } else {
-                                        $('#nameTag').val('');
-                                        $('.user_tag_here').prepend(
-                                            '<li style ="width:30% "><div class="input-group" >' +
-                                    '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' +data.count + '</span>'+
-                                    '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
-                                    '<span  style="cursor: pointer" class="input-group-addon">...</span>'+
-                                    '</div></li>'
-                                        )
-                                    }
-                                })
-                            };
+                                    })
+                                };
 
-                        </script>
-                        <!-- end tag by user function -->
+                            </script>
+                            <!-- end tag by user function -->
 
 
-                        <h4>Tags Comunity : </h4>
-                        <div id="list_actor_carousel" style="padding-left: 0px;">
-                            {% for tagname,count in dict_tag.items %}
-                                <li style ="width:30%; height : 70% "><div class="input-group" >
-                                    <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
-                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagname}}</button>
-                                    <span style="cursor: pointer" class="input-group-addon">+</span>
-                                    
-                                </div></li>
-                            {% endfor %}
-                        </div>
-                        <br>
+                            <h4>Tags Comunity : </h4>
+                            <div id="list_actor_carousel" style="padding-left: 0px;">
+                                {% for tagname,count in dict_tag.items %}
+                                    <li style ="width:30%; height : 70% "><div class="input-group" >
+                                        <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
+                                        <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagname}}</button>
+                                        <span style="cursor: pointer" class="input-group-addon">+</span>
+                                        
+                                    </div></li>
+                                {% endfor %}
+                            </div>
+                            <br>
+                        {% endif %}
 
 
                         <h4>Review for {{object.title}}</h4>
@@ -660,7 +664,11 @@
                                         {% for review in reviews %}
                                             <div class="col-md-3">
                                                 <img src="{{review.user.profile.profile_picture.url}}" width ="60px" height ="60px" class="img-rounded">
-                                                <div class="review-block-name"><a href="{{review.user.profile.get_absolute_url}}">{{review.user.username}}</a></div>
+                                                {% if request.user.is_authenticated %}
+                                                    <div class="review-block-name"><a href="{{review.user.profile.get_absolute_url}}">{{review.user.username}}</a></div>
+                                                {% else %}
+                                                    <div class="review-block-name"><a>{{review.user.username}}</a></div>
+                                                {% endif %}
                                                 <div class="review-block-date">{{review.get_date}}</div>
                                             </div>
                                             <div class="col-md-9">
@@ -752,46 +760,48 @@
 
                                                     <div class="review-block-description">{{review.review}}
                                                 </div>
-                                                <div class="media-feed-control">
-                                                    <a href="" id="likeButton" style="color:black">
-                                                        <input type="hidden" name="likePostID" value="{{ review.id }}">
-                                                        {% if  review.total_likes > 0 %}
-                                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"> ({{review.total_likes}}) </span>
-                                                        {% else %}
-                                                            <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
-                                                        {% endif %}
-                                                    </a>
-                                                    <a onclick="show_block_reply({{review.id}})"  style="color:black" href="#">
-                                                        {% if review.total_reply > 0  %}
-                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}" >({{review.total_reply}}) </span>
-                                                        {% else %}
-                                                            <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
-                                                        {% endif %}
-                                                    </a>
-                                                </div>
-                                                <div hidden class="media-body-reply-block" id="block-reply-{{review.id}}" >
-                                                    <div class="media mt-4" id="list_reply_review">
-                                                        {% for reply in review.get_all_reply %}
-                                                            <div class="media-body" style="padding-left: 10px ; border: 5px">
-                                                                <div class="media-title mt-0 mb-1">
-                                                                    <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> just now</small>
-                                                                </div>
-                                                                <div class ="reply-content" >
-                                                                    {{reply.content}}
-                                                                </div>
-                                                            </div>
-                                                        {% endfor %}
+                                                {% if request.user.is_authenticated %}
+                                                    <div class="media-feed-control">
+                                                        <a href="" id="likeButton" style="color:black">
+                                                            <input type="hidden" name="likePostID" value="{{ review.id }}">
+                                                            {% if  review.total_likes > 0 %}
+                                                                    <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"> ({{review.total_likes}}) </span>
+                                                            {% else %}
+                                                                <i class="batch-icon batch-icon-heart-full" ></i> Like <span id="count-likes{{ review.id }}"></span>
+                                                            {% endif %}
+                                                        </a>
+                                                        <a onclick="show_block_reply({{review.id}})"  style="color:black" href="#">
+                                                            {% if review.total_reply > 0  %}
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}" >({{review.total_reply}}) </span>
+                                                            {% else %}
+                                                                <i class="batch-icon batch-icon-speech-bubble-left-tip"></i> Comment <span id="count-comments{{ review.id }}"> </span>
+                                                            {% endif %}
+                                                        </a>
                                                     </div>
+                                                    <div hidden class="media-body-reply-block" id="block-reply-{{review.id}}" >
+                                                        <div class="media mt-4" id="list_reply_review{{review.id}}">
+                                                            {% for reply in review.get_all_reply %}
+                                                                <div class="media-body" style="padding-left: 10px ; border: 5px">
+                                                                    <div class="media-title mt-0 mb-1">
+                                                                        <a href="{{ reply.user.profile.get_absolute_url }}">{{ reply.user.username }}</a> <small> just now</small>
+                                                                    </div>
+                                                                    <div class ="reply-content" >
+                                                                        {{reply.content}}
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                        
                                                     
-                                                   
-                                                    <div class="comment-reply-block mt-4">
-                                                        <form method="POST" class="form-reply" enctype="multipart/form-data">
-                                                            <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
-                                                            <input style="height: 50%"  class="form-control comment-reply-textarea" name="reply-content" rows="2" placeholder="reply review here..."> </input>
-                                                            <button style="float: right;"  type="submit" class="rrSend"> Reply </button>
-                                                        </form>
+                                                        <div class="comment-reply-block mt-4">
+                                                            <form method="POST" class="form-reply" enctype="multipart/form-data">
+                                                                <input type="hidden" class="replyID" name="postID" value="{{ review.id }}">
+                                                                <input style="height: 50%"  class="form-control comment-reply-textarea" name="reply-content" rows="2" placeholder="reply review here..."> </input>
+                                                                <button style="float: right;"  type="submit" class="rrSend"> Reply </button>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                {% endif %}
                                             </div>
                                             <div>
                                             </div>
@@ -853,6 +863,8 @@
 
     
 <script>
+
+
 
 function get_breaking_rate(){
     var movieid = '{{object.movieid}}';
@@ -968,7 +980,8 @@ $(document).on('submit', '.form-reply', function (event){
             }).done(function (data){
                 $content.val('');
                 console.log(data);
-                $('#list_reply_review').prepend(
+                var id = '#list_reply_review' + data.review_id;
+                $(id).prepend(
 
                     '<div class="media-body" style="padding-left: 10px" >'+
                     '<div class="media-title mt-0 mb-1">' +
