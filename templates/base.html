@@ -76,12 +76,22 @@
                        placeholder="Search Movies or Actors"
                        onkeyup="start_timer()" size="55" autocomplete="off" required/>
                 <input type="submit" class="btn btn-info waves-effect waves-light m-b-5" name="search" value="Search"/>
+                {% if request.user.is_authenticated  %}
+                <div class="searchlistdiv"
+                     style="position:absolute;top:45px;left:380px;user-select:none;display:none;width: 500px;"
+                     aria-expanded="false">
+                    <div class="search-movie"><h4><b> Movie </b> </h4> </div>
+                    <div class="search-actor"><h4><b> Actor </b> </h4> </div>
+                </div>
+                {% else %}
                 <div class="searchlistdiv"
                      style="position:absolute;top:45px;left:300px;user-select:none;display:none;width: 500px;"
                      aria-expanded="false">
                     <div class="search-movie"><h4><b> Movie </b> </h4> </div>
                     <div class="search-actor"><h4><b> Actor </b> </h4> </div>
                 </div>
+                {% endif %}
+
             </form>
 
             <ul class="nav navbar-nav navbar-right">
@@ -146,10 +156,11 @@
                         </form>
                     </li>
                 {% else %}
-                    {% if message %}
+                    {% if message == 'login-error' %}
                         <li><p class="navbar-text">{{ message }}</p></li>
-                    {% endif %}
+                    {% else %}
                     <li><p class="navbar-text">Already have an account?</p></li>
+                    {% endif %}
                     <li class="dropdown" >
                         <a href="http://bootsnipp-env.elasticbeanstalk.com/iframe/DV3m4#" class="dropdown-toggle"
                            data-toggle="dropdown"><b>Login</b> <span class="caret"></span></a>
@@ -167,6 +178,7 @@
                                         <form class="form" role="form" method="post" action="/user/login/"
                                               accept-charset="UTF-8" id="login-nav">
                                             {% csrf_token %}
+                                             <p id="helptextLogin" style="color: red"  hidden>The username or password is incorrect.</p>
                                             <div class="form-group">
                                                 <label class="sr-only" for="exampleInputEmail2">User Name</label>
                                                 <input name='username' class="form-control" id="exampleInputEmail2"
@@ -179,7 +191,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <input type="hidden" name="path" value="{{ request.path }}">
-                                                <input type="submit" class="btn btn-primary btn-block" value="Sign in"/>
+                                                <input onclick="sendLogin()" type="submit" class="btn btn-primary btn-block" value="Sign in"/>
                                             </div>
                                             <div class="checkbox">
                                                 <label>
@@ -205,7 +217,29 @@
 </nav>
 <script>
 
-    
+    function sendLogin(){
+                            event.preventDefault();
+                            var username = $('#exampleInputEmail2').val();
+                            var password = $('#exampleInputPassword2').val();
+                            $.ajax({
+                                url: "{% url 'send-login' %}",
+                                type: 'POST',
+                                datatype: 'json',
+                                processData: "application/json",
+                                data: {
+                                    username: username,
+                                    password: password,
+                                },
+                            }).done(function (data){
+                                if(data.mess=='error'){
+                                    $('#helptextLogin').show();
+                                }
+                                else{
+                                    console.log('login succsessful!');
+                                    location.reload();
+                                }
+                            });
+            }
 
     function getCookie(name) {
         var cookieValue = null;

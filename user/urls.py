@@ -9,6 +9,9 @@ urlpatterns = [
     url(r'^logout/', views.user_logout, name='logout'),
     url(r'^register/', views.user_register, name='register'),
     url(r'^facebook/', views.facebook, name='facebook'),
+
+    url('sendLoginAPI/', views.send_login, name='send-login'),
+
     
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='password_reset_form.html'), name='password_reset'),
     path('password_reset/done', auth_views.PasswordResetDoneView.as_view(template_name='password_reset_done.html') ,name='password_reset_done'),

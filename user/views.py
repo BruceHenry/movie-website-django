@@ -48,9 +48,28 @@ def user_login(request):
             login(request, user)
             return redirect('/')
         else:
-            return render(request, 'base.html', {'message': 'Username or Password wrong!'})
+            return redirect('/')
     else:
         return render(request, '404.html')
+
+@csrf_exempt
+def send_login(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            print('nguyen minh dan')
+            type = request.POST.get('type')
+            password = request.POST.get('password')
+            username = request.POST.get('username')
+            print(username)
+            print(password)
+            user = authenticate(username=username, password=password)
+            print('None', user)
+            if user is not None and user.is_active:
+                login(request, user)
+                return JsonResponse({'mess':'oke'})
+            else:
+                return JsonResponse({'mess':'error'})
+
 
 @csrf_exempt
 @login_required
