@@ -32,6 +32,8 @@ from django.views.decorators.csrf import csrf_exempt
 # add random
 import operator
 import random
+from django.core.mail import send_mail
+
 # UserModel = get_user_model()
 
 # Create your views here.
@@ -149,6 +151,21 @@ def user_register(request):
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(mail_subject, message, to=[to_email])
             email.send()
+
+            # context = {
+            #     'user' : user,
+            #     'domain' : current_site.domain,
+            #     'uid':urlsafe_base64_encode(force_bytes(user.pk)),}
+
+            # html_message = render_to_string('acc_active_email.html', context = context)
+            # send_mail(
+            #     subject='Activate your  account',
+            #     html_message= html_message,
+            #     recipient_list=[to_email],
+            #     message = 'Email from Imovie Team',
+            #      html_message= html_message,
+            #     from_email=[to_email],
+            # )
             return render(request, template_name="confirm_email.html")
     else:
         form = UserCreateForm()
