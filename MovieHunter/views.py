@@ -16,7 +16,7 @@ def index(request):
     movie_dict = search_index.data_in_memory['movie_dict']
     if request.user.is_authenticated:
         data = {'username': request.user.get_username()}
-        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:10]
         data['notifications'] = notifications
         # not seen 
         count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()

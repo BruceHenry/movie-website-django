@@ -126,6 +126,11 @@ class User_Rate(models.Model):
     def get_date(self):
         return humanize.naturaltime(self.date_posted)
 
+# create activity by user_rate
+@receiver(post_save, sender=User_Rate)
+def create_activity(sender,instance, created, **kwargs ):
+    if created:
+        user.models.Activity.objects.create(user = instance.user,review=instance ,type=3)
 
 
 class ReplyToReview(models.Model):

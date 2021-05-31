@@ -29,7 +29,9 @@ import humanize
 #add os to display image
 import os
 from django.views.decorators.csrf import csrf_exempt
-
+# add random
+import operator
+import random
 # UserModel = get_user_model()
 
 # Create your views here.
@@ -122,7 +124,7 @@ def connect_social(request):
 
 
 
-@csrf_protect
+@csrf_exempt
 def user_logout(request):
     logout(request)
     return redirect('/')
@@ -272,33 +274,71 @@ def check_follow(user1, user2):
 def comunity(request):
     # show activity for user follow 
     activitys = []
-    for acti in Activity.objects.order_by('-date_posted'):
+    for acti in Activity.objects.all():
         if check_follow(request.user, acti.user):
             activitys.append(acti)
     # add activity by request.user
     for acti in Activity.objects.filter(user= request.user):
         activitys.append(acti)
-
+    activitys = sorted(activitys, key = lambda x : x.date_posted)
+    activitys.reverse()
     # add notification to show user...
     data = {}
-    notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+    notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:10]
     count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
     data['activitys'] = activitys
     data['notifications'] = notifications
     data['count_noti'] = count_noti
     # recommend friend here 
-    recommend = []
+    recommend_follow = []
+    recommend2 = []
     for u1 in User.objects.all():
         if check_follow(request.user, u1) is False:
-            recommend.append(u1)
-            
-    data['recommend'] = recommend[:5]
-
+            if check_follow(u1, request.user) is True:
+                recommend_follow.append(u1)
+    all_users = User.objects.all()
+    all_users = [all_users[i] for i in random.sample(range(len(all_users)), 8)]
+    for u3 in all_users:
+        if u3 not in recommend_follow:
+            if check_follow(request.user, u3) is False and u3.id != request.user.id:
+                recommend2.append(u3)
     
+    data['recommend_random'] = recommend2[:6]
+    data['recommend_follow'] = recommend_follow[:5]
+    # print(recommend2)
+    # print(recommend_follow)
+
     
     return render(request, 'comunity.html',  data)
 
 # get profile by id ...
+
+
+@csrf_exempt
+def follow_now(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            user2_Id =  request.POST.get('userID')
+            user1 = request.user
+            user2 = User.objects.get(id = user2_Id)
+            record = Follow.objects.filter(user1 = user1, user2 = user2)
+            if len(record) >=1:
+                record[0].delete()
+                print('unfollow')
+                return JsonResponse({'mess':'oke'})
+            else:
+                new_record = Follow(user1 = user1, user2 = user2)
+                new_record.save()
+                print('follow')
+                return JsonResponse({'mess':'oke'})
+        
+    return JsonResponse({'mess':'error'})
+        
+
+
+            
+
+
 
 @csrf_exempt
 @login_required
@@ -324,6 +364,8 @@ def detail_user(request, profile_id):
     # count followers , following 
     following = Follow.objects.filter(user1 = profile.user).count()
     followers = Follow.objects.filter(user2 = profile.user).count()
+    list_followers = Follow.objects.filter(user2 = profile.user)
+    print(list_followers)
     if request.method == 'POST':
         print('vao day 2')
 
@@ -381,7 +423,7 @@ def detail_user(request, profile_id):
                     }
 
                     return JsonResponse(data)
-    return render(request, 'user_profile.html', {'notifications':notifications,'count_noti':count_noti,'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag, 'follow_flag': follow_flag, 'followers': followers, 'following': following})
+    return render(request, 'user_profile.html', {'notifications':notifications,'list_followers':list_followers ,'count_noti':count_noti,'user':request.user, 'profile':profile, 'posts': post_comments, 'profile_flag' : profile_flag, 'follow_flag': follow_flag, 'followers': followers, 'following': following})
 
 #profile request user
 def user_detail(request, format=None):
@@ -420,9 +462,9 @@ def like_post(request):
 @login_required
 def report_post(request):
     if request.method == 'POST':
-        print('1')
         if request.is_ajax():
             postID = request.POST.get('postID')
+            print(postID)
             type = request.POST.get('type')
             if type == 'report':
                 post = get_object_or_404(PostToUser, pk=int(postID))
@@ -505,7 +547,7 @@ def get_data_chart1(request):
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 10).count())
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 11).count())
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 12).count())
-            return JsonResponse({'data': register_list, 'mess': 'sucess','label':'Total Rates'})
+            return JsonResponse({'data': register_list, 'mess': 'sucess','label':'Total Reviews'})
         if type == 'chart3':
             register_list = []
             register_list.append(PostToUser.objects.filter(date_posted__month = 1).count())     

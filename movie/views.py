@@ -319,7 +319,7 @@ def movie_detail(request, model, id):
     # print(review_form_flag)
 
     if request.user.is_authenticated :
-        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:5]
+        notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:10]
         count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
         return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
         'items': items,'notifications' : notifications, 'count_noti':count_noti, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
@@ -807,6 +807,7 @@ def get_data_chart3(request):
             labels.append(movie.title)
             data.append(get_all_rates(movie))
         total_rates = User_Rate.objects.all().count()
+        print(total_rates)
         return JsonResponse({'mess':'success', 'labels': labels, 'data': data, 'total_rates':total_rates})
     return JsonResponse({'mess':'error'})
 

@@ -46,52 +46,38 @@
                             </div>
                         </div>
                         <hr>
+                    {% if followers > 0 %}
                     <div class="mt-3">
                         <label class="tx-11 font-weight-bold mb-0 text-uppercase">Followers:</label>
                         <h5>
                         <div class="profile-page-block-outer clearfix">
+                        {% for follow in list_followers %}
                             <div class="profile-page-block">
                                 <div class="profile-picture bg-gradient bg-primary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
-                                </div>
-                            </div>
-                            <div class="profile-page-block">
-                                <div class="profile-picture bg-gradient bg-secondary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
+                                 <a href = "{{follow.user1.profile.get_absolute_url}}">
+                                    <img src="{{follow.user1.profile.profile_picture.url}}" width="44" height="44">
+                                </a>
                                 </div>
                             </div>
                             <div class="profile-page-block">
                                 <div class="profile-picture bg-gradient bg-primary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar3.png" width="44" height="44">
+                                <a href = "{{follow.user1.profile.get_absolute_url}}">
+                                    <img src="{{follow.user1.profile.profile_picture.url}}" width="44" height="44">
+                                </a>
                                 </div>
                             </div>
                             <div class="profile-page-block">
                                 <div class="profile-picture bg-gradient bg-primary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar4.png" width="44" height="44">
+                                <a href = "{{follow.user1.profile.get_absolute_url}}">
+                                    <img src="{{follow.user1.profile.profile_picture.url}}" width="44" height="44">
+                                </a>
                                 </div>
                             </div>
-                            <div class="profile-page-block">
-                                <div class="profile-picture bg-gradient bg-secondary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" width="44" height="44">
-                                </div>
-                            </div>
-                            <div class="profile-page-block">
-                                <div class="profile-picture bg-gradient bg-primary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar6.png" width="44" height="44">
-                                </div>
-                            </div>
-                            <div class="profile-page-block">
-                                <div class="profile-picture bg-gradient bg-secondary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
-                                </div>
-                            </div>
-                            <div class="profile-page-block">
-                                <div class="profile-picture bg-gradient bg-primary">
-                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
-                                </div>
-                            </div>
+                        {% endfor %}
+                        
                         </div>
                     </div>
+                    {% endif %}
                     {% if profile.bio is not None %}
                     <div class="mt-3">
                         <label class="tx-11 font-weight-bold mb-0 text-uppercase">About:</label>
@@ -323,11 +309,11 @@
                                         '<i class="batch-icon batch-icon-speech-bubble-left-tip"></i>' + 'Comment' + '<span id="count-comments' + data.post_id + '">'+ ' '+ '</span>' +
                                     '</a>' +
                                     '<a href="" id="reportButton">' +
-                                                '<input type="hidden" name="reportPostID" value="{{'+ data.post_id + '}}">' +
+                                                '<input type="hidden" name="reportPostID" value="'+ data.post_id + '">' +
                                                 '{% if request.user in post.reports.all %}' +
-                                                    '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports{{' + data.post_id +'}}"> Report </span>' +
+                                                    '<i class="batch-icon batch-icon-flag"></i><span style="color: red" id="reports' + data.post_id +'"> Report </span>' +
                                                 '{% else %}'+
-                                                    '<i class="batch-icon batch-icon-flag"></i><span id="reports{{'+ data.post_id + '}}"> Report </span>' +
+                                                    '<i class="batch-icon batch-icon-flag"></i><span id="reports'+ data.post_id + '"> Report </span>' +
                                                 '{% endif %}'+
 
                                     '</a>'+

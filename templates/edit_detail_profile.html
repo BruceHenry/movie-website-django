@@ -235,23 +235,6 @@ html:not(.dark-style) .account-settings-links .list-group-item.active {
                   {% endif %}
                 </div>
                 <div class="form-group">
-                  <label class="form-label">Google+</label>
-                  {% if request.user.profile.google_link is not None %}
-                    <input id="google" type="text" class="form-control" value="{{request.user.profile.google_link}}">
-                  {% else %}
-                    <input id="google" type="text" class="form-control" value="">
-                  {% endif %}
-                </div>
-                <div class="form-group">
-                  <label class="form-label">LinkedIn</label>
-                  {% if request.user.profile.linkedln_link is not None %}
-                    <input id="linked" type="text" class="form-control" value="{{request.user.profile.linkedln_link}}">
-                  {% else %}
-                    <input id="linked" type="text" class="form-control" value="">
-                  {% endif %}
-
-                </div>
-                <div class="form-group">
                   <label class="form-label">Instagram</label>
                   {% if request.user.profile.instagram is not None %}
                     <input id="instagram" type="text" class="form-control" value="{{request.user.profile.instagram}}">

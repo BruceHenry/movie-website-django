@@ -99,13 +99,23 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link text-light" href="#" id="navbarDropdown" onclick = "seen_noti()" role="button" data-toggle="dropdown">
                             {% if count_noti > 0 %}
-                                <i class="fa fa-bell" id="icon_noti" style="font-size:20px; color:red"> <span id='count_noti' class="badge">{{count_noti}}</span></i>
+                                <i class="fa fa-bell" id="icon_noti" style="font-size:20px"> <span id='count_noti' class="badge">{{count_noti}}</span></i>
                             {% else %}
                                 <i class="fa fa-bell" id="icon_noti" style="font-size:20px"> <span id='count_noti' class="badge"></span></i>
                             {% endif %}
 
 
                         </a>
+                        <style>
+                            .badge {
+                                position: relative;
+                                top: -10px;
+                                left: -13px;
+                                border: 1px solid black;
+                                border-radius: 50%;
+                            }
+
+                        </style>
                         <ul class="dropdown-menu notibox">
                             <div class = "notibox">
                                 <li class="head">
@@ -463,24 +473,23 @@
 
             $('#new_noti_prepend').prepend(
                 '<li class="notification-box" >'
-                +'<div class="row">'
-                +'<div class="col-lg-3 col-sm-3 col-3 text-center">'
-                + '<img src="' + mess.sender_image + '"width =44 height =40 class="w-50 rounded-circle">'
-                +'</div>'    
-                + '<a href ="' + mess.link  + '">'
-                +'<div>'
-                +'<strong style="font-size: 14px; class="text-info">' + mess.sender + '</strong>'
-                + '<p style="font-size: 14px; color: black">'
-                +    mess.noti
-                +    '</p>'
-                + '<small style="font-size: 12px; color: black"' + mess.date + '</small>'
-                + '</div>'  
-                + '</a>'  
-                + '</div>'
+                    +'<div class="row">'
+                        +'<div class="col-lg-3 col-sm-3 col-3 text-center">'
+                            + '<img src="' + mess.sender_image + '"width =44 height =40 class="w-50 rounded-circle">'
+                        +'</div>'
+                        +'<div class="col-lg-8 col-sm-8 col-8">'    
+                            + '<a href ="' + mess.link  + '">'
+                                +'<div>'
+                                    +'<strong style="font-size: 14px; class="text-info">' + mess.sender + '</strong>'
+                                        + '<div style="font-size: 14px; color: black; text-align: left;">'+mess.noti+ '</div>'
+                                            + '<small style="font-size: 12px; color: black"' + mess.date + '</small>'
+                                            + '<small style="font-size: 12px; color: black; text-align: center;" >' + mess.date + '</small>'
+                                + '</div>'  
+                            + '</a>'  
+                        + '</div>'
+                    +'</div>'
                 +'</li>'
             );
-            
-            
         }; 
 
   
@@ -544,6 +553,7 @@
        
 
 {% endblock %}
+
 </body>
 </html>
 

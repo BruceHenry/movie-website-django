@@ -40,6 +40,9 @@ urlpatterns = [
     path('reportPost/', views.report_post, name='report-post'),
 
     path('follow/', views.follow, name='follow'),
+    path('APIfollowNow/', views.follow_now, name='follow-now'),
+
+
 
     path('seen-noti/', views.seen_noti, name='seen-noti'),
 
