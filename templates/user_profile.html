@@ -51,7 +51,7 @@
                         <label class="tx-11 font-weight-bold mb-0 text-uppercase">Followers:</label>
                         <h5>
                         <div class="profile-page-block-outer clearfix">
-                        {% for follow in list_followers %}
+                        {% comment %} {% for follow in list_followers %}
                             <div class="profile-page-block">
                                 <div class="profile-picture bg-gradient bg-primary">
                                  <a href = "{{follow.user1.profile.get_absolute_url}}">
@@ -73,8 +73,47 @@
                                 </a>
                                 </div>
                             </div>
-                        {% endfor %}
-                        
+                        {% endfor %} {% endcomment %}
+                        <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar3.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar4.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar5.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar6.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar7.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-secondary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" width="44" height="44">
+                                </div>
+                            </div>
+                            <div class="profile-page-block">
+                                <div class="profile-picture bg-gradient bg-primary">
+                                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" width="44" height="44">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% endif %}

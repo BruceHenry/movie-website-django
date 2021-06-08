@@ -110,83 +110,83 @@
                 <div class="col-md-8">
                     <div style="padding: 20px;">
                         <h1>{{object.title}}</h1>
-                        <div class="rating">
-                            <input type="radio" name="rating" value="5" id="5">
-                            <label for="5">☆</label>
-                            <input type="radio" name="rating" value="4" id="4">
-                            <label for="4">☆</label>
-                            <input type="radio" name="rating" value="3" id="3">
-                            <label for="3">☆</label>
-                            <input type="radio" name="rating" value="2" id="2">
-                            <label for="2">☆</label>
-                            <input type="radio" name="rating" value="1" id="1">
-                            <label for="1">☆</label>
-                            <!-- rating function js --->
-                            {% if request.user.is_authenticated %}
-                                <script>
-                                    var rated = {{ object.rate }} ;
-                                    var movieid = '{{object.movieid}}';
-                                    console.log(movieid);
-                                    var username = '{{ user.username }}';
-                                    console.log(username);
-                                    user_rate_movie = {{ rate_score }};
-                                    if(user_rate_movie==0){
-                                        var stars = Math.floor(rated/2);
-                                        input_value = '#' + stars.toString();
-                                        console.log(input_value);
-                                        $(input_value).attr('checked', 'checked');
-                                    }
-                                    else{
-                                        input_value = '#' + user_rate_movie.toString();
-                                        console.log(input_value);
-                                        $(input_value).attr('checked', 'checked');
-                                    }
-
-                                    $("input[name='rating']").click(function() {
-                                        var radioValue = $("input[name='rating']:checked").val();
-                                        console.log(radioValue);
-                                        if (radioValue) {
-                                            console.log('send mess !');
-                                            $.ajax({
-                                            url : "{% url 'rate-movie' %}",
-                                            type: 'POST',
-                                            datatype: 'json',
-                                            processData: "application/json",
-                                            data: {
-                                            movieid: movieid,
-                                            type: 'rate',
-                                            username : username,
-                                            rate_score : radioValue,
-                                                },
-                                                //beforeSend:function (xhr,settings) {
-                                                //console.log("{{ csrf_token }}");
-                                                //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
-                                                //},
-                                                }).done(function (data) {
-                                                if (data.type == 'error') {
-                                                    alert('erorr !');
-                                                    Swal.fire('Any fool can use a computer')
-                                                    Swal.fire({
-                                                        icon: 'error',
-                                                        title: 'Oops...',
-                                                        text: 'Something went wrong!',
-                                                        footer: '<a href>Why do I have this issue?</a>'
-                                                    })
-                                                } else {
-                                                    Swal.fire(
-                                                        'Good job!',
-                                                        'You rated this movie!',
-                                                        'success'
-                                                    );
-                                                    console.log(data);
-                                                }
-                                            });
+                        {% if request.user.is_authenticated %}
+                            <div class="rating">
+                                <input type="radio" name="rating" value="5" id="5">
+                                <label for="5">☆</label>
+                                <input type="radio" name="rating" value="4" id="4">
+                                <label for="4">☆</label>
+                                <input type="radio" name="rating" value="3" id="3">
+                                <label for="3">☆</label>
+                                <input type="radio" name="rating" value="2" id="2">
+                                <label for="2">☆</label>
+                                <input type="radio" name="rating" value="1" id="1">
+                                <label for="1">☆</label>
+                                <!-- rating function js --->
+                                    <script>
+                                        var rated = {{ object.rate }} ;
+                                        var movieid = '{{object.movieid}}';
+                                        console.log(movieid);
+                                        var username = '{{ user.username }}';
+                                        console.log(username);
+                                        user_rate_movie = {{ rate_score }};
+                                        if(user_rate_movie==0){
+                                            var stars = Math.floor(rated/2);
+                                            input_value = '#' + stars.toString();
+                                            console.log(input_value);
+                                            $(input_value).attr('checked', 'checked');
                                         }
-                                    });
+                                        else{
+                                            input_value = '#' + user_rate_movie.toString();
+                                            console.log(input_value);
+                                            $(input_value).attr('checked', 'checked');
+                                        }
 
-                                </script>
-                            {% endif %}
-                        </div>
+                                        $("input[name='rating']").click(function() {
+                                            var radioValue = $("input[name='rating']:checked").val();
+                                            console.log(radioValue);
+                                            if (radioValue) {
+                                                console.log('send mess !');
+                                                $.ajax({
+                                                url : "{% url 'rate-movie' %}",
+                                                type: 'POST',
+                                                datatype: 'json',
+                                                processData: "application/json",
+                                                data: {
+                                                movieid: movieid,
+                                                type: 'rate',
+                                                username : username,
+                                                rate_score : radioValue,
+                                                    },
+                                                    //beforeSend:function (xhr,settings) {
+                                                    //console.log("{{ csrf_token }}");
+                                                    //xhr.setRequestHeader("X-CSRFToken","{{ csrf_token }}");
+                                                    //},
+                                                    }).done(function (data) {
+                                                    if (data.type == 'error') {
+                                                        alert('erorr !');
+                                                        Swal.fire('Any fool can use a computer')
+                                                        Swal.fire({
+                                                            icon: 'error',
+                                                            title: 'Oops...',
+                                                            text: 'Something went wrong!',
+                                                            footer: '<a href>Why do I have this issue?</a>'
+                                                        })
+                                                    } else {
+                                                        Swal.fire(
+                                                            'Good job!',
+                                                            'You rated this movie!',
+                                                            'success'
+                                                        );
+                                                        console.log(data);
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    </script>
+                            </div>
+                        {% endif %}
                         <!-- add seen , andd expect --->
                         {% if  user.is_authenticated %}
                             <button class="btn btn-warning" id="seen">Have seen</button>

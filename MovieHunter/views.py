@@ -61,7 +61,7 @@ def get_recommendation(request, popular_movie_list):
             if len(liked_movie) == 1:
                 print('helloword')
                 # use Jaccard Index
-                recommend_movie = get_recommend_by_jaccard('tt1038988')
+                recommend_movie = get_recommend_by_jaccard(liked_movie[0])
                 movie_object_list = []
                 for movieid in recommend_movie:
                     movie_object_list.append(Movie.objects.get(movieid=movieid))

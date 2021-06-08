@@ -2,18 +2,21 @@
 
 {% block mainbody %}
         <div style=" margin-left: 1%;">
-            <h4 class="title_text"><a href="#">My Seen list </a></h4>
-            {% for movie in items %}
-                <a href="/movie/movie_detail/{{ movie.movieid }}">
-                    <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
-                </a>
-            {% endfor %}
+            <span hidden id="number_seen_movie">{{number_seen_movie}} </span>
+            {% if number_seen_movie > 0 %}
+                <h4 class="title_text"><a href="#">My Seen list </a></h4>
+                {% for movie in items %}
+                    <a href="/movie/movie_detail/{{ movie.movieid }}">
+                        <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+                    </a>
+                {% endfor %}
+            {% endif %}
 
         </div>
 
             <div style=" margin-left: 1%;">
                 <h4 class="title_text"><a href="#">You Might Also Like </a></h4>
-                {% for movie in top_movie %}
+                {% for movie in recommend_movies %}
                     <a href="/movie/movie_detail/{{ movie.movieid }}">
                         <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
                     </a>
@@ -37,5 +40,11 @@
                     </a>
                 {% endfor %}
             </div>
+            <script>
+                var mess = $('#number_seen_movie').text();
+                if(mess == 0){
+                    Swal.fire("You haven't added a movie to your seen list yet !")
+                }
+            </script>
 
 {% endblock %}

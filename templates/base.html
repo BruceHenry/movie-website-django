@@ -77,9 +77,12 @@
                        onkeyup="start_timer()" size="55" autocomplete="off" required/>
                 <input type="submit" class="btn btn-info waves-effect waves-light m-b-5" name="search" value="Search"/>
                 {% if request.user.is_authenticated  %}
+                {% comment %} <div style="left:500px"><span>Showing results for</span><a style="color:red"> Money</a></div> {% endcomment %}
                 <div class="searchlistdiv"
-                     style="position:absolute;top:45px;left:380px;user-select:none;display:none;width: 500px;"
+                     style="position:absolute;top:45px;left:380px;display:none;width: 500px;"
                      aria-expanded="false">
+                    <div style="left:500px"><span>Showing results for</span><a style="color:red"> Money</a></div>
+                    
                     <div class="search-movie"><h4><b> Movie </b> </h4> </div>
                     <div class="search-actor"><h4><b> Actor </b> </h4> </div>
                 </div>
@@ -357,23 +360,25 @@
                                         console.log(data);
                                         if (data.check_recommend === 'true') {
                                             console.log('Recommend model ');
-                                            showResult(data.key_recommend);
+                                            //$('.searchlistdiv').prepend()
+                                            showResult(data.key_recommend, data.key_recommend);
+
                                         } else {
                                             console.log('Normal model ');
-                                        showResult(document.getElementById('search-input').value);
+                                        showResult(document.getElementById('search-input').value, '');
                                     }
                                 })
                     }
                     else
                     {
-                        showResult(document.getElementById('search-input').value);
+                        showResult(document.getElementById('search-input').value, '');
                     }
                 }
             }, 500, this_input_time);
     };
 
 
-    function showResult(str) {
+    function showResult(str, mess) {
         console.log(str);
         if (str.length === 0) {
             $(".searchlistdiv").hide();
@@ -405,7 +410,10 @@
             }
             if (data.actor.length === 0)
                 $(".search-actor").after("<div class='no_suggest'><b>No suggestion!</b></div>")
-
+            if (mess.length >0){
+            $(".search-movie").before('<div class="no_suggest">Showing results for <b style="color: red"> ' + mess+ "</b></div>")
+                
+            }
             $(".searchlistdiv").show();
         });
     };
@@ -496,32 +504,29 @@
 </script>
 {% block mainbody %}
     {% load static %}
+        {% if user.is_authenticated  %}
+            <div style=" margin-left: 1%;">
+                <h4 class="title_text"><a href="#">Top Pick For You </a></h4>
+                {% comment %} <h3 class="title_text" style="color: #f5c518; line-height: 2.5rem; font-size: 2rem"><b>Popular Now </b></h3> {% endcomment %}
+                {% for movie in recommendation %} 
+                    <a href="/movie/movie_detail/{{ movie.movieid }}">
+                        <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-    <div style=" margin-left: 1%;">
-        <h4 class="title_text"><a href="#">Popular now </a></h4>
-        {% comment %} <h3 class="title_text" style="color: #f5c518; line-height: 2.5rem; font-size: 2rem"><b>Popular Now </b></h3> {% endcomment %}
-        {% for movie in popular %}
-            <a href="/movie/movie_detail/{{ movie.movieid }}">
-                <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
-            </a>
-        {% endfor %}
-    </div>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}"/>
-
-    {% load static %}
-    {% if user.is_authenticated  %}
         <div style=" margin-left: 1%;">
-            <h4 class="title_text"><a href="#">Top Pick For You </a></h4>
+            <h4 class="title_text"><a href="#">Popular now  </a></h4>
 
             {% comment %} <h3 class="title_text" style="color: #f5c518"><b>Top Pick For You </b></h3> {% endcomment %}
-            {% for movie in recommendation %}
+            {% for movie in popular %}
                 <a href="/movie/movie_detail/{{ movie.movieid }}">
                     <img id="poster" class="img-rounded" src="{{ movie.poster }}" width="125" height="180">
                 </a>
             {% endfor %}
 
         </div>
-    {% endif %}
         <div style=" margin-left: 1%;">
             <h4 class="title_text"><a href="#">Top IMDB </a></h4>
             {% comment %} <h3 class="title_text" style="color: #f5c518"><b>Top IMDB </b></h3> {% endcomment %}

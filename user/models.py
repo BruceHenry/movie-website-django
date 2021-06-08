@@ -96,7 +96,7 @@ class PostToUser(models.Model):
         return CommentToPost.objects.filter(post = self).count()
 
     def get_all_reply(self):
-        replys = CommentToPost.objects.filter(post = self).order_by('-date_posted')
+        replys = CommentToPost.objects.filter(post = self).order_by('date_posted')
         return replys
 
     def get_date(self):

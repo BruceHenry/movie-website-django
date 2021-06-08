@@ -142,7 +142,7 @@ def reply_review(request):
                     data['send_user_url'] = request.user.profile.get_absolute_url()
                     data['send_user_avatar']= request.user.profile.profile_picture.url
                     data['date_posted']  = 'just now'
-                    data['count_reply'] = rate_movie.total_reply() + 1
+                    data['count_reply'] = rate_movie.total_reply()
                     print('data here', data)
 
                     return JsonResponse(data)
@@ -464,23 +464,51 @@ def seen(request, movie_id):
     movie_dict = search_index.data_in_memory['movie_dict']
     records = Seen.objects.filter(username=request.user.get_username())
     movies = []
-    popular_movies = Popularity.objects.all().order_by('-weight')
-    popular = []
-    for movie in popular_movies[:11]:
-        try:
-            popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
-        except:
-            continue
+    watched_movies = set([movie_dict[movie.movieid_id] for movie in records ] +
+                        [movie_dict[movie.movieid_id] for movie in Expect.objects.filter(username=request.user.username)])
+    unwatched_movies = set(search_index.data_in_memory['movie_list']) - watched_movies
+    
     data = {}
-    data['popular'] = popular
+    # add you may also like movie - recommend here 
+
     data['top_movie'] = top_movie(request)
     data['action_movie'] = action_movie(request)
     data['comedy_movie'] = comedy_movie(request)
+    list_movie_id = []
+    #id movie
+    recommend_movie = []
+    recommend = []
+    recommend_for_seen_movie = []
     for record in records:
         movie_id = str(record).split('|')[1]
         movies.append(Movie.objects.get(movieid=movie_id))
+        list_movie_id.append(movie_id)
+    if len(list_movie_id) >= 2:
+        recommend_movie = get_recommend_by_cosine(list_movie_id)
+        for movieid in recommend_movie:
+            recommend.append(Movie.objects.get(movieid=movieid))
+        for movie in recommend:
+            if movie not in watched_movies:
+                recommend_for_seen_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+    if len(list_movie_id) == 1:
+        recommend_movie = get_recommend_by_jaccard(list_movie_id[0])
+        for movieid in recommend_movie:
+            recommend.append(Movie.objects.get(movieid=movieid))
+        for movie in recommend:
+            if movie not in watched_movies:
+                recommend_for_seen_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+    if len(list_movie_id) == 0:
+        for movie in unwatched_movies:
+                recommend_for_seen_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+                if len(recommend_for_seen_movie) == 11:
+                    break
+    if len(recommend_for_seen_movie) > 11:
+        recommend_for_seen_movie = [recommend_for_seen_movie[i] for i in random.sample(range(len(recommend_for_seen_movie)), 11)]
+
+    
+    data['recommend_movies'] = recommend_for_seen_movie
     data['items'] = movies
-    data['number'] = len(movies)
+    data['number_seen_movie'] = len(movies)
     return render(request, 'seen.html', data)
 
 @login_required
@@ -491,27 +519,56 @@ def expect(request, movie_id):
             d.delete()
         except:
             return render(request, '404.html')
+    movie_dict = search_index.data_in_memory['movie_dict']
     records = Expect.objects.filter(username=request.user.get_username())
     movies = []
-    for record in records:
-        movie_id = str(record).split('|')[1]
-        movies.append(Movie.objects.get(movieid=movie_id))
-    ## add new infomation
-    movie_dict = search_index.data_in_memory['movie_dict']
-    popular_movies = Popularity.objects.all().order_by('-weight')
-    popular = []
-    for movie in popular_movies[:11]:
-        try:
-            popular.append({'movieid': movie.movieid_id, 'poster': movie_dict[movie.movieid_id].poster})
-        except:
-            continue
+    watched_movies = set([movie_dict[movie.movieid_id] for movie in records ] +
+                        [movie_dict[movie.movieid_id] for movie in Expect.objects.filter(username=request.user.username)])
+    unwatched_movies = set(search_index.data_in_memory['movie_list']) - watched_movies
+    
     data = {}
-    data['popular'] = popular
+    # add you may also like movie - recommend here 
+
     data['top_movie'] = top_movie(request)
     data['action_movie'] = action_movie(request)
     data['comedy_movie'] = comedy_movie(request)
+    list_movie_id = []
+    #id movie
+    recommend_movie = []
+    recommend = []
+    recommend_for_expect_movie = []
+    for record in records:
+        movie_id = str(record).split('|')[1]
+        movies.append(Movie.objects.get(movieid=movie_id))
+        list_movie_id.append(movie_id)
+    if len(list_movie_id) >= 2:
+        recommend_movie = get_recommend_by_cosine(list_movie_id)
+        for movieid in recommend_movie:
+            recommend.append(Movie.objects.get(movieid=movieid))
+        for movie in recommend:
+            if movie not in watched_movies:
+                recommend_for_expect_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+    if len(list_movie_id) == 1:
+        recommend_movie = get_recommend_by_jaccard(list_movie_id[0])
+        for movieid in recommend_movie:
+            recommend.append(Movie.objects.get(movieid=movieid))
+        for movie in recommend:
+            if movie not in watched_movies:
+                recommend_for_expect_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+    if len(list_movie_id) == 0:
+        for movie in unwatched_movies:
+                recommend_for_expect_movie.append({'movieid': movie.movieid, 'poster': movie.poster})
+                if len(recommend_for_expect_movie) == 11:
+                    break
+    if len(recommend_for_expect_movie) > 11:
+        recommend_for_expect_movie = [recommend_for_expect_movie[i] for i in random.sample(range(len(recommend_for_expect_movie)), 11)]
+
+    
+    data['recommend_movies'] = recommend_for_expect_movie
     data['items'] = movies
-    data['number'] = len(movies)
+    data['number_expect_movie'] = len(movies)
+    
+    
     return render(request, 'expect.html', data)
 
 

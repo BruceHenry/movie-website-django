@@ -1,7 +1,17 @@
 from django.contrib import admin
 from .models import *
+from django.contrib.auth.models import User
+
 # Register your models here.
-# admin.site.register(Profile)
+# admin.site.unregister(User)
+
+# class UserAdmin(admin.ModelAdmin):
+#     # This will help you to disbale add functionality
+#     def has_add_permission(self, request):
+#         return False
+# admin.site.register(User, UserAdmin)
+
+
 # admin.site.register(CommentToPost)
 # admin.site.register(PostToUser)
 # admin.site.register(Follow)

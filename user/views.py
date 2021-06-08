@@ -293,10 +293,20 @@ def comunity(request):
     activitys = []
     for acti in Activity.objects.all():
         if check_follow(request.user, acti.user):
-            activitys.append(acti)
+            if acti.type == 3:
+                if acti.review.review is not None:
+                    activitys.append(acti)
+            else:
+                activitys.append(acti)
+
     # add activity by request.user
     for acti in Activity.objects.filter(user= request.user):
-        activitys.append(acti)
+        if acti.type == 3:
+                if acti.review.review is not None:
+                    activitys.append(acti)
+        else:
+            activitys.append(acti)
+    #done
     activitys = sorted(activitys, key = lambda x : x.date_posted)
     activitys.reverse()
     # add notification to show user...
