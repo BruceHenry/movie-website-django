@@ -553,12 +553,12 @@ def get_data_chart1(request):
             register_list.append(User.objects.filter(date_joined__month = 4).count())
             register_list.append(User.objects.filter(date_joined__month = 5).count())
             register_list.append(User.objects.filter(date_joined__month = 6).count())
-            register_list.append(User.objects.filter(date_joined__month = 7).count())
-            register_list.append(User.objects.filter(date_joined__month = 8).count())
-            register_list.append(User.objects.filter(date_joined__month = 9).count())
-            register_list.append(User.objects.filter(date_joined__month = 10).count())
-            register_list.append(User.objects.filter(date_joined__month = 11).count())
-            register_list.append(User.objects.filter(date_joined__month = 12).count())
+            # register_list.append(User.objects.filter(date_joined__month = 7).count())
+            # register_list.append(User.objects.filter(date_joined__month = 8).count())
+            # register_list.append(User.objects.filter(date_joined__month = 9).count())
+            # register_list.append(User.objects.filter(date_joined__month = 10).count())
+            # register_list.append(User.objects.filter(date_joined__month = 11).count())
+            # register_list.append(User.objects.filter(date_joined__month = 12).count())
             return JsonResponse({'data': register_list, 'mess': 'sucess', 'label':'Total User Register'})
         if type == 'chart2':
             register_list = []
@@ -568,12 +568,12 @@ def get_data_chart1(request):
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 4).count())
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 5).count())
             register_list.append(Activity.objects.filter(type=3, date_posted__month = 6).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 7).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 8).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 9).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 10).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 11).count())
-            register_list.append(Activity.objects.filter(type=3, date_posted__month = 12).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 7).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 8).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 9).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 10).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 11).count())
+            # register_list.append(Activity.objects.filter(type=3, date_posted__month = 12).count())
             return JsonResponse({'data': register_list, 'mess': 'sucess','label':'Total Reviews'})
         if type == 'chart3':
             register_list = []
@@ -583,12 +583,12 @@ def get_data_chart1(request):
             register_list.append(PostToUser.objects.filter(date_posted__month = 4).count())
             register_list.append(PostToUser.objects.filter(date_posted__month = 5).count())
             register_list.append(PostToUser.objects.filter(date_posted__month = 6).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 7).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 8).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 9).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 10).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 11).count())
-            register_list.append(PostToUser.objects.filter(date_posted__month = 12).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 7).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 8).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 9).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 10).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 11).count())
+            # register_list.append(PostToUser.objects.filter(date_posted__month = 12).count())
             return JsonResponse({'data': register_list, 'mess': 'sucess', 'label':'Total Posts'})
         
     return JsonResponse({'mess':'error'})
@@ -620,13 +620,22 @@ def get_data_chart2(request):
     if request.is_ajax():
         # get top 6 user hoat dong nhieu nhat 
         all_user = User.objects.all()
-        lables = []
-        data = []
+        dict_data = {}
         for user in all_user:
-            lables.append(user.username)
-            data.append(check_activity(user))
+            dict_data[user.username] = check_activity(user)
+        dict_data = sorted(dict_data.items(), key=lambda item: -item[1])
+        # get top5 user
+        top5_user = list(dict_data)[:5]
+        data = []
+        labels = []
+        # get data for graph, data , labels
+        for item in top5_user:
+            data.append(item[1])
+            labels.append(item[0])
+
+
         total_acivitys = Activity.objects.all().count()
-        return JsonResponse({'mess':'success', 'labels':lables, 'data':data, 'total': total_acivitys})
+        return JsonResponse({'mess':'success', 'labels':labels, 'data':data, 'total': total_acivitys})
     return JsonResponse({'mess':'error'})
 
 def check_activity(user):

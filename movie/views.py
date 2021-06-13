@@ -860,7 +860,7 @@ def get_data_chart3(request):
         top_movie = sorted(all_movies, key= lambda t: get_all_rates(t))[-10:]
         labels = []
         data = []
-        for movie in top_movie:
+        for movie in top_movie[-5:]:
             labels.append(movie.title)
             data.append(get_all_rates(movie))
         total_rates = User_Rate.objects.all().count()
