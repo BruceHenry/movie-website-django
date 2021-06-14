@@ -396,25 +396,30 @@
                                 <div class="input-group" style ="width:35%" >
                                     <label for="inputGroupSuccess1"></label>
                                     <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for movie ..." aria-describedby="inputGroupSuccess1Status">
-                                    <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
+                                    <span onclick="addTag(1)" style="cursor: pointer" class="input-group-addon">+</span>
                                 </div>
                             </div>
                             <!-- function add tag here -->
                             <div class="user_tag_here" id="list_actor_carousel" style="padding-left: 0px;">
-                            {% for user_tag in users_tags %} 
-                                <li style="max-width:30%" ><div class="input-group" id="{{user_tag.id}}" >
-                                    <span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x{{user_tag.count_tag}}</span>
-                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">{{user_tag.tags}}</button>
-                                    <span onclick="deleteTag({{user_tag.id}})"  style="cursor: pointer" class="input-group-addon">-</span>
+                            {% for tag in users_tags %} 
+                                <li style="max-width:30%" ><div class="input-group" id="{{tag.id}}" >
+                                    <span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x{{tag.count_tag}}</span>
+                                    <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">{{tag.tags}}</button>
+                                    <span onclick="deleteTag({{tag.id}})"  style="cursor: pointer" class="input-group-addon">-</span>
                                 </div></li>
                             {% endfor %}
                             </div>
                             <!-- function add tag by user here -->
                             <script>
-                                function addTag(){
+                                function addTag(key){
                                     var movieid = '{{object.movieid}}';
                                     var username = '{{ user.username }}';
-                                    var nameTag = $('#nameTag').val();
+                                    if(key==1){
+                                        var nameTag = $('#nameTag').val();
+                                    }
+                                    else{
+                                        var nameTag = key;
+                                    }
                                     console.log(nameTag);
                                     //send ajax
                                     $.ajax({
@@ -433,19 +438,39 @@
                                             Swal.fire('You have tagged this movie already')
                                         } else {
                                             //add count if have tag in comunitys 
-
                                             $('#nameTag').val('');
                                             $('.user_tag_here').prepend(
-                                                '<li style ="width:30% "><div class="input-group" id="'+ data.id + '" >' +
-                                        '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' +data.count + '</span>'+
-                                        '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
-                                        '<span onclick="deleteTag(' + data.id + ')"style="cursor: pointer" class="input-group-addon">-</span>'+
-                                        '</div></li>'
-                                            )
+                                                                '<li style="max-width:30%" ><div class="input-group" id="' + data.id + '" >' +
+                                                            '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' + data.count + '</span>'+
+                                                            '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' + data.tags + '</button>'+
+                                                            '<span onclick="deleteTag(' + data.id + ')"  style="cursor: pointer" class="input-group-addon">-</span>'+
+                                                        '</div></li>'
+                                                        );
+                                            // add comunity tags 
+                                            if(data.newTag == 1){
+                                                // add comunity tagname and count 
+                                                $('.comunity_tags_here').prepend(
+                                                    '<li style ="width:30% "><div class="input-group" id="tag'+ data.tags + '" >' +
+                                                    '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' + data.new_count + '</span>'+
+                                                    '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
+                                                    '<span style="cursor: pointer" class="input-group-addon">+</span>'+
+                                                    '</div></li>'
+                                                            );
+                                            }
+                                            else{
+                                                if(data.newTag==0){
+                                                    //add count to comunity tag if tagName exits 
+                                                    var id_count = '#x' + data.tags ;
+                                                    var count = 'x' + data.count.toString();
+                                                    console.log(count);
+                                                    console.log(id_count);
+                                                    $(id_count).text(count);
+                                                }
+                                            } 
                                         }
                                     })
                                 };
-                                 function deleteTag(tagID){
+                                function deleteTag(tagID){
                                     var id = '#'+ tagID.toString();
                                     $(id).hide();
                                      $.ajax({
@@ -459,22 +484,17 @@
                                             }
                                             }).done(function (data) {
                                                 console.log(data);
-                                                // if tagname in comunitys , =>> delete count in  comunity now 
-                                                {% comment %} var id_tag = '#' + data.tagname;
-                                                var groupTag = '#tag' + data.tagname;
-                                                var count_tag = $(id_tag).val();
-                                                var count = parseInt(count_tag.split("x")[1]);
-                                                
-                                                if(count==1){
-                                                    $(groupTag).hide();
-                                                    alert(count);
+                                                if(data.deleteComunity == 1){
+                                                    // clear comunity
+                                                    $(data.id_group).hide();
                                                 }
                                                 else{
-                                                    var new_count = count - 1;
-                                                    var new_count_text = 'x' + new_count.toString();
-                                                    alert(new_count_text);
-                                                    $(id_tag).val(new_count_text);
-                                                } {% endcomment %}
+                                                    if(data.deleteComunity == 0){
+                                                        $(data.id_count).text(data.count);
+                                                    }
+                                                }
+                                        
+                                                 
                                             })
                                  }
 
@@ -483,13 +503,12 @@
 
 
                             <h4>Tags Comunity : </h4>
-                            <div id="list_actor_carousel" style="padding-left: 0px;">
-                                {% for tagname,count in dict_tag.items %}
-                                    <li style ="width:30%; height : 70% "><div class="input-group" id="tag{{tagname}}" >
-                                        <span id="{{tagname}}" style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
-                                        <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagname}}</button>
-                                        <span style="cursor: pointer" class="input-group-addon">+</span>
-                                        
+                            <div class="comunity_tags_here" id="list_actor_carousel" style="padding-left: 0px;">
+                                {% for tagName, countTag in comunity_tags.items %}
+                                    <li style ="width:30%; height : 70% "><div class="input-group" id="tag{{tagName}}" >
+                                        <span id="x{{tagName}}" style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{countTag}}</span>
+                                        <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagName}}</button>
+                                        <span onclick="addTag('{{tagName}}')" style="cursor: pointer" class="input-group-addon">+</span>
                                     </div></li>
                                 {% endfor %}
                             </div>

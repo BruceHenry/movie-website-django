@@ -176,11 +176,32 @@ def add_tag(request):
                     return JsonResponse(data)
                 else:
                     tag = MovieTags(movie=movie, user=user, tags=tags)
+                    comunity_tags = MovieTags.objects.filter(movie=movie)
+                    # tinh toan chen vao comunity
+                    dict_comunity = {}
+                    for historyTag in comunity_tags:
+                        if historyTag.tags in dict_comunity.keys():
+                            dict_comunity[historyTag.tags] +=1
+                        else:
+                            dict_comunity[historyTag.tags] = 1
+                    # neu tag moi them co trong danh sach cac tag trong qua khu
+                    if tags in dict_comunity.keys():
+                        # neu co
+                        dict_comunity[tags] +=1
+                        data['newTag'] = 0 # false
+                        data['new_count'] = dict_comunity[tags]
+                    else:
+                        dict_comunity[tags] =1
+                        data['newTag'] = 1 # true
+                        data['new_count'] = 1
+                    # tinh toan chen vao user tags
                     tag.save()
+                    # save and send to show user's tag
                     data['id'] = tag.id
                     data['mess'] = 'success'
                     data['tags'] = tags
                     data['count'] = MovieTags.objects.filter(movie=movie, tags=tags).count()
+                    print(data)
                     return JsonResponse(data)
             except:
                 print('iam very sick !!!')
@@ -299,26 +320,26 @@ def movie_detail(request, model, id):
 
             # get tags from movie
             users_tags = []
-            comunity_tags1 = []
-            comunity_tags = []
-            dict_tag = {}
+            all_tags = []
+            dict_tag_users = {}
+            dict_all_tag = {}
             try:
                 users_tags = MovieTags.objects.filter(movie=object, user = request.user)
-                comunity_tags1 = MovieTags.objects.filter(movie=object)
+                all_tags = MovieTags.objects.filter(movie=object)
                 
-                for tag in comunity_tags1:
-                    if tag not in users_tags:
-                        comunity_tags.append(tag)
-                for tag in comunity_tags1:
-                    if tag.tags in dict_tag.keys():
-                        dict_tag[tag.tags] += 1
+                # must build tag by dict 
+                # comunity's tag
+                for tag in all_tags:
+                    if tag.tags in dict_all_tag.keys():
+                        dict_all_tag[tag.tags] +=1
                     else:
-                        dict_tag[tag.tags] = 1
-
+                        dict_all_tag[tag.tags] =1
+                # print(dict_all_tag)
+                # print(dict_tag_users)
             except:
+                dict_tag_users = []
+                dict_all_tag = []
                 users_tags = []
-                dict_tag = {}
-                comunity_tags = []
     except:
         return render(request, '404.html')
 
@@ -327,7 +348,7 @@ def movie_detail(request, model, id):
     if request.user.is_authenticated :
         notifications = Notification.objects.filter(user = request.user).order_by('-date_posted')[:10]
         count_noti = UserSeenNotifycation.objects.filter(user = request.user, is_seen = False).count()
-        return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
+        return render(request, 'movie_detail.html', {'users_tags': users_tags, 'comunity_tags':dict_all_tag,
         'items': items,'notifications' : notifications, 'count_noti':count_noti, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 
@@ -341,11 +362,34 @@ def delete_tag(request):
         if request.is_ajax():
             tagID = request.POST.get('tagID')
             print(tagID)
+            data = {}
             try:
                 tag = MovieTags.objects.get(id=tagID)
-                print(tag)
+                # print(tag)
+                comunity_tags = MovieTags.objects.filter(movie=tag.movie)
+                # tinh toan de xoa khoi comunity
+                dict_comunity = {}
+                for historyTag in comunity_tags:
+                    if historyTag.tags in dict_comunity.keys():
+                        dict_comunity[historyTag.tags] +=1
+                    else:
+                        dict_comunity[historyTag.tags] = 1
+                # neu chi co 1 tag cua user do trong comunity
+                if dict_comunity[tag.tags] == 1:
+                    # xoa luon ca o comunity
+                    data['deleteComunity'] = 1 # true
+                    data['id_group'] = '#tag' + tag.tags
+                else:
+                    data['deleteComunity'] = 0 # False
+                    data['id_count'] = '#x' + tag.tags
+                    data['count'] = 'x' + str(dict_comunity[tag.tags] - 1)
+
+                data['mess'] = 'succsess'
+                data['tagName'] = tag.tags
+                # delete ta
                 tag.delete()
-                return JsonResponse({'mess':'succsess', 'tagName': tag.tags})
+                # print(data)
+                return JsonResponse(data)
             except:
                 return JsonResponse({'mess':'error'})
     return JsonResponse({'mess':'error'})
@@ -642,9 +686,12 @@ def favourite_movie(user):
         for rate in user_rate:
             sum_rate += rate.rate
         medium = sum_rate/count
-        # print(medium)
-        list_rate_good = User_Rate.objects.filter(user=user, rate__gte=medium)
-        print('list movieid liked : ')
+        print('medium',medium)
+        if medium >=3:
+            list_rate_good = User_Rate.objects.filter(user=user, rate__gte=medium)
+        else:
+            list_rate_good = User_Rate.objects.filter(user=user, rate__gte=3)
+        # print('list movieid liked : ')
         list_movie = [rate.movie.movieid for rate in list_rate_good]
         # print(list_movie)
 
