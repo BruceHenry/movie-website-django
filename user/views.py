@@ -197,6 +197,7 @@ def facebook(request):
     print('Process here ...')
     username = request.POST.get('username')
     password = request.POST.get('password')
+    email = request.POST.get('email')
     user = authenticate(username=username, password=password)
     if user is not None and user.is_active:
         login(request, user)

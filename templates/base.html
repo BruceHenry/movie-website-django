@@ -310,7 +310,7 @@
                     $.post("/user/facebook/", {
                         csrfmiddlewaretoken: getCookie('csrftoken'),
                         username: response.name,
-                        password: "facebook"
+                        password: "facebook",
                     }, function () {
                         console.log('okeeeee');
                         location.reload();

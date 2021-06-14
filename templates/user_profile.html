@@ -256,7 +256,7 @@
                                                 <form method="POST" class="form-reply" enctype="multipart/form-data">
                                                     {% csrf_token %}
                                                     <input type="hidden" class="postID" name="postID" value="{{ post.id }}">
-                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="How are you today ..."> </textarea>
+                                                    <textarea class="form-control comment-reply-textarea" name="content" rows="2" placeholder="Reply post here ..."> </textarea>
                                                     <button type="submit" class="btn btn-secondary btn-sm comment-reply float-right waves-effect waves-light"> Reply </button>
                                                 </form>
                                             </li>

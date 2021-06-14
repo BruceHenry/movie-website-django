@@ -30,6 +30,8 @@ urlpatterns = [
     path('rate_movie/', views.rate_movie, name='rate-movie'),
     path('top_movie/', views.top_movie, name='top_movie'),
     path('add_tag/', views.add_tag, name='add-tag'),
+    path('delete_tag/', views.delete_tag, name='delete-tag'),
+
 
     #get comunity tags
     path('favourite_movie/', views.favourite_movie, name='favourite-movie'),

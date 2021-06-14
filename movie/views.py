@@ -177,6 +177,7 @@ def add_tag(request):
                 else:
                     tag = MovieTags(movie=movie, user=user, tags=tags)
                     tag.save()
+                    data['id'] = tag.id
                     data['mess'] = 'success'
                     data['tags'] = tags
                     data['count'] = MovieTags.objects.filter(movie=movie, tags=tags).count()
@@ -298,12 +299,17 @@ def movie_detail(request, model, id):
 
             # get tags from movie
             users_tags = []
+            comunity_tags1 = []
             comunity_tags = []
             dict_tag = {}
             try:
                 users_tags = MovieTags.objects.filter(movie=object, user = request.user)
-                comunity_tags = MovieTags.objects.filter(movie=object)
-                for tag in comunity_tags:
+                comunity_tags1 = MovieTags.objects.filter(movie=object)
+                
+                for tag in comunity_tags1:
+                    if tag not in users_tags:
+                        comunity_tags.append(tag)
+                for tag in comunity_tags1:
                     if tag.tags in dict_tag.keys():
                         dict_tag[tag.tags] += 1
                     else:
@@ -327,6 +333,23 @@ def movie_detail(request, model, id):
 
     return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
     'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
+
+
+@csrf_exempt
+def delete_tag(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            tagID = request.POST.get('tagID')
+            print(tagID)
+            try:
+                tag = MovieTags.objects.get(id=tagID)
+                print(tag)
+                tag.delete()
+                return JsonResponse({'mess':'succsess', 'tagName': tag.tags})
+            except:
+                return JsonResponse({'mess':'error'})
+    return JsonResponse({'mess':'error'})
+
 
 @csrf_exempt
 def actor_detail(request, model, id):

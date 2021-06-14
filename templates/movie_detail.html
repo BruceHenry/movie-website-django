@@ -393,19 +393,19 @@
                             <div class="form-group has-success has-feedback">
                                 <hr>
                                 <label class="control-label" style="color: black" ></label>
-                                <div class="input-group" style ="width:30% " >
+                                <div class="input-group" style ="width:35%" >
                                     <label for="inputGroupSuccess1"></label>
-                                    <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for {{object.title}}.." aria-describedby="inputGroupSuccess1Status">
+                                    <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for movie ..." aria-describedby="inputGroupSuccess1Status">
                                     <span onclick="addTag()" style="cursor: pointer" class="input-group-addon">+</span>
                                 </div>
                             </div>
                             <!-- function add tag here -->
                             <div class="user_tag_here" id="list_actor_carousel" style="padding-left: 0px;">
-                            {% for user_tag in users_tags %}
-                                <li style ="width:30% "><div class="input-group" >
+                            {% for user_tag in users_tags %} 
+                                <li style="max-width:30%" ><div class="input-group" id="{{user_tag.id}}" >
                                     <span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x{{user_tag.count_tag}}</span>
                                     <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">{{user_tag.tags}}</button>
-                                    <span  style="cursor: pointer" class="input-group-addon">-</span>
+                                    <span onclick="deleteTag({{user_tag.id}})"  style="cursor: pointer" class="input-group-addon">-</span>
                                 </div></li>
                             {% endfor %}
                             </div>
@@ -432,17 +432,51 @@
                                         if (data.mess == 'error') {
                                             Swal.fire('You have tagged this movie already')
                                         } else {
+                                            //add count if have tag in comunitys 
+
                                             $('#nameTag').val('');
                                             $('.user_tag_here').prepend(
-                                                '<li style ="width:30% "><div class="input-group" >' +
+                                                '<li style ="width:30% "><div class="input-group" id="'+ data.id + '" >' +
                                         '<span  style="cursor: pointer; background-color: #def0d8" class="input-group-addon">x' +data.count + '</span>'+
                                         '<button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status">' +data.tags +'</button>'+
-                                        '<span  style="cursor: pointer" class="input-group-addon">...</span>'+
+                                        '<span onclick="deleteTag(' + data.id + ')"style="cursor: pointer" class="input-group-addon">-</span>'+
                                         '</div></li>'
                                             )
                                         }
                                     })
                                 };
+                                 function deleteTag(tagID){
+                                    var id = '#'+ tagID.toString();
+                                    $(id).hide();
+                                     $.ajax({
+                                        url : "{% url 'delete-tag' %}",
+                                        type: 'POST',
+                                        datatype: 'json',
+                                        processData: "application/json",
+                                        data: {
+                                        type: 'delete-tag',
+                                        tagID : tagID,
+                                            }
+                                            }).done(function (data) {
+                                                console.log(data);
+                                                // if tagname in comunitys , =>> delete count in  comunity now 
+                                                {% comment %} var id_tag = '#' + data.tagname;
+                                                var groupTag = '#tag' + data.tagname;
+                                                var count_tag = $(id_tag).val();
+                                                var count = parseInt(count_tag.split("x")[1]);
+                                                
+                                                if(count==1){
+                                                    $(groupTag).hide();
+                                                    alert(count);
+                                                }
+                                                else{
+                                                    var new_count = count - 1;
+                                                    var new_count_text = 'x' + new_count.toString();
+                                                    alert(new_count_text);
+                                                    $(id_tag).val(new_count_text);
+                                                } {% endcomment %}
+                                            })
+                                 }
 
                             </script>
                             <!-- end tag by user function -->
@@ -451,8 +485,8 @@
                             <h4>Tags Comunity : </h4>
                             <div id="list_actor_carousel" style="padding-left: 0px;">
                                 {% for tagname,count in dict_tag.items %}
-                                    <li style ="width:30%; height : 70% "><div class="input-group" >
-                                        <span  style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
+                                    <li style ="width:30%; height : 70% "><div class="input-group" id="tag{{tagname}}" >
+                                        <span id="{{tagname}}" style="cursor: pointer; background-color:#def0d8" class="input-group-addon">x{{count}}</span>
                                         <button class="form-control" id="inputGroupSuccess1" aria-describedby="inputGroupSuccess1Status"> {{tagname}}</button>
                                         <span style="cursor: pointer" class="input-group-addon">+</span>
                                         
