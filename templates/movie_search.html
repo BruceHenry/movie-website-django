@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block mainbody %}
-
+<div class="container" id='container'>
     <a href="/movie/search/movie/{{ query_string }}/{{ 1 }}">
         <button class="button search_button" style="background-color: #008CBA;color: white;">
             <span class="glyphicon glyphicon-film"></span> Movie
@@ -13,11 +13,11 @@
         </button>
     </a>
     <div>
-        <h2>{{ length }} movie(s) with "{{ query_string }}":</h2>
+        <h3>{{ length }} movie(s) with "{{ query_string }}":</h3>
         <hr>
 
         {% for movie in items %}
-            <h2><a href="/movie/movie_detail/{{ movie.movieid }}" target="_self">{{ movie.title }}</a></h2>
+            <h3><a href="/movie/movie_detail/{{ movie.movieid }}" target="_self">{{ movie.title }}</a></h3>
             <img border="0" src="{{ movie.poster }}" alt="Cannot load photo, sorry!" width="200" height="320">
             <hr>
         {% endfor %}
@@ -44,4 +44,5 @@
         {% endif %}
 
     </div>
+</div>
 {% endblock %}

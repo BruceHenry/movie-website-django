@@ -311,7 +311,7 @@
                             {% for item in items %}
                                 <li><a href="/movie/actor_detail/{{ item.actorid }}" class="actor-profile-item">
                                     <div class="actor-image"
-                                        style="background-image:url('{{item.photo}}')"></div>
+                                        style="background-image:url('{{item.photo}}')" ></div>
                                     <div class="actor-name">{{item.get_simple_name}}</div>
                                 </a></li>
                             {% endfor %}

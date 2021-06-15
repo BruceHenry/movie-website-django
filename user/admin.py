@@ -35,4 +35,4 @@ from django.contrib.auth.models import User
 #         })
 #         return extra_context
 
-# admin.site.register(Activity, ActivityAdmin)
+# admin.site.register(Activity)

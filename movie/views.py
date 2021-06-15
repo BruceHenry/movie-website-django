@@ -104,13 +104,15 @@ def review_movie(request):
                     rate_movie.review = content
                     print(rate_movie)
                     rate_movie.save()
+                    # add activity
+                    Activity.objects.create(review = rate_movie, user = request.user, type = 3)
 
                 except:
                     rate_movie = User_Rate(movie=movie, user=user, review=content)
                     rate_movie.save()
-                    # every one create 1 review => create here !!!
+                    # every one create 1 review => create activity  here !!!
+                    # add activity
                     Activity.objects.create(review = rate_movie, user = request.user, type = 3)
-                    print(rate_movie)
 
                 return JsonResponse({'mess':'success'})
             else:
@@ -853,7 +855,7 @@ def get_search_value(request):
                 key_recommend = content_best_similarity.split(",")[-1]
                 print('tu khoa goi y',key_recommend)
                 jaccard_value = jaccard_similarity(content, content_best_similarity)[0]
-                # print(jaccard_value)
+                print(jaccard_value)
                 # print('key recommend here', key_recommend)
                 # if jaccard similarity > 0.5 
                 # print(keyup_now)
