@@ -3,7 +3,7 @@ from movie.models import *
 
 
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'movieid', 'rate')
+    list_display = ('title', 'movieid', 'rate', 'genres', 'year')
     search_fields = ['title']
 
 
@@ -22,5 +22,5 @@ admin.site.register(Actor, ActorAdmin)
 # admin.site.register(ReplyToReview)
 # admin.site.register(MovieTags)
 
-# admin.site.register(User_Search)
+admin.site.register(User_Search)
 

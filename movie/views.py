@@ -177,6 +177,10 @@ def add_tag(request):
                 else:
                     tag = MovieTags(movie=movie, user=user, tags=tags)
                     comunity_tags = MovieTags.objects.filter(movie=movie)
+                    if len(comunity_tags) >0:
+                        data['showComunity'] = 1
+                    else:
+                        data['showComunity'] = 0
                     # tinh toan chen vao comunity
                     dict_comunity = {}
                     for historyTag in comunity_tags:
@@ -831,33 +835,34 @@ def get_search_value(request):
              
             try:
                 all_sessions = User_Search.objects.all()
-                print('len all_sessions:', len(all_sessions))
-                all_search_value = [session.content for  session in  all_sessions]
+                user_search_sessions = User_Search.objects.filter(user=request.user)
+                recommend_sessions = []
+                for search_session in all_sessions:
+                    if search_session not in user_search_sessions:
+                        recommend_sessions.append(search_session)
+                print(search_session)
+
+                all_search_value = [session.content for  session in  recommend_sessions]
 
                 #search in all_search_value , which the best similarity 
                 sort_search_value = sorted(all_search_value , key = lambda value: jaccard_similarity(content, value)[0])
-                
-                best_similarity_session_content = sort_search_value[-1]
-                jaccard_value = jaccard_similarity(content, best_similarity_session_content)[0]
-                list_key_recommend = jaccard_similarity(content, best_similarity_session_content)[1]
-                print(jaccard_value)
-                print(list_key_recommend)
+                print('content giong nhau nhat',sort_search_value[-1])
+                # content giong nhau nhat 
+                content_best_similarity = sort_search_value[-1]
+                print(content_best_similarity.split(","))
+                key_recommend = content_best_similarity.split(",")[-1]
+                print('tu khoa goi y',key_recommend)
+                jaccard_value = jaccard_similarity(content, content_best_similarity)[0]
+                # print(jaccard_value)
+                # print('key recommend here', key_recommend)
                 # if jaccard similarity > 0.5 
-                if jaccard_value > 0.5:
-                    list_key_success = []
-                    for key_recommend in list_key_recommend :
-                        if key_recommend.find(keyup_now) != -1 and len(key_recommend) > len(keyup_now):
-                            list_key_success.append(key_recommend)
-                            print('2')
-                            print('Exactly recommend key :', key_recommend)
-                        
-                    if len(list_key_success) > 0:
-                        #recommend for last search by diffrent user ....
-                        longest_key = max(list_key_success, key=len)
+                # print(keyup_now)
+                if jaccard_value > 0.75 :
+                    if key_recommend.find(keyup_now) != -1 and len(key_recommend) > len(keyup_now):
+                        print('Exactly recommend key :', key_recommend)
                         data['mess'] = 'success'
                         data['check_recommend'] = 'true'
-                        data['key_recommend'] = longest_key
-
+                        data['key_recommend'] = key_recommend
                 else:
                     data['mess'] = 'success'
                     data['check_recommend'] = 'false'
@@ -874,6 +879,7 @@ def get_search_value(request):
                 now_user_session = User_Search.objects.filter(user=user).latest('date_posted')
                 if content.find(now_user_session.content) != -1:
                     now_user_session.content = content
+                    # after search , save... now dont save
                     now_user_session.save()
                 else:
                     new_user_session = User_Search(user=user, content=content)

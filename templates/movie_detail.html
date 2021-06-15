@@ -391,14 +391,13 @@
                         {% if request.user.is_authenticated %}
                             <h4>Your Tag: </h4>
                             <div class="form-group has-success has-feedback">
-                                <hr>
-                                <label class="control-label" style="color: black" ></label>
-                                <div class="input-group" style ="width:35%" >
-                                    <label for="inputGroupSuccess1"></label>
-                                    <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for movie ..." aria-describedby="inputGroupSuccess1Status">
-                                    <span onclick="addTag(1)" style="cursor: pointer" class="input-group-addon">+</span>
+                                    <label class="control-label" style="color: black" ></label>
+                                    <div class="input-group" style ="width:35%" >
+                                        <label for="inputGroupSuccess1"></label>
+                                        <input id= "nameTag" type="text" class="form-control" placeholder ="add tag for movie ..." aria-describedby="inputGroupSuccess1Status">
+                                        <span onclick="addTag(1)" style="cursor: pointer" class="input-group-addon">+</span>
+                                    </div>
                                 </div>
-                            </div>
                             <!-- function add tag here -->
                             <div class="user_tag_here" id="list_actor_carousel" style="padding-left: 0px;">
                             {% for tag in users_tags %} 
@@ -500,7 +499,6 @@
 
                             </script>
                             <!-- end tag by user function -->
-
 
                             <h4>Tags Comunity : </h4>
                             <div class="comunity_tags_here" id="list_actor_carousel" style="padding-left: 0px;">
@@ -908,207 +906,197 @@
             </script>
         {% endif %}
     </div>
-
-
-                
-
-       
-
-    
 <script>
 
-
-
-function get_breaking_rate(){
-    var movieid = '{{object.movieid}}';
-    console.log(movieid);
-    $.ajax({
-                url: "{% url 'get_data_rate' %}",
-                type: 'POST',
-                datatype: 'json',
-                processData: "application/json",
-                data: {
-                    movieid: movieid,
-                },
-                
-            }).done(function (data){
-                console.log(data.mess);
-                if(data.mess=='oke'){
-                    $('#count_5_star').text(data.count_rate_5);
-                    var count_rate_5_percent = data.count_rate_5_percent;
-                    var count_rate_5_percent_width = count_rate_5_percent + '%';
-                    console.log(count_rate_5_percent_width); 
-                    $('#count_rate_sum_5').css("width", count_rate_5_percent_width);
-
-                    $('#count_4_star').text(data.count_rate_4);
-                    var count_rate_4_percent = data.count_rate_4_percent;
-                    var count_rate_4_percent_width = count_rate_4_percent + '%';
-                    console.log(count_rate_4_percent_width); 
-                    $('#count_rate_sum_4').css("width", count_rate_4_percent_width);
-
-                    $('#count_3_star').text(data.count_rate_3);
-                    var count_rate_3_percent = data.count_rate_3_percent;
-                    var count_rate_3_percent_width = count_rate_3_percent + '%';
-                    console.log(count_rate_3_percent_width); 
-                    $('#count_rate_sum_3').css("width", count_rate_3_percent_width);
-
-                    $('#count_2_star').text(data.count_rate_2);
-                    var count_rate_2_percent = data.count_rate_2_percent;
-                    var count_rate_2_percent_width = count_rate_2_percent + '%';
-                    console.log(count_rate_2_percent_width); 
-
-                    $('#count_rate_sum_2').css("width", count_rate_2_percent_width);
-
-                    $('#count_1_star').text(data.count_rate_1);
-                    var count_rate_1_percent = data.count_rate_1_percent;
-                    var count_rate_1_percent_width = count_rate_1_percent + '%';
-                    console.log(count_rate_1_percent_width); 
-
-                    $('#count_rate_sum_1').css("width", count_rate_1_percent_width);
-
-                    $('#rate_all_for_movie').text(data.rate_all_for_movie +'/5');
-
-                }
-                else{
-                    console.log('heelo world');
-                    $('#count_1_star').text(0);
-                    $('#count_2_star').text(0);
-                    $('#count_3_star').text(0);
-                    $('#count_4_star').text(0);
-                    $('#count_5_star').text(0);
-
-                    $('#count_rate_sum_5').css("width", "0%");
-                    $('#count_rate_sum_4').css("width", "0%");
-                    $('#count_rate_sum_3').css("width", "0%");
-                    $('#count_rate_sum_2').css("width", "0%");
-                    $('#count_rate_sum_1').css("width", "0%");
-                    $('#rate_all_for_movie').text('0/0');
-
-                }
-                
-
-               
-
-
-            });
-};
-
-get_breaking_rate();
-
-
-function show_block_reply(post_id){
-            event.preventDefault();
-            var id = '#block-reply-' + post_id;
-            $(id).toggle();
-        }
-
-$(document).on('submit', '.form-reply', function (event){
-                event.preventDefault();
-                //remember the form element
-                var $form = $(this);
-
-                // get dom by name
-                var $content = $form.find("input[name='reply-content']");
-                // get dome by id
-                var $postID = $form.find(".postID");
-
-                var content =  $form.find("input[name='reply-content']").val();
-                var postID =   $form.find("input[name='postID']").val();
-
-                console.log(content);
-                console.log(postID);
-
-                // now do ajax
-                $.ajax({
-                url: "{% url 'reply-review' %}",
-                type: 'POST',
-                datatype: 'json',
-                processData: "application/json",
-                data: {
-                    content: content,
-                    postID: postID,
-                    type: 'reply',
-                },
-                
-            }).done(function (data){
-                $content.val('');
-                console.log(data);
-                var id = '#list_reply_review' + data.review_id;
-                $(id).prepend(
-
-                    '<div class="media-body" style="padding-left: 10px" >'+
-                    '<div class="media-title mt-0 mb-1">' +
-                    '<a href="' + data.send_user_url + '">'+ data.send_user + '</a> <small> just now</small>'+
-                    '</div>' +
-                    '<div class ="reply-content" >'+
-                    data.content +
-                    '</div>' +
-                    '</div>')
-                    var countCommentID = '#count-comments' + data.review_id;
-                    $(countCommentID).html('(' +data.count_reply +')');
-
-                });
-            });
-
-function review(){
-        var content = $('#review-textarea').val();
+    function get_breaking_rate(){
         var movieid = '{{object.movieid}}';
-        var username = '{{ user.username }}';
-            console.log(content);
-
-            if (content == '') {
-                Swal.fire('Comments cannot be empty');
-                return
-            }
-            $.ajax({
-                type: "POST",
-                // bo sung dau gach cheo moi duoc
-                url: "{% url 'review-movie' %}",
-                data: {content: content, type : 'review', movieid: movieid, 'username':username},
-                processData: "application/json",
-                dataType: "json",
-
-            }).done(function (data) {
-                console.log(data);
-                location.reload();
-
-            });
-
-        };
-$(document).on('click', '#likeButton', function (event) {
-                event.preventDefault();
-                var postID  = $(this).find("input[name='likePostID']").val();
-                var likeID = '#count-likes' + postID
-
-                $.ajax({
-                    url : "{% url 'like-review'%}",
+        console.log(movieid);
+        $.ajax({
+                    url: "{% url 'get_data_rate' %}",
                     type: 'POST',
                     datatype: 'json',
                     processData: "application/json",
                     data: {
-                    postID: postID,
-                    type: 'like',
-                    status : 'True',
-                },
-            }).done(function (data) {
-                    if(data.type==-1){
-                        alert('erorr !');
+                        movieid: movieid,
+                    },
+                    
+                }).done(function (data){
+                    console.log(data.mess);
+                    if(data.mess=='oke'){
+                        $('#count_5_star').text(data.count_rate_5);
+                        var count_rate_5_percent = data.count_rate_5_percent;
+                        var count_rate_5_percent_width = count_rate_5_percent + '%';
+                        console.log(count_rate_5_percent_width); 
+                        $('#count_rate_sum_5').css("width", count_rate_5_percent_width);
+
+                        $('#count_4_star').text(data.count_rate_4);
+                        var count_rate_4_percent = data.count_rate_4_percent;
+                        var count_rate_4_percent_width = count_rate_4_percent + '%';
+                        console.log(count_rate_4_percent_width); 
+                        $('#count_rate_sum_4').css("width", count_rate_4_percent_width);
+
+                        $('#count_3_star').text(data.count_rate_3);
+                        var count_rate_3_percent = data.count_rate_3_percent;
+                        var count_rate_3_percent_width = count_rate_3_percent + '%';
+                        console.log(count_rate_3_percent_width); 
+                        $('#count_rate_sum_3').css("width", count_rate_3_percent_width);
+
+                        $('#count_2_star').text(data.count_rate_2);
+                        var count_rate_2_percent = data.count_rate_2_percent;
+                        var count_rate_2_percent_width = count_rate_2_percent + '%';
+                        console.log(count_rate_2_percent_width); 
+
+                        $('#count_rate_sum_2').css("width", count_rate_2_percent_width);
+
+                        $('#count_1_star').text(data.count_rate_1);
+                        var count_rate_1_percent = data.count_rate_1_percent;
+                        var count_rate_1_percent_width = count_rate_1_percent + '%';
+                        console.log(count_rate_1_percent_width); 
+
+                        $('#count_rate_sum_1').css("width", count_rate_1_percent_width);
+
+                        $('#rate_all_for_movie').text(data.rate_all_for_movie +'/5');
+
                     }
-                    else {
-                        // why with 1 id , count not run !!
-                        console.log(data.count_likes);
-                        if(data.count_likes == 0){
-                            $(likeID).text('');
-                        }
-                        else{
-                            $(likeID).text('('+data.count_likes+')');
-                        }
+                    else{
+                        console.log('heelo world');
+                        $('#count_1_star').text(0);
+                        $('#count_2_star').text(0);
+                        $('#count_3_star').text(0);
+                        $('#count_4_star').text(0);
+                        $('#count_5_star').text(0);
+
+                        $('#count_rate_sum_5').css("width", "0%");
+                        $('#count_rate_sum_4').css("width", "0%");
+                        $('#count_rate_sum_3').css("width", "0%");
+                        $('#count_rate_sum_2').css("width", "0%");
+                        $('#count_rate_sum_1').css("width", "0%");
+                        $('#rate_all_for_movie').text('0/0');
+
                     }
+                    
+
+                
 
 
                 });
-});
+    };
 
+    get_breaking_rate();
+
+
+    function show_block_reply(post_id){
+                event.preventDefault();
+                var id = '#block-reply-' + post_id;
+                $(id).toggle();
+            }
+
+    $(document).on('submit', '.form-reply', function (event){
+                    event.preventDefault();
+                    //remember the form element
+                    var $form = $(this);
+
+                    // get dom by name
+                    var $content = $form.find("input[name='reply-content']");
+                    // get dome by id
+                    var $postID = $form.find(".postID");
+
+                    var content =  $form.find("input[name='reply-content']").val();
+                    var postID =   $form.find("input[name='postID']").val();
+
+                    console.log(content);
+                    console.log(postID);
+
+                    // now do ajax
+                    $.ajax({
+                    url: "{% url 'reply-review' %}",
+                    type: 'POST',
+                    datatype: 'json',
+                    processData: "application/json",
+                    data: {
+                        content: content,
+                        postID: postID,
+                        type: 'reply',
+                    },
+                    
+                }).done(function (data){
+                    $content.val('');
+                    console.log(data);
+                    var id = '#list_reply_review' + data.review_id;
+                    $(id).prepend(
+
+                        '<div class="media-body" style="padding-left: 10px" >'+
+                        '<div class="media-title mt-0 mb-1">' +
+                        '<a href="' + data.send_user_url + '">'+ data.send_user + '</a> <small> just now</small>'+
+                        '</div>' +
+                        '<div class ="reply-content" >'+
+                        data.content +
+                        '</div>' +
+                        '</div>')
+                        var countCommentID = '#count-comments' + data.review_id;
+                        $(countCommentID).html('(' +data.count_reply +')');
+
+                    });
+                });
+
+    function review(){
+            var content = $('#review-textarea').val();
+            var movieid = '{{object.movieid}}';
+            var username = '{{ user.username }}';
+                console.log(content);
+
+                if (content == '') {
+                    Swal.fire('Comments cannot be empty');
+                    return
+                }
+                $.ajax({
+                    type: "POST",
+                    // bo sung dau gach cheo moi duoc
+                    url: "{% url 'review-movie' %}",
+                    data: {content: content, type : 'review', movieid: movieid, 'username':username},
+                    processData: "application/json",
+                    dataType: "json",
+
+                }).done(function (data) {
+                    console.log(data);
+                    location.reload();
+
+                });
+
+            };
+    $(document).on('click', '#likeButton', function (event) {
+                    event.preventDefault();
+                    var postID  = $(this).find("input[name='likePostID']").val();
+                    var likeID = '#count-likes' + postID
+
+                    $.ajax({
+                        url : "{% url 'like-review'%}",
+                        type: 'POST',
+                        datatype: 'json',
+                        processData: "application/json",
+                        data: {
+                        postID: postID,
+                        type: 'like',
+                        status : 'True',
+                    },
+                }).done(function (data) {
+                        if(data.type==-1){
+                            alert('erorr !');
+                        }
+                        else {
+                            // why with 1 id , count not run !!
+                            console.log(data.count_likes);
+                            if(data.count_likes == 0){
+                                $(likeID).text('');
+                            }
+                            else{
+                                $(likeID).text('('+data.count_likes+')');
+                            }
+                        }
+
+
+                    });
+    });
 
 </script>
 <script type="text/javascript">
