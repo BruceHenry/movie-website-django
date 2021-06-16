@@ -24,7 +24,7 @@ def add_seen(request, movie_id):
             weight = movie.weight
             movie.delete()
             # if user seen movie , popularity + 3
-            new_record = Popularity(movieid_id=movie_id, weight=weight + 3)
+            new_record = Popularity(movieid_id=movie_id, weight=weight + 2)
             new_record.save()
             new_record = Seen(movieid_id=movie_id, username=request.user.get_username())
             new_record.save()
@@ -358,7 +358,7 @@ def movie_detail(request, model, id):
         'items': items,'notifications' : notifications, 'count_noti':count_noti, 'review_form_flag':review_form_flag  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 
-    return render(request, 'movie_detail.html', {'users_tags': users_tags, 'dict_tag':dict_tag,
+    return render(request, 'movie_detail.html', {
     'items': items  ,'number': len(items), 'object': object , 'rate_score' : rate_score,'user':request.user, 'reviews':reviews})
 
 
