@@ -22,5 +22,5 @@ admin.site.register(Actor, ActorAdmin)
 # admin.site.register(ReplyToReview)
 # admin.site.register(MovieTags)
 
-admin.site.register(User_Search)
+# admin.site.register(User_Search)
 

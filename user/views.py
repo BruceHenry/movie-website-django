@@ -34,6 +34,7 @@ import operator
 import random
 from django.core.mail import send_mail
 
+from movie.models import User_Rate
 # UserModel = get_user_model()
 
 # Create your views here.
@@ -281,8 +282,47 @@ def user_detail_edit_profile(request):
         birthday = str(request.user.profile.birthday.year)+'-' +'{:02d}'.format(request.user.profile.birthday.month) +'-' + '{:02d}'.format(request.user.profile.birthday.day)
         return render(request, 'edit_detail_profile.html', {'user': request.user, 'birthday':birthday})
     return render(request, 'edit_detail_profile.html', {'user': request.user, 'birthday':''})
-    
 
+# jaccard_algo
+def getJaccardValue(set1, set2):
+    return len(set1.intersection(set2))/len(set1.union(set2))
+
+# get K user similarity with user     
+def getKSimilarityFriend(request):
+    # list user similarity
+    list_user = []
+    # mark , if k user similarity exits return 1, else .... 0
+    mark = 0
+    # neu chua co lich su --- random
+    nowUser = request.user
+    list_rates = User_Rate.objects.filter(user=nowUser)
+    if len(list_rates) <1 :
+        return (list_user, 0)
+    else:
+        set_movie1 = set() # set movie rate by nowUser
+        listUsersFollow = [] # list user now user dont follow
+        for rate in list_rates:
+            set_movie1.add(rate.movie.movieid)
+        # get list user now_user dont follow
+        for user in User.objects.all():
+            if check_follow(nowUser, user) is False and user != request.user:
+                listUsersFollow.append(user)
+        # find similarity user 
+        #print('list user dont follow', listUsersFollow)
+        for user in listUsersFollow:
+            set_movie_by_user = set()
+            for rate in User_Rate.objects.filter(user=user):
+                set_movie_by_user.add(rate.movie.movieid)
+            # end set_by_user
+            # calcuatle similarity by jaccard index 
+            jaccard_value = getJaccardValue(set_movie1, set_movie_by_user)
+            # print('jaccard_value ', jaccard_value)
+            if jaccard_value > 0.5:
+                list_user.append(user)
+    if len(list_user) > 0:
+        return (list_user, 1)
+    else:
+        return (list_user, 0)
 def check_follow(user1, user2):
     if len(Follow.objects.filter(user1 = user1, user2 = user2)) >0:
         return True
@@ -309,19 +349,37 @@ def comunity(request):
     data['activitys'] = activitys
     data['notifications'] = notifications
     data['count_noti'] = count_noti
-    # recommend friend here 
+    # recommend friend by follow here 
     recommend_follow = []
     recommend2 = []
+    list_user_similarity = getKSimilarityFriend(request)[0]
+    mark = getKSimilarityFriend(request)[1]
+    print('list user similarity', list_user_similarity)
+    print('cach 0 - Gioi thieu qua follow')
     for u1 in User.objects.all():
         if check_follow(request.user, u1) is False:
             if check_follow(u1, request.user) is True:
                 recommend_follow.append(u1)
+    # neu khong co thanh vien nao cung so thich
+    # cach 0
+    print('cach 2 Gioi thieu qua random')
     all_users = User.objects.all()
     all_users = [all_users[i] for i in random.sample(range(len(all_users)), 8)]
     for u3 in all_users:
         if u3 not in recommend_follow:
             if check_follow(request.user, u3) is False and u3.id != request.user.id:
                 recommend2.append(u3)
+    else:
+        print('cach 3 Gioi thieu qua thanh vien cung so thich')
+        # neu co thanh vien cung so thich
+        for u2 in list_user_similarity:
+            for u3 in User.objects.all():
+                if check_follow(u2, u3) is True:
+                    if u3 not in recommend_follow:
+                        recommend2.append(u3)
+
+
+
     
     data['recommend_random'] = recommend2[:6]
     data['recommend_follow'] = recommend_follow[:5]
