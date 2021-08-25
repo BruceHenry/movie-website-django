@@ -7,7 +7,7 @@ For the current version, the following features are implemented,
 - Login via Facebook (**OAuth** with Facebook API)
 - **Recommender** according to user's taste
 
-This website is deployed at [https://baohan08.pythonanywhere.com/](https://baohan08.pythonanywhere.com/).
+This website is deployed at [http://movie.hbao.blog](http://movie.hbao.blog).
 
 ***
 
